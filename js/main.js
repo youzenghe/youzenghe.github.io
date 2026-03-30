@@ -552,7 +552,7 @@ function initLive2DWidget() {
   document.body.classList.add('live2d-loading');
   window.L2Dwidget.init({
     model: {
-      jsonPath: 'https://unpkg.com/live2d-widget-model-haru/01/assets/haru01.model.json',
+      jsonPath: '/assets/live2d/haru/haru02.model.json',
     },
     display: {
       position: 'left',
