@@ -98,9 +98,47 @@
     .fav-item:hover { background: var(--glass-mid); }
     .fav-name { font-size: 0.82rem; margin-bottom: 0.15rem; }
     .fav-type { font-size: 0.68rem; color: var(--text-muted); }
+    .friend-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .friend-link-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text);
+      transition: transform var(--transition), background var(--transition), border-color var(--transition);
+    }
+    .friend-link-card:hover {
+      transform: translateY(-2px);
+      background: var(--glass-mid);
+      border-color: rgba(192,132,252,0.45);
+    }
+    .friend-link-main { min-width: 0; }
+    .friend-link-name { font-family: 'ZCOOL XiaoWei', serif; font-size: 1.05rem; margin-bottom: 0.2rem; }
+    .friend-link-url { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; word-break: break-word; }
+    .friend-link-badge {
+      flex-shrink: 0;
+      padding: 0.26rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(192,132,252,0.15);
+      border: 1px solid rgba(192,132,252,0.28);
+      color: var(--accent);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+    }
+    .about-content-block:has(.friend-links) > h2:first-of-type:not(:last-of-type) { display: none; }
     @media (max-width: 860px) {
       .about-layout { grid-template-columns: 1fr; }
       .about-card-main { position: static; }
+    }
+    @media (max-width: 560px) {
+      .friend-link-card {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -162,6 +200,21 @@
             <div class="fav-item"><div class="fav-name">与你心相连</div><div class="fav-type">AVG · 10/10</div></div>
             <div class="fav-item"><div class="fav-name">妹相随</div><div class="fav-type">SLG · 10/10</div></div>
             <div class="fav-item"><div class="fav-name">妹生活</div><div class="fav-type">SLG · 10/10</div></div>
+          </div>
+        </div>
+
+        <div class="about-content-block reveal">
+          <h2>成长时间线</h2>
+          <h2>友链交换</h2>
+          <p>如果你也在认真维护自己的博客，欢迎之后来交换友链。这里先放上目前已经加入的一位朋友。</p>
+          <div class="friend-links">
+            <a class="friend-link-card" href="https://blog.hitachi-mako.com" target="_blank" rel="noreferrer">
+              <div class="friend-link-main">
+                <div class="friend-link-name">Mako</div>
+                <div class="friend-link-url">blog.hitachi-mako.com</div>
+              </div>
+              <span class="friend-link-badge">Friend Link</span>
+            </a>
           </div>
         </div>
 
