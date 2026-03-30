@@ -15,6 +15,30 @@ let currentNavigationId = 0;
 let live2dReady = false;
 let live2dLoading = false;
 let pendingPageRunRaf = 0;
+let bgPrefetchUrl = '';
+let bgPrefetchPromise = null;
+
+function createBgUrl() {
+  return `https://www.loliapi.com/acg/?t=${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function preloadBg(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+function ensureNextBgPrefetch() {
+  if (bgPrefetchPromise) return bgPrefetchPromise;
+  bgPrefetchUrl = createBgUrl();
+  bgPrefetchPromise = preloadBg(bgPrefetchUrl)
+    .catch(() => '')
+    .finally(() => {});
+  return bgPrefetchPromise;
+}
 
 function getSiteConfig() {
   const { dataset } = document.body;
@@ -56,16 +80,29 @@ function loadBg(bgLayer, btn) {
   if (!bgLayer) return;
   if (btn) btn.classList.add('spinning');
 
-  const url = `https://www.loliapi.com/acg/?t=${Date.now()}`;
-  bgLayer.style.backgroundImage = `url('${url}')`;
-
-  const img = new Image();
-  img.onload = img.onerror = () => {
+  const applyAndPrefetch = (url) => {
+    if (url) {
+      bgLayer.style.backgroundImage = `url('${url}')`;
+      bgLayer.dataset.bgUrl = url;
+    }
+    bgPrefetchUrl = '';
+    bgPrefetchPromise = null;
+    ensureNextBgPrefetch();
     if (btn) {
       setTimeout(() => btn.classList.remove('spinning'), 400);
     }
   };
-  img.src = url;
+
+  if (bgPrefetchPromise) {
+    bgPrefetchPromise.then((url) => applyAndPrefetch(url || bgLayer.dataset.bgUrl || ''));
+    return;
+  }
+
+  const existingUrl = bgLayer.dataset.bgUrl || '';
+  const initialUrl = createBgUrl();
+  preloadBg(initialUrl)
+    .then((url) => applyAndPrefetch(url))
+    .catch(() => applyAndPrefetch(existingUrl));
 }
 
 function initParticles(canvasId) {
@@ -982,6 +1019,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loader')?.classList.add('hidden');
     }, 700);
     syncLive2DVisibility();
+    ensureNextBgPrefetch();
   });
 
   window.addEventListener('pagehide', markLive2DHidden);

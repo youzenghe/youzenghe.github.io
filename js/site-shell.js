@@ -84,7 +84,7 @@
           </span>
         </button>
         <div class="music-popover">
-          <div id="music-title" class="music-title">温馨</div>
+          <div id="music-title" class="music-title">要播放音乐嘛</div>
           <div id="music-status" class="music-status" aria-live="polite">等待播放</div>
         </div>
         <audio id="global-audio" preload="auto" playsinline src="${musicSrc}"></audio>
