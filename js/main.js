@@ -13,6 +13,7 @@ let currentPageCleanup = null;
 let currentNavigationId = 0;
 let live2dReady = false;
 let live2dLoading = false;
+let pendingPageRunRaf = 0;
 
 function getSiteConfig() {
   const { dataset } = document.body;
@@ -623,6 +624,10 @@ function registerPageModule(key, init) {
 }
 
 function teardownCurrentPageModule() {
+  if (pendingPageRunRaf) {
+    window.cancelAnimationFrame(pendingPageRunRaf);
+    pendingPageRunRaf = 0;
+  }
   if (typeof currentPageCleanup === 'function') {
     currentPageCleanup();
     currentPageCleanup = null;
@@ -812,8 +817,12 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
 
   await ensurePageScripts(doc);
   syncLive2DVisibility();
-  runCurrentPageModule();
   scrollToNavigationTarget(hash);
+
+  pendingPageRunRaf = window.requestAnimationFrame(() => {
+    pendingPageRunRaf = 0;
+    runCurrentPageModule();
+  });
 }
 
 function isSameDocumentHashNavigation(url) {
