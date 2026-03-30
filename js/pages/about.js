@@ -1,9 +1,15 @@
 window.SiteApp.registerPage('about', () => {
   const skills = document.getElementById('skills-list');
   const friendLinksContainer = document.getElementById('friend-links-list');
-  const friendLinks = window.SITE_DATA?.friendLinks || [];
 
-  if (friendLinksContainer) {
+  function renderFriendLinks() {
+    const friendLinks = window.SITE_DATA?.friendLinks || [];
+    if (!friendLinksContainer) return;
+    if (friendLinks.length === 0) {
+      // SITE_DATA 可能还没准备好，等下一帧再试一次
+      requestAnimationFrame(renderFriendLinks);
+      return;
+    }
     friendLinksContainer.innerHTML = friendLinks.map((item) => `
       <a class="friend-link-card" href="${item.url}" target="_blank" rel="noreferrer">
         <div class="friend-link-main">
@@ -14,6 +20,8 @@ window.SiteApp.registerPage('about', () => {
       </a>
     `).join('');
   }
+
+  renderFriendLinks();
 
   if (!skills) {
     initReveal();
