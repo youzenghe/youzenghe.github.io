@@ -8,6 +8,7 @@ const MUSIC_STORAGE_KEY = 'acg-blog:music-state';
 const MUSIC_SAVE_INTERVAL = 800;
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
+const PAGE_CACHE = new Map();
 
 let currentPageCleanup = null;
 let currentNavigationId = 0;
@@ -29,6 +30,12 @@ function getSiteConfig() {
 
 function resolvePagePath(path) {
   return `${getSiteConfig().rootPrefix}${path}`;
+}
+
+function normalizePageUrl(url) {
+  const next = new URL(url, location.href);
+  next.hash = '';
+  return next.href;
 }
 
 function getPageKey(url = location.href) {
@@ -814,6 +821,7 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   appContent.replaceChildren(...extractPageNodes(doc));
   document.getElementById('search-overlay')?.classList.remove('open');
   document.getElementById('mobile-menu')?.classList.remove('open');
+  loadBg(document.getElementById('bg-layer'));
 
   await ensurePageScripts(doc);
   syncLive2DVisibility();
@@ -823,6 +831,36 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
     pendingPageRunRaf = 0;
     runCurrentPageModule();
   });
+}
+
+async function fetchPageDocument(url) {
+  const cacheKey = normalizePageUrl(url);
+  if (PAGE_CACHE.has(cacheKey)) {
+    return PAGE_CACHE.get(cacheKey);
+  }
+
+  const response = await fetch(cacheKey, {
+    headers: {
+      'X-Requested-With': 'site-shell',
+    },
+  });
+  const html = await response.text();
+  if (!response.ok && !html) {
+    throw new Error(`Navigation failed: ${response.status}`);
+  }
+
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  PAGE_CACHE.set(cacheKey, doc);
+  return doc;
+}
+
+function prefetchPage(url) {
+  const targetUrl = new URL(url, location.href);
+  if (targetUrl.origin !== location.origin) return;
+  const cacheKey = normalizePageUrl(targetUrl.href);
+  if (PAGE_CACHE.has(cacheKey)) return;
+
+  fetchPageDocument(cacheKey).catch(() => {});
 }
 
 function isSameDocumentHashNavigation(url) {
@@ -863,18 +901,7 @@ async function navigateTo(url, options = {}) {
   const navigationId = ++currentNavigationId;
 
   try {
-    const response = await fetch(targetUrl.href, {
-      headers: {
-        'X-Requested-With': 'site-shell',
-      },
-    });
-
-    const html = await response.text();
-    if (!response.ok && !html) {
-      throw new Error(`Navigation failed: ${response.status}`);
-    }
-
-    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const doc = await fetchPageDocument(targetUrl.href);
     if (!doc.getElementById('site-shell-top') || !doc.getElementById('site-shell-bottom')) {
       location.assign(targetUrl.href);
       return;
@@ -902,8 +929,27 @@ function initRouter() {
     navigateTo(link.href);
   });
 
+  document.addEventListener('mouseover', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link) return;
+    prefetchPage(link.href);
+  });
+
+  document.addEventListener('touchstart', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link) return;
+    prefetchPage(link.href);
+  }, { passive: true });
+
   window.addEventListener('popstate', () => {
     navigateTo(location.href, { replaceHistory: true });
+  });
+
+  const idle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 300));
+  idle(() => {
+    document.querySelectorAll('a[href]').forEach((link) => {
+      prefetchPage(link.href);
+    });
   });
 }
 

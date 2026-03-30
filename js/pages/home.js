@@ -61,35 +61,90 @@ window.SiteApp.registerPage('home', () => {
     return el;
   }
 
-  function renderHomeCards() {
+  function renderHomeSections() {
     rafId = 0;
+    const secondary = document.getElementById('home-secondary');
+    if (!secondary) return;
 
-    const postsContainer = document.getElementById('home-posts');
-    if (postsContainer) {
-      postsContainer.innerHTML = '';
+    secondary.innerHTML = `
+      <div class="stats-bar reveal home-deferred" id="home-stats">
+        <div class="stat-item"><div class="stat-num">${POSTS.length}</div><div class="stat-label">篇文章</div></div>
+        <div class="stat-item"><div class="stat-num">${PROJECTS.length}</div><div class="stat-label">个项目</div></div>
+        <div class="stat-item"><div class="stat-num">${typeof GAMES !== 'undefined' ? GAMES.length : 0}</div><div class="stat-label">款游戏</div></div>
+        <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">热爱</div></div>
+      </div>
+      <section class="home-deferred">
+        <div class="glass-card reveal">
+          <div class="about-strip">
+            <div class="about-avatar"></div>
+            <div class="about-info">
+              <h2>你好，我是这个次元空间的主人 ✦</h2>
+              <p>一个沉迷于二次元世界的普通人。在这里分享我喜欢的动画、漫画与游戏，也记录平凡却珍贵的生活瞬间。</p>
+              <div class="about-tags">
+                <span class="tag">ACG 爱好者</span>
+                <span class="tag">编程爱好者</span>
+                <span class="tag">AI 爱好者</span>
+                <span class="tag">吃谷爱好者</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="home-deferred">
+        <div class="section-header">
+          <div class="section-header-row">
+            <div>
+              <div class="section-label">Latest Posts</div>
+              <div class="divider"></div>
+              <h2 class="section-title">最新文章</h2>
+            </div>
+            <a href="pages/posts.html" class="btn btn-ghost" style="align-self: flex-end;">查看全部 →</a>
+          </div>
+        </div>
+        <div class="posts-grid" id="home-posts"></div>
+      </section>
+      <section class="home-deferred">
+        <div class="section-header">
+          <div class="section-header-row">
+            <div>
+              <div class="section-label">Projects</div>
+              <div class="divider"></div>
+              <h2 class="section-title">最近的项目</h2>
+            </div>
+            <a href="pages/projects.html" class="btn btn-ghost" style="align-self: flex-end;">项目列表 →</a>
+          </div>
+        </div>
+        <div class="project-mini reveal" id="home-projects"></div>
+      </section>
+    `;
+
+    initReveal();
+
+    queueTask(() => {
+      const postsContainer = document.getElementById('home-posts');
+      if (!postsContainer) return;
       const fragment = document.createDocumentFragment();
       POSTS.slice(0, 3).forEach((post, index) => {
         fragment.appendChild(buildPostCard(post, index));
       });
-      postsContainer.appendChild(fragment);
+      postsContainer.replaceChildren(fragment);
       initReveal();
-    }
+    }, 60);
 
     queueTask(() => {
       const projectContainer = document.getElementById('home-projects');
       if (!projectContainer) return;
-      projectContainer.innerHTML = '';
       const fragment = document.createDocumentFragment();
       PROJECTS.slice(0, 4).forEach((project) => {
         fragment.appendChild(buildProjectCard(project));
       });
-      projectContainer.appendChild(fragment);
+      projectContainer.replaceChildren(fragment);
       initReveal();
-    }, 120);
+    }, 180);
   }
 
   rafId = window.requestAnimationFrame(() => {
-    queueTask(renderHomeCards, 16);
+    queueTask(renderHomeSections, 16);
   });
 
   return () => {
