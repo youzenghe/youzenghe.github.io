@@ -1039,6 +1039,7 @@ async function fetchPageDocument(url) {
     headers: {
       'X-Requested-With': 'site-shell',
     },
+    cache: 'no-store',
   });
   const html = await response.text();
   if (!response.ok && !html) {

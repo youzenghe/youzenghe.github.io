@@ -273,10 +273,20 @@ const GAMES = [
   },
 ];
 
+const FRIEND_LINKS = [
+  {
+    name: "Mako",
+    url: "https://blog.hitachi-mako.com",
+    displayUrl: "blog.hitachi-mako.com",
+    badge: "Friend Link",
+  },
+];
+
 const SITE_DATA = Object.freeze({
   posts: POSTS,
   projects: PROJECTS,
   games: GAMES,
+  friendLinks: FRIEND_LINKS,
 });
 
 window.SITE_DATA = SITE_DATA;
