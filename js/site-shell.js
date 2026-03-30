@@ -35,10 +35,15 @@
 
     return `
       <div id="loader">
-        <div class="loader-ring"></div>
+        <div class="loader-bar" aria-hidden="true">
+          <span class="loader-bar-fill"></span>
+        </div>
         <div class="loader-text">${config.loaderText}</div>
       </div>
-      <div id="bg-layer"></div>
+      <div id="bg-layer" data-active-pane="0">
+        <div class="bg-pane bg-pane-a is-active" data-bg-pane="0"></div>
+        <div class="bg-pane bg-pane-b" data-bg-pane="1"></div>
+      </div>
       <div id="bg-overlay"></div>
       <canvas id="particles"></canvas>
 

@@ -15,8 +15,11 @@ let currentNavigationId = 0;
 let live2dReady = false;
 let live2dLoading = false;
 let pendingPageRunRaf = 0;
-let bgPrefetchUrl = '';
-let bgPrefetchPromise = null;
+const BG_PREFETCH_POOL_SIZE = 3;
+const bgReadyQueue = [];
+const bgPendingUrls = new Set();
+let bgPoolFillPromise = null;
+let navigationPendingCount = 0;
 
 function createBgUrl() {
   return `https://www.loliapi.com/acg/?t=${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -25,19 +28,86 @@ function createBgUrl() {
 function preloadBg(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(url);
+    img.decoding = 'async';
+    img.fetchPriority = 'high';
+    img.onload = async () => {
+      try {
+        if (typeof img.decode === 'function') {
+          await img.decode();
+        }
+      } catch (error) {
+        // decode failure should not block a successfully loaded image
+      }
+      resolve({
+        url,
+        img,
+      });
+    };
     img.onerror = reject;
     img.src = url;
   });
 }
 
-function ensureNextBgPrefetch() {
-  if (bgPrefetchPromise) return bgPrefetchPromise;
-  bgPrefetchUrl = createBgUrl();
-  bgPrefetchPromise = preloadBg(bgPrefetchUrl)
-    .catch(() => '')
-    .finally(() => {});
-  return bgPrefetchPromise;
+function getNextBgCandidateUrl() {
+  let nextUrl = '';
+
+  while (!nextUrl || bgPendingUrls.has(nextUrl) || bgReadyQueue.some((item) => item.url === nextUrl)) {
+    nextUrl = createBgUrl();
+  }
+
+  return nextUrl;
+}
+
+function fillBgQueue() {
+  if (bgReadyQueue.length >= BG_PREFETCH_POOL_SIZE) {
+    return Promise.resolve(bgReadyQueue[0] || null);
+  }
+
+  if (bgPoolFillPromise) return bgPoolFillPromise;
+
+  const missingCount = BG_PREFETCH_POOL_SIZE - bgReadyQueue.length;
+  const tasks = Array.from({ length: missingCount }, () => {
+    const url = getNextBgCandidateUrl();
+    bgPendingUrls.add(url);
+
+    return preloadBg(url)
+      .then((readyBg) => {
+        if (!bgReadyQueue.some((item) => item.url === readyBg.url)) {
+          bgReadyQueue.push(readyBg);
+        }
+        return readyBg;
+      })
+      .catch(() => null)
+      .finally(() => {
+        bgPendingUrls.delete(url);
+      });
+  });
+
+  bgPoolFillPromise = Promise.all(tasks)
+    .then(() => bgReadyQueue[0] || null)
+    .finally(() => {
+      bgPoolFillPromise = null;
+      if (bgReadyQueue.length < BG_PREFETCH_POOL_SIZE && !bgPendingUrls.size) {
+        window.setTimeout(() => {
+          fillBgQueue().catch(() => {});
+        }, 0);
+      }
+    });
+
+  return bgPoolFillPromise;
+}
+
+async function takeNextBgUrl() {
+  if (bgReadyQueue.length) {
+    const nextUrl = bgReadyQueue.shift() || null;
+    fillBgQueue().catch(() => {});
+    return nextUrl;
+  }
+
+  await fillBgQueue().catch(() => null);
+  const nextUrl = bgReadyQueue.shift() || null;
+  fillBgQueue().catch(() => {});
+  return nextUrl;
 }
 
 function getSiteConfig() {
@@ -50,6 +120,18 @@ function getSiteConfig() {
     footerHtml: dataset.footerHtml || '',
     loaderText: dataset.loaderText || '加载中...',
   };
+}
+
+function showNavigationLoader() {
+  navigationPendingCount += 1;
+  document.getElementById('loader')?.classList.remove('hidden');
+}
+
+function hideNavigationLoader() {
+  navigationPendingCount = Math.max(0, navigationPendingCount - 1);
+  if (navigationPendingCount === 0) {
+    document.getElementById('loader')?.classList.add('hidden');
+  }
 }
 
 function resolvePagePath(path) {
@@ -76,33 +158,108 @@ function getPageKey(url = location.href) {
   return '';
 }
 
+function getBgPanes(bgLayer) {
+  if (!bgLayer) {
+    return {
+      activePane: null,
+      inactivePane: null,
+      activeIndex: 0,
+      nextIndex: 1,
+    };
+  }
+
+  const panes = Array.from(bgLayer.querySelectorAll('[data-bg-pane]'));
+  const activeIndex = Number(bgLayer.dataset.activePane || 0) === 1 ? 1 : 0;
+  const nextIndex = activeIndex === 0 ? 1 : 0;
+
+  return {
+    activePane: panes[activeIndex] || null,
+    inactivePane: panes[nextIndex] || null,
+    activeIndex,
+    nextIndex,
+  };
+}
+
+function setPaneImage(pane, readyBg) {
+  if (!pane || !readyBg?.img) return;
+
+  pane.replaceChildren();
+  const paneImg = readyBg.img.cloneNode(false);
+  paneImg.className = 'bg-pane-media';
+  paneImg.alt = '';
+  paneImg.decoding = 'async';
+  paneImg.draggable = false;
+  paneImg.dataset.bgUrl = readyBg.url;
+  pane.appendChild(paneImg);
+}
+
+function swapBgPane(bgLayer, readyBg) {
+  const { activePane, inactivePane, nextIndex } = getBgPanes(bgLayer);
+  const url = readyBg?.url || '';
+  if (!inactivePane) {
+    if (activePane && url) {
+      setPaneImage(activePane, readyBg);
+      activePane.dataset.bgUrl = url;
+    }
+    bgLayer.dataset.bgUrl = url || '';
+    return url;
+  }
+
+  setPaneImage(inactivePane, readyBg);
+  inactivePane.dataset.bgUrl = url;
+
+  window.requestAnimationFrame(() => {
+    inactivePane.classList.add('is-active');
+    activePane?.classList.remove('is-active');
+    bgLayer.dataset.activePane = String(nextIndex);
+    bgLayer.dataset.bgUrl = url;
+
+    window.setTimeout(() => {
+      if (activePane && !activePane.classList.contains('is-active')) {
+        activePane.replaceChildren();
+        activePane.dataset.bgUrl = '';
+      }
+    }, 700);
+  });
+
+  return url;
+}
+
 function loadBg(bgLayer, btn) {
   if (!bgLayer) return;
   if (btn) btn.classList.add('spinning');
 
-  const applyAndPrefetch = (url) => {
-    if (url) {
-      bgLayer.style.backgroundImage = `url('${url}')`;
-      bgLayer.dataset.bgUrl = url;
-    }
-    bgPrefetchUrl = '';
-    bgPrefetchPromise = null;
-    ensureNextBgPrefetch();
+  const finishButton = () => {
     if (btn) {
-      setTimeout(() => btn.classList.remove('spinning'), 400);
+      window.setTimeout(() => btn.classList.remove('spinning'), 400);
     }
   };
 
-  if (bgPrefetchPromise) {
-    bgPrefetchPromise.then((url) => applyAndPrefetch(url || bgLayer.dataset.bgUrl || ''));
-    return;
-  }
+  const applyAndRefill = (url) => {
+    if (url?.url) {
+      swapBgPane(bgLayer, url);
+    }
+    fillBgQueue().catch(() => {});
+    finishButton();
+    return url?.url || '';
+  };
 
   const existingUrl = bgLayer.dataset.bgUrl || '';
-  const initialUrl = createBgUrl();
-  preloadBg(initialUrl)
-    .then((url) => applyAndPrefetch(url))
-    .catch(() => applyAndPrefetch(existingUrl));
+  return takeNextBgUrl()
+    .then((readyBg) => {
+      if (readyBg?.url) {
+        return applyAndRefill(readyBg);
+      }
+
+      const fallbackUrl = getNextBgCandidateUrl();
+      return preloadBg(fallbackUrl)
+        .then((fallbackBg) => applyAndRefill(fallbackBg))
+        .catch(() => applyAndRefill(existingUrl));
+    })
+    .catch(() => {
+      finishButton();
+      return existingUrl;
+    });
 }
 
 function initParticles(canvasId) {
@@ -854,11 +1011,13 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   applyPageHead(doc);
   applyShellConfig();
 
+  const bgReady = loadBg(document.getElementById('bg-layer'));
+  await Promise.resolve(bgReady);
+
   const appContent = ensureAppContentRoot();
   appContent.replaceChildren(...extractPageNodes(doc));
   document.getElementById('search-overlay')?.classList.remove('open');
   document.getElementById('mobile-menu')?.classList.remove('open');
-  loadBg(document.getElementById('bg-layer'));
 
   await ensurePageScripts(doc);
   syncLive2DVisibility();
@@ -936,6 +1095,7 @@ async function navigateTo(url, options = {}) {
   }
 
   const navigationId = ++currentNavigationId;
+  showNavigationLoader();
 
   try {
     const doc = await fetchPageDocument(targetUrl.href);
@@ -951,6 +1111,8 @@ async function navigateTo(url, options = {}) {
     });
   } catch (error) {
     location.assign(targetUrl.href);
+  } finally {
+    hideNavigationLoader();
   }
 }
 
@@ -998,8 +1160,9 @@ window.SiteApp = {
 
 document.addEventListener('DOMContentLoaded', () => {
   const bgLayer = document.getElementById('bg-layer');
+  let initialBgPromise = Promise.resolve('');
   if (bgLayer) {
-    loadBg(bgLayer);
+    initialBgPromise = Promise.resolve(loadBg(bgLayer));
   }
 
   ensureAppContentRoot();
@@ -1013,13 +1176,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initMusicPlayer();
   applyShellConfig();
   initRouter();
+  fillBgQueue().catch(() => {});
 
   window.addEventListener('load', () => {
-    setTimeout(() => {
+    Promise.all([
+      initialBgPromise.catch(() => ''),
+      new Promise((resolve) => window.setTimeout(resolve, 700)),
+    ]).finally(() => {
       document.getElementById('loader')?.classList.add('hidden');
-    }, 700);
-    syncLive2DVisibility();
-    ensureNextBgPrefetch();
+      syncLive2DVisibility();
+      fillBgQueue().catch(() => {});
+    });
   });
 
   window.addEventListener('pagehide', markLive2DHidden);
