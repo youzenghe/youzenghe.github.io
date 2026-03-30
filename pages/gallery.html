@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>相册 · 次元日记</title>
+  <meta name="description" content="浏览次元日记的相册内容，包括插画、周边、截图与生活瞬间。" />
+  <meta name="theme-color" content="#120b18" />
+  <link rel="icon" type="image/png" href="../assets/avatar.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js"></script>
+  <style>
+    .gallery-page { padding-bottom: 6rem; }
+    .page-hero { padding: 7rem 0 3rem; }
+    .track-section { margin-bottom: 2.8rem; overflow: hidden; position: relative; }
+    .track-section::before,
+    .track-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 80px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .track-section::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg, #120b18), transparent);
+    }
+    .track-section::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg, #120b18), transparent);
+    }
+    .track {
+      display: flex;
+      gap: 12px;
+      width: max-content;
+      will-change: transform;
+      cursor: grab;
+    }
+    .track:active { cursor: grabbing; }
+    .photo-card {
+      flex-shrink: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s;
+      cursor: pointer;
+    }
+    .photo-card:hover {
+      transform: scale(1.04) translateY(-4px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.45);
+      z-index: 10;
+    }
+    .photo-card img {
+      display: block;
+      height: 220px;
+      width: auto;
+      max-width: 320px;
+      min-width: 120px;
+      object-fit: contain;
+      background: transparent;
+    }
+    .track-row-2 .photo-card img { height: 180px; }
+    .track-row-3 .photo-card img { height: 250px; }
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: rgba(8, 4, 14, 0.93);
+      backdrop-filter: blur(16px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      animation: lbFadeIn 0.22s ease;
+    }
+    @keyframes lbFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #lightbox.open { display: flex; }
+    .lb-inner { position: relative; max-width: min(90vw, 900px); text-align: center; }
+    .lb-img-wrap {
+      position: relative;
+      display: inline-block;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    }
+    .lb-img-wrap img {
+      display: block;
+      max-width: 88vw;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .lb-img-wrap .lb-bg {
+      position: absolute;
+      inset: -12px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(24px) brightness(0.4) saturate(1.4);
+      transform: scale(1.08);
+      z-index: 0;
+    }
+    .lb-img-wrap img { position: relative; z-index: 1; }
+    .lb-close {
+      position: absolute;
+      top: -2.8rem;
+      right: 0;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 1.6rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .lb-close:hover { color: #fff; }
+    .lb-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.3rem;
+      transition: background 0.2s;
+    }
+    .lb-nav:hover { background: rgba(255,255,255,0.2); }
+    .lb-prev { left: -3.2rem; }
+    .lb-next { right: -3.2rem; }
+    .pause-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      padding: 0.4rem 1.2rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .pause-hint.show { opacity: 1; }
+    @media (max-width: 600px) {
+      .photo-card img { height: 150px; max-width: 240px; }
+      .track-row-2 .photo-card img { height: 130px; }
+      .track-row-3 .photo-card img { height: 170px; }
+      .lb-prev { left: -1.5rem; }
+      .lb-next { right: -1.5rem; }
+    }
+  </style>
+</head>
+<body data-root-prefix="../" data-active-nav="gallery" data-loader-text="加载相册中...">
+  <div id="site-shell-top"></div>
+
+  <div id="lightbox">
+    <div class="lb-inner">
+      <button class="lb-close" id="lb-close" type="button">✕</button>
+      <button class="lb-nav lb-prev" id="lb-prev" type="button">←</button>
+      <div class="lb-img-wrap" id="lb-img-wrap">
+        <div class="lb-bg" id="lb-bg"></div>
+        <img id="lb-img" src="" alt="" />
+      </div>
+      <button class="lb-nav lb-next" id="lb-next" type="button">→</button>
+    </div>
+  </div>
+
+  <div class="pause-hint" id="pause-hint">已暂停 · 点击空白处继续</div>
+
+  <div class="site-wrapper gallery-page">
+    <div class="page-hero reveal">
+      <div class="section-label">Gallery</div>
+      <h1>相册</h1>
+      <p>用图片记录走过的每一段路，悬停或点击都可以放大查看。</p>
+    </div>
+
+    <div class="track-section" id="section-1"><div class="track track-row-1" id="track-1"></div></div>
+    <div class="track-section" id="section-2"><div class="track track-row-2" id="track-2"></div></div>
+    <div class="track-section" id="section-3"><div class="track track-row-3" id="track-3"></div></div>
+  </div>
+
+  <div id="site-shell-bottom"></div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/pages/gallery.js"></script>
+</body>
+</html>

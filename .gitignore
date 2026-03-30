@@ -1,0 +1,26 @@
+# OS / Explorer
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local-only helper files
+鸣潮启动.bat
+
+# Unused original image sources
+assets/game1.png
+assets/posts/*.jpg
+assets/projects/*.png

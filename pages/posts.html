@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>文章 · 次元日记</title>
+  <meta name="description" content="浏览次元日记的全部文章内容，按分类、标签与推荐内容快速查找。" />
+  <meta name="theme-color" content="#120b18" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="文章 · 次元日记" />
+  <meta property="og:description" content="浏览次元日记的全部文章内容，按分类、标签与推荐内容快速查找。" />
+  <meta property="og:image" content="../assets/avatar.png" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="文章 · 次元日记" />
+  <meta name="twitter:description" content="浏览次元日记的全部文章内容，按分类、标签与推荐内容快速查找。" />
+  <meta name="twitter:image" content="../assets/avatar.png" />
+  <link rel="icon" type="image/png" href="../assets/avatar.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js"></script>
+  <style>
+    .posts-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 2.5rem;
+      padding-bottom: 5rem;
+      align-items: start;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
+    }
+    .filter-btn {
+      padding: 0.3rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--sakura-deep);
+      color: #fff;
+      border-color: transparent;
+    }
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .post-list-card {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 1.2rem;
+      padding: 1.2rem;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      transition: transform 0.25s, box-shadow 0.25s;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .post-list-card:hover {
+      transform: translateX(6px);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    .plc-thumb {
+      width: 100px;
+      height: 100px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(249,168,201,0.15), rgba(192,132,252,0.15));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .plc-thumb .img-bg {
+      position: absolute;
+      inset: -6px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(12px) brightness(0.55) saturate(1.2);
+      transform: scale(1.05);
+    }
+    .plc-thumb img {
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .plc-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-family: 'Raleway', sans-serif;
+    }
+    .plc-cat {
+      padding: 0.12rem 0.5rem;
+      border-radius: 1rem;
+      background: var(--glass);
+    }
+    .plc-title {
+      font-family: 'ZCOOL XiaoWei', serif;
+      font-size: 1rem;
+      line-height: 1.4;
+      margin-bottom: 0.4rem;
+    }
+    .plc-excerpt {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .plc-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.6rem;
+    }
+    .plc-tag {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 1rem;
+      background: var(--glass);
+      color: var(--text-muted);
+    }
+
+    .sidebar-widget {
+      margin-bottom: 1.5rem;
+      padding: 1.3rem;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius);
+    }
+    .sw-title {
+      font-family: 'ZCOOL XiaoWei', serif;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .sw-tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .sw-tag {
+      padding: 0.25rem 0.7rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .sw-tag:hover {
+      color: var(--sakura);
+      border-color: var(--sakura-deep);
+    }
+    .sw-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .sw-list a {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      text-decoration: none;
+    }
+    .sw-list a:hover { color: var(--sakura); }
+    .sw-list-num {
+      flex-shrink: 0;
+      width: 1.2rem;
+      height: 1.2rem;
+      border-radius: 50%;
+      background: var(--glass);
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.05rem;
+    }
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+    .no-results span {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 0.8rem;
+    }
+
+    @media (max-width: 860px) {
+      .posts-layout { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
+    }
+    @media (max-width: 560px) {
+      .post-list-card {
+        grid-template-columns: 70px 1fr;
+        gap: 0.8rem;
+        padding: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body data-root-prefix="../" data-active-nav="posts" data-loader-text="加载中...">
+  <div id="site-shell-top"></div>
+
+  <div class="site-wrapper">
+    <div class="page-hero reveal">
+      <div class="section-label">Blog</div>
+      <h1>文章</h1>
+      <p>这里存放着我的荣誉证明与趣味生活，一些认真走过的痕迹，也有一些让自己发笑的瞬间。</p>
+    </div>
+
+    <div class="posts-layout">
+      <main>
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-btn active" data-cat="全部">全部</button>
+          <button class="filter-btn" data-cat="荣誉证明">🏆 荣誉证明</button>
+          <button class="filter-btn" data-cat="趣味生活">🌸 趣味生活</button>
+        </div>
+        <div class="posts-list" id="posts-list"></div>
+      </main>
+
+      <aside class="sidebar">
+        <div class="sidebar-widget reveal">
+          <div class="sw-title">热门文章</div>
+          <div class="sw-list" id="sw-popular"></div>
+        </div>
+        <div class="sidebar-widget reveal reveal-delay-1">
+          <div class="sw-title">标签云</div>
+          <div class="sw-tag-cloud" id="sw-tags"></div>
+        </div>
+        <div class="sidebar-widget reveal reveal-delay-2">
+          <div class="sw-title">分类统计</div>
+          <div id="sw-cats"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="site-shell-bottom"></div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/pages/posts.js"></script>
+</body>
+</html>

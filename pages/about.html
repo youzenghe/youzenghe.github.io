@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>关于我 · 次元日记</title>
+  <meta name="description" content="了解次元日记的作者、兴趣爱好、技能与个人成长时间线。" />
+  <meta name="theme-color" content="#120b18" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="关于我 · 次元日记" />
+  <meta property="og:description" content="了解次元日记的作者、兴趣爱好、技能与个人成长时间线。" />
+  <meta property="og:image" content="../assets/avatar.png" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="关于我 · 次元日记" />
+  <meta name="twitter:description" content="了解次元日记的作者、兴趣爱好、技能与个人成长时间线。" />
+  <meta name="twitter:image" content="../assets/avatar.png" />
+  <link rel="icon" type="image/png" href="../assets/avatar.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js"></script>
+  <style>
+    .about-layout { display: grid; grid-template-columns: 300px 1fr; gap: 3rem; padding-bottom: 5rem; align-items: start; }
+    .about-card-main {
+      padding: 2rem;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      text-align: center;
+      position: sticky;
+      top: 90px;
+    }
+    .avatar-wrap {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-image: url('../assets/avatar.png');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin: 0 auto 1.2rem;
+      position: relative;
+    }
+    .avatar-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--sakura-deep), var(--accent), var(--accent2));
+      z-index: -1;
+      opacity: 0.4;
+      filter: blur(12px);
+    }
+    .avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px dashed rgba(192,132,252,0.4);
+      animation: spin 8s linear infinite;
+    }
+    .acm-name { font-family: 'ZCOOL XiaoWei', serif; font-size: 1.5rem; margin-bottom: 0.3rem; }
+    .acm-handle { color: var(--accent); font-size: 0.8rem; letter-spacing: 0.08em; margin-bottom: 1rem; }
+    .acm-bio { font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 1.5rem; }
+    .acm-socials { display: flex; flex-direction: column; gap: 0.5rem; }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.55rem 1rem;
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .social-link:hover { background: var(--glass-mid); color: var(--text); }
+    .acm-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-bottom: 1.2rem; }
+    .about-content-block { margin-bottom: 2.5rem; }
+    .about-content-block h2 { font-family: 'ZCOOL XiaoWei', serif; font-size: 1.4rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .about-content-block p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.9; margin-bottom: 0.8rem; }
+    .skill-item { margin-bottom: 0.9rem; }
+    .skill-top { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.3rem; }
+    .skill-bar { height: 5px; background: var(--glass-border); border-radius: 2px; overflow: hidden; }
+    .skill-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--sakura-deep), var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform 1s ease; }
+    .tl { position: relative; padding-left: 2rem; }
+    .tl::before { content: ''; position: absolute; left: 0.4rem; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--sakura-deep), var(--accent), transparent); }
+    .tl-item { position: relative; padding-bottom: 1.8rem; }
+    .tl-item::before { content: ''; position: absolute; left: -1.7rem; top: 0.35rem; width: 10px; height: 10px; border-radius: 50%; background: var(--sakura-deep); border: 2px solid var(--accent); box-shadow: 0 0 8px rgba(192,132,252,0.5); }
+    .tl-date { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; font-family: 'Raleway', sans-serif; font-weight: 700; margin-bottom: 0.25rem; }
+    .tl-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 1rem; margin-bottom: 0.2rem; }
+    .tl-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+    .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem; }
+    .fav-item { padding: 0.9rem 1rem; border-radius: var(--radius-sm); background: var(--glass); border: 1px solid var(--glass-border); transition: background var(--transition); }
+    .fav-item:hover { background: var(--glass-mid); }
+    .fav-name { font-size: 0.82rem; margin-bottom: 0.15rem; }
+    .fav-type { font-size: 0.68rem; color: var(--text-muted); }
+    @media (max-width: 860px) {
+      .about-layout { grid-template-columns: 1fr; }
+      .about-card-main { position: static; }
+    }
+  </style>
+</head>
+<body data-root-prefix="../" data-active-nav="about" data-loader-text="加载中...">
+  <div id="site-shell-top"></div>
+
+  <div class="site-wrapper">
+    <div class="page-hero reveal">
+      <div class="section-label">About Me</div>
+      <h1>关于我</h1>
+      <p>一个在次元世界里找到快乐与温暖的普通人。</p>
+    </div>
+
+    <div class="about-layout">
+      <aside class="about-card-main reveal">
+        <div class="avatar-wrap">
+          <div class="avatar-ring"></div>
+        </div>
+        <div class="acm-name">次元日记</div>
+        <div class="acm-handle">@youzenghe</div>
+        <div class="acm-bio">动画 · 游戏 · 生活<br>在这里记录与二次元相关的一切。</div>
+        <div class="acm-tags">
+          <span class="tag">ACG</span>
+          <span class="tag">吃谷</span>
+          <span class="tag">写代码</span>
+        </div>
+        <div class="acm-socials">
+          <a class="social-link" href="https://github.com/youzenghe" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="social-link" href="https://space.bilibili.com/220928497" target="_blank" rel="noreferrer">Bilibili</a>
+          <a class="social-link" href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=2442616509@qq.com" target="_blank" rel="noreferrer">邮件联系</a>
+        </div>
+      </aside>
+
+      <main>
+        <div class="about-content-block reveal">
+          <h2>你好，</h2>
+          <p>我是这个博客的主人，一个在次元世界里找到快乐与温暖的普通人。欢迎来到我的自留地。</p>
+          <p>这里是属于我的 ACG 空间。我会在这里写游戏感想、吃谷推荐，以及偶尔夹带一点生活碎片。</p>
+          <p>博客的名字“次元日记”，意在把每一天与二次元相关的小故事都记录下来，哪怕只是看了一集很打动自己的动画，也值得被认真对待。</p>
+        </div>
+
+        <div class="about-content-block reveal">
+          <h2>技能与爱好</h2>
+          <div id="skills-list">
+            <div class="skill-item"><div class="skill-top"><span>编程</span><span>99%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.99"></div></div></div>
+            <div class="skill-item"><div class="skill-top"><span>使用 AI</span><span>92%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.92"></div></div></div>
+            <div class="skill-item"><div class="skill-top"><span>玩 Gal</span><span>85%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.85"></div></div></div>
+            <div class="skill-item"><div class="skill-top"><span>写文章</span><span>78%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.78"></div></div></div>
+            <div class="skill-item"><div class="skill-top"><span>吃谷</span><span>95%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.95"></div></div></div>
+          </div>
+        </div>
+
+        <div class="about-content-block reveal">
+          <h2>最喜欢的游戏</h2>
+          <div class="fav-grid">
+            <div class="fav-item"><div class="fav-name">常轨脱离 Creative</div><div class="fav-type">AVG · 10/10</div></div>
+            <div class="fav-item"><div class="fav-name">夏日口袋</div><div class="fav-type">AVG · 10/10</div></div>
+            <div class="fav-item"><div class="fav-name">甜蜜女友 2</div><div class="fav-type">AVG · 10/10</div></div>
+            <div class="fav-item"><div class="fav-name">与你心相连</div><div class="fav-type">AVG · 10/10</div></div>
+            <div class="fav-item"><div class="fav-name">妹相随</div><div class="fav-type">SLG · 10/10</div></div>
+            <div class="fav-item"><div class="fav-name">妹生活</div><div class="fav-type">SLG · 10/10</div></div>
+          </div>
+        </div>
+
+        <div class="about-content-block reveal">
+          <h2>成长时间线</h2>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-date">2026 · 春</div><div class="tl-title">博客正式上线</div><div class="tl-body">终于有了属于自己的次元角落，用文字记录每一段旅程。</div></div>
+            <div class="tl-item"><div class="tl-date">2025 · 秋</div><div class="tl-title">拿下国一</div><div class="tl-body">凭自己的实力拿下第一个国家级一等奖。</div></div>
+            <div class="tl-item"><div class="tl-date">2024 · 夏</div><div class="tl-title">考上大学</div><div class="tl-body">开始系统学习编程，并深入使用 AI。</div></div>
+            <div class="tl-item"><div class="tl-date">2023 · 春</div><div class="tl-title">第一次认真接触 Gal</div><div class="tl-body">因为 Gal 爱上了被故事打动的感觉。</div></div>
+            <div class="tl-item"><div class="tl-date">2022 · 秋</div><div class="tl-title">开始系统追番</div><div class="tl-body">从此打开了看番的大门，一发不可收拾。</div></div>
+            <div class="tl-item"><div class="tl-date">2020 · 春</div><div class="tl-title">入坑二次元</div><div class="tl-body">因为一部动画踏进了这个让人上头的世界。</div></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="site-shell-bottom"></div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/pages/about.js"></script>
+</body>
+</html>

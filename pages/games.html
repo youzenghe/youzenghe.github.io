@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的游戏作品 · 次元日记</title>
+  <meta name="description" content="查看次元日记收录的个人游戏作品、项目简介与下载入口。" />
+  <meta name="theme-color" content="#120b18" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="我的游戏作品 · 次元日记" />
+  <meta property="og:description" content="查看次元日记收录的个人游戏作品、项目简介与下载入口。" />
+  <meta property="og:image" content="../assets/game1.webp" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="我的游戏作品 · 次元日记" />
+  <meta name="twitter:description" content="查看次元日记收录的个人游戏作品、项目简介与下载入口。" />
+  <meta name="twitter:image" content="../assets/game1.webp" />
+  <link rel="icon" type="image/png" href="../assets/avatar.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js"></script>
+  <style>
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.8rem;
+      margin-top: 2rem;
+    }
+    .game-card {
+      display: block;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      color: var(--text);
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px var(--shadow);
+    }
+    .game-card-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, rgba(249,168,201,0.1), rgba(192,132,252,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-card-img img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .game-card-body { padding: 1.3rem; }
+    .game-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+      font-family: 'Raleway', sans-serif;
+    }
+    .game-category {
+      padding: 0.15rem 0.6rem;
+      border-radius: 1rem;
+      font-size: 0.68rem;
+      background: var(--glass);
+      color: var(--sakura);
+    }
+    .game-title {
+      font-family: 'ZCOOL XiaoWei', serif;
+      font-size: 1.15rem;
+      line-height: 1.4;
+      margin-bottom: 0.6rem;
+    }
+    .game-description {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .game-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--glass-border);
+      padding-top: 0.8rem;
+    }
+    .game-download {
+      color: var(--sakura);
+      font-weight: 600;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(18,11,24,0.9);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      width: min(90vw, 800px);
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-family: 'ZCOOL XiaoWei', serif;
+      font-size: 1.4rem;
+      margin: 0;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background var(--transition);
+    }
+    .modal-close:hover { background: var(--glass); }
+    .modal-body { padding: 1.5rem; }
+    .modal-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, rgba(249,168,201,0.1), rgba(192,132,252,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      margin-bottom: 1.2rem;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .modal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .modal-description {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .modal-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .detail-item { display: flex; flex-direction: column; }
+    .detail-label {
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+      font-family: 'Raleway', sans-serif;
+    }
+    .detail-value { font-size: 0.9rem; color: var(--text); }
+    .modal-download-btn {
+      display: block;
+      width: 100%;
+      padding: 0.8rem 1.5rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--sakura-deep), var(--accent));
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 1rem;
+    }
+    .modal-download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(192,132,252,0.5);
+    }
+    @media (max-width: 680px) {
+      .games-grid { grid-template-columns: 1fr; }
+      .modal-content { width: 95vw; margin: 2rem; }
+    }
+  </style>
+</head>
+<body data-root-prefix="../" data-active-nav="games" data-loader-text="加载次元世界中...">
+  <div id="site-shell-top"></div>
+
+  <div class="site-wrapper">
+    <section class="page-hero reveal">
+      <h1>我的游戏作品</h1>
+      <p>这里展示了我个人开发的游戏项目。每一款都倾注了我的热情与创意，点击卡片可以查看详情并下载体验。</p>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <div class="section-header-row">
+          <div>
+            <div class="section-label">My Games</div>
+            <div class="divider"></div>
+            <h2 class="section-title">游戏作品集</h2>
+          </div>
+        </div>
+      </div>
+      <div class="games-grid" id="games-container"></div>
+    </section>
+  </div>
+
+  <div class="modal" id="game-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-game-title">游戏标题</h2>
+        <button class="modal-close" id="modal-close" type="button">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-image" id="modal-game-image">🎮</div>
+        <p class="modal-description" id="modal-game-description">游戏描述</p>
+        <div class="modal-details">
+          <div class="detail-item"><span class="detail-label">类型</span><span class="detail-value" id="modal-game-type">游戏类型</span></div>
+          <div class="detail-item"><span class="detail-label">平台</span><span class="detail-value" id="modal-game-platform">游戏平台</span></div>
+          <div class="detail-item"><span class="detail-label">发布时间</span><span class="detail-value" id="modal-game-date">发布日期</span></div>
+          <div class="detail-item"><span class="detail-label">状态</span><span class="detail-value" id="modal-game-status">开发状态</span></div>
+        </div>
+        <a href="#" class="modal-download-btn" id="modal-download-link" target="_blank" rel="noreferrer">百度网盘下载</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-shell-bottom"></div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/pages/games.js"></script>
+</body>
+</html>
