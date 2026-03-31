@@ -625,7 +625,7 @@ function readMusicState() {
     const raw = localStorage.getItem(MUSIC_STORAGE_KEY);
     if (!raw) {
       return {
-        playing: true,
+        playing: false,
         currentTime: 0,
       };
     }
@@ -637,7 +637,7 @@ function readMusicState() {
     };
   } catch (error) {
     return {
-      playing: true,
+      playing: false,
       currentTime: 0,
     };
   }
@@ -669,7 +669,6 @@ function initMusicPlayer() {
   if (!player || !audio || !toggle || !status || player.dataset.inited === 'true') return;
   player.dataset.inited = 'true';
 
-  const state = readMusicState();
   let lastSavedAt = 0;
   let unlockHandlersBound = false;
 
@@ -805,10 +804,6 @@ function initMusicPlayer() {
   syncButton();
   syncProgress();
 
-  if (state.playing) {
-    setStatus('正在恢复播放...');
-    tryPlay();
-  }
 }
 
 function registerCurrentScripts() {
