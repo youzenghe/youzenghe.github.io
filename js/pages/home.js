@@ -6,15 +6,6 @@ window.SiteApp.registerPage('home', () => {
   );
 
   let rafId = 0;
-  let timeoutIds = [];
-
-  function queueTask(callback, delay = 0) {
-    const id = window.setTimeout(() => {
-      timeoutIds = timeoutIds.filter((item) => item !== id);
-      callback();
-    }, delay);
-    timeoutIds.push(id);
-  }
 
   function buildPostCard(post, index) {
     const el = document.createElement('a');
@@ -120,39 +111,35 @@ window.SiteApp.registerPage('home', () => {
 
     initReveal();
 
-    queueTask(() => {
-      const postsContainer = document.getElementById('home-posts');
-      if (!postsContainer) return;
-      const fragment = document.createDocumentFragment();
+    const postsContainer = document.getElementById('home-posts');
+    if (postsContainer) {
+      const postsFragment = document.createDocumentFragment();
       POSTS.slice(0, 3).forEach((post, index) => {
-        fragment.appendChild(buildPostCard(post, index));
+        postsFragment.appendChild(buildPostCard(post, index));
       });
-      postsContainer.replaceChildren(fragment);
+      postsContainer.replaceChildren(postsFragment);
       initReveal();
-    }, 60);
+    }
 
-    queueTask(() => {
-      const projectContainer = document.getElementById('home-projects');
-      if (!projectContainer) return;
-      const fragment = document.createDocumentFragment();
+    const projectContainer = document.getElementById('home-projects');
+    if (projectContainer) {
+      const projectFragment = document.createDocumentFragment();
       PROJECTS.slice(0, 4).forEach((project) => {
-        fragment.appendChild(buildProjectCard(project));
+        projectFragment.appendChild(buildProjectCard(project));
       });
-      projectContainer.replaceChildren(fragment);
+      projectContainer.replaceChildren(projectFragment);
       initReveal();
-    }, 180);
+    }
   }
 
   rafId = window.requestAnimationFrame(() => {
-    queueTask(renderHomeSections, 16);
+    renderHomeSections();
   });
 
   return () => {
     if (rafId) {
       window.cancelAnimationFrame(rafId);
     }
-    timeoutIds.forEach((id) => window.clearTimeout(id));
-    timeoutIds = [];
     if (typeof stopTypewriter === 'function') {
       stopTypewriter();
     }

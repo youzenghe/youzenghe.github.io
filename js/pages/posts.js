@@ -1,7 +1,8 @@
 window.SiteApp.registerPage('posts', () => {
-  function renderCard(post, simple = false) {
+  function renderCard(post, simple = false, index = 0) {
+    const eagerImage = index < 2;
     const thumbContent = post.cover
-      ? `<div class="img-bg" style="background-image:url('${post.cover}')"></div><img src="${post.cover}" alt="${post.title}" />`
+      ? `<div class="img-bg" style="background-image:url('${post.cover}')"></div><img src="${post.cover}" alt="${post.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async"${index === 0 ? ' fetchpriority="high"' : ''} />`
       : post.emoji;
     const tags = simple ? '' : `<div class="plc-tags">${post.tags.map((tag) => `<span class="plc-tag">#${tag}</span>`).join('')}</div>`;
     const readMeta = simple ? '' : `<span>· ${post.readTime} min</span>`;
@@ -36,7 +37,7 @@ window.SiteApp.registerPage('posts', () => {
       el.className = 'post-list-card reveal';
       el.style.transitionDelay = `${index * 0.07}s`;
       el.href = `post.html?id=${post.id}`;
-      el.innerHTML = renderCard(post, simple);
+      el.innerHTML = renderCard(post, simple, index);
       container.appendChild(el);
     });
 

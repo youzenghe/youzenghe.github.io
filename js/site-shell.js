@@ -92,7 +92,7 @@
           <div id="music-title" class="music-title">要播放音乐嘛</div>
           <div id="music-status" class="music-status" aria-live="polite">等待播放</div>
         </div>
-        <audio id="global-audio" preload="auto" playsinline src="${musicSrc}"></audio>
+        <audio id="global-audio" preload="none" playsinline src="${musicSrc}"></audio>
       </div>
     `;
   }

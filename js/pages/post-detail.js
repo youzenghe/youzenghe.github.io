@@ -36,7 +36,7 @@ window.SiteApp.registerPage('post-detail', () => {
   const cover = document.getElementById('post-cover');
   if (cover) {
     cover.innerHTML = post.cover
-      ? `<div class="img-bg" style="background-image:url('${post.cover}')"></div><img src="${post.cover}" alt="文章封面" />`
+      ? `<div class="img-bg" style="background-image:url('${post.cover}')"></div><img src="${post.cover}" alt="文章封面" loading="eager" decoding="async" fetchpriority="high" />`
       : post.emoji;
   }
 

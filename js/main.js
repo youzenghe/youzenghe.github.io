@@ -141,6 +141,9 @@ function resolvePagePath(path) {
 function normalizePageUrl(url) {
   const next = new URL(url, location.href);
   next.hash = '';
+  if (/\/index\.html$/i.test(next.pathname)) {
+    next.pathname = next.pathname.replace(/\/index\.html$/i, '/');
+  }
   return next.href;
 }
 
@@ -1006,9 +1009,6 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   applyPageHead(doc);
   applyShellConfig();
 
-  const bgReady = loadBg(document.getElementById('bg-layer'));
-  await Promise.resolve(bgReady);
-
   const appContent = ensureAppContentRoot();
   appContent.replaceChildren(...extractPageNodes(doc));
   document.getElementById('search-overlay')?.classList.remove('open');
@@ -1017,6 +1017,9 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   await ensurePageScripts(doc);
   syncLive2DVisibility();
   scrollToNavigationTarget(hash);
+
+  // Keep route transitions responsive: update background asynchronously.
+  Promise.resolve(loadBg(document.getElementById('bg-layer'))).catch(() => {});
 
   pendingPageRunRaf = window.requestAnimationFrame(() => {
     pendingPageRunRaf = 0;
@@ -1034,7 +1037,6 @@ async function fetchPageDocument(url) {
     headers: {
       'X-Requested-With': 'site-shell',
     },
-    cache: 'no-store',
   });
   const html = await response.text();
   if (!response.ok && !html) {
@@ -1136,15 +1138,23 @@ function initRouter() {
     prefetchPage(link.href);
   }, { passive: true });
 
+  document.addEventListener('focusin', (event) => {
+    const link = event.target.closest?.('a[href]');
+    if (!link) return;
+    prefetchPage(link.href);
+  });
+
   window.addEventListener('popstate', () => {
     navigateTo(location.href, { replaceHistory: true });
   });
 
   const idle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 300));
   idle(() => {
-    document.querySelectorAll('a[href]').forEach((link) => {
-      prefetchPage(link.href);
+    const navLinks = new Set();
+    document.querySelectorAll('nav a[href], #mobile-menu a[href]').forEach((link) => {
+      navLinks.add(link.href);
     });
+    navLinks.forEach((href) => prefetchPage(href));
   });
 }
 

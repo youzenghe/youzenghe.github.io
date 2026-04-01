@@ -14,7 +14,10 @@ window.SiteApp.registerPage('games', () => {
         openGameModal(game);
       });
 
-      const imageContent = game.image ? `<img src="${game.image}" alt="${game.title}">` : game.previewEmoji;
+      const eagerImage = index < 2;
+      const imageContent = game.image
+        ? `<img src="${game.image}" alt="${game.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async"${index === 0 ? ' fetchpriority="high"' : ''}>`
+        : game.previewEmoji;
       card.innerHTML = `
         <div class="game-card-img">${imageContent}</div>
         <div class="game-card-body">
@@ -44,7 +47,7 @@ window.SiteApp.registerPage('games', () => {
     document.getElementById('modal-game-status').textContent = game.status;
     document.getElementById('modal-download-link').href = game.downloadLink;
     document.getElementById('modal-game-image').innerHTML = game.image
-      ? `<img src="${game.image}" alt="${game.title}">`
+      ? `<img src="${game.image}" alt="${game.title}" decoding="async">`
       : game.previewEmoji;
 
     document.getElementById('game-modal').style.display = 'flex';
