@@ -161,7 +161,7 @@ const POSTS = [
 const PROJECTS = [
   {
     id: 1,
-    title: "LegalMind",
+    title: "智审云枢",
     desc: "面向法律学习与应用场景打造的智能法律辅助平台，聚焦法律知识整合、文本理解与案例分析，致力于提升法律信息获取与应用效率。",
     cat: "AI / 法律科技",
     tech: ["Vue", "Python", "NLP", "法律知识库"],
