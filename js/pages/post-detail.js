@@ -1,4 +1,5 @@
 window.SiteApp.registerPage('post-detail', () => {
+  const absoluteBase = 'https://yzh1019.top';
   const params = new URLSearchParams(location.search);
   const id = parseInt(params.get('id'), 10) || 1;
   const post = POSTS.find((item) => item.id === id) || POSTS[0];
@@ -11,14 +12,59 @@ window.SiteApp.registerPage('post-detail', () => {
     }
   }
 
+  function toAbsoluteAssetUrl(path) {
+    if (!path) return `${absoluteBase}/assets/avatar.png`;
+    return `${absoluteBase}/${path.replace(/^\.\.\//, '')}`;
+  }
+
+  function stripHtml(html) {
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return temp.textContent?.replace(/\s+/g, ' ').trim() || '';
+  }
+
   document.title = `${post.title} · 次元日记`;
   setMeta('meta[name="description"]', 'content', post.excerpt);
+  setMeta('meta[property="og:url"]', 'content', `https://yzh1019.top/pages/post.html?id=${post.id}`);
   setMeta('meta[property="og:title"]', 'content', `${post.title} · 次元日记`);
   setMeta('meta[property="og:description"]', 'content', post.excerpt);
-  setMeta('meta[property="og:image"]', 'content', post.cover || '../assets/avatar.png');
+  setMeta('meta[property="og:image"]', 'content', toAbsoluteAssetUrl(post.cover));
+  setMeta('meta[property="og:image:alt"]', 'content', `${post.title} 的文章封面`);
   setMeta('meta[name="twitter:title"]', 'content', `${post.title} · 次元日记`);
   setMeta('meta[name="twitter:description"]', 'content', post.excerpt);
-  setMeta('meta[name="twitter:image"]', 'content', post.cover || '../assets/avatar.png');
+  setMeta('meta[name="twitter:image"]', 'content', toAbsoluteAssetUrl(post.cover));
+  setMeta('meta[name="twitter:image:alt"]', 'content', `${post.title} 的文章封面`);
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) {
+    canonical.href = `https://yzh1019.top/pages/post.html?id=${post.id}`;
+  }
+  const structuredData = document.getElementById('post-structured-data');
+  if (structuredData) {
+    structuredData.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: post.title,
+      articleSection: post.cat,
+      keywords: post.tags.join(', '),
+      datePublished: post.date,
+      dateModified: post.date,
+      timeRequired: `PT${post.readTime}M`,
+      description: post.excerpt,
+      image: toAbsoluteAssetUrl(post.cover),
+      url: `https://yzh1019.top/pages/post.html?id=${post.id}`,
+      author: {
+        '@type': 'Person',
+        name: '次元日记',
+        url: `${absoluteBase}/pages/about.html`,
+      },
+      publisher: {
+        '@type': 'Person',
+        name: '次元日记',
+        url: `${absoluteBase}/pages/about.html`,
+      },
+      articleBody: stripHtml(post.content),
+    });
+  }
 
   const header = document.getElementById('post-header');
   if (header) {

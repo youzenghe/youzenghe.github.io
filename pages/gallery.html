@@ -6,9 +6,23 @@
   <title>相册 · 次元日记</title>
   <meta name="description" content="浏览次元日记的相册内容，包括插画、周边、截图与生活瞬间。" />
   <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/gallery.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://yzh1019.top/pages/gallery.html" />
+  <meta property="og:site_name" content="次元日记" />
+  <meta property="og:title" content="相册 · 次元日记" />
+  <meta property="og:description" content="浏览次元日记的相册内容，包括插画、周边、截图与生活瞬间。" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta property="og:image:alt" content="次元日记相册页代表封面" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="相册 · 次元日记" />
+  <meta name="twitter:description" content="浏览次元日记的相册内容，包括插画、周边、截图与生活瞬间。" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta name="twitter:image:alt" content="次元日记相册页代表封面" />
   <link rel="icon" type="image/png" href="../assets/avatar.png" />
   <link rel="stylesheet" href="../css/main.css" />
-  <script src="../js/site-shell.js"></script>
+  <script src="../js/site-shell.js" defer></script>
   <style>
     .gallery-page { padding-bottom: 6rem; }
     .page-hero { padding: 7rem 0 3rem; }
@@ -172,8 +186,9 @@
 <body data-root-prefix="../" data-active-nav="gallery" data-loader-text="加载相册中...">
   <div id="site-shell-top"></div>
 
-  <div id="lightbox">
+  <div id="lightbox" role="dialog" aria-modal="true" aria-labelledby="gallery-lightbox-title" aria-hidden="true">
     <div class="lb-inner">
+      <h2 id="gallery-lightbox-title" class="sr-only">相册大图预览</h2>
       <button class="lb-close" id="lb-close" type="button">✕</button>
       <button class="lb-nav lb-prev" id="lb-prev" type="button">←</button>
       <div class="lb-img-wrap" id="lb-img-wrap">
@@ -186,7 +201,7 @@
 
   <div class="pause-hint" id="pause-hint">已暂停 · 点击空白处继续</div>
 
-  <div class="site-wrapper gallery-page">
+  <main class="site-wrapper gallery-page" id="main-content" tabindex="-1">
     <div class="page-hero reveal">
       <div class="section-label">Gallery</div>
       <h1>相册</h1>
@@ -196,12 +211,12 @@
     <div class="track-section" id="section-1"><div class="track track-row-1" id="track-1"></div></div>
     <div class="track-section" id="section-2"><div class="track track-row-2" id="track-2"></div></div>
     <div class="track-section" id="section-3"><div class="track track-row-3" id="track-3"></div></div>
-  </div>
+  </main>
 
   <div id="site-shell-bottom"></div>
 
-  <script src="../js/data.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/pages/gallery.js"></script>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/gallery.js" defer></script>
 </body>
 </html>

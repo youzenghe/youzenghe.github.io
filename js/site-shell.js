@@ -34,6 +34,7 @@
     const navLinks = renderNavLinks(config.rootPrefix, config.activeNav);
 
     return `
+      <a class="skip-link" href="#main-content">跳到主要内容</a>
       <div id="loader">
         <div class="loader-bar" aria-hidden="true">
           <span class="loader-bar-fill"></span>
@@ -47,8 +48,9 @@
       <div id="bg-overlay"></div>
       <canvas id="particles"></canvas>
 
-      <div id="search-overlay">
+      <div id="search-overlay" role="dialog" aria-modal="true" aria-labelledby="search-title">
         <div class="search-box">
+          <h2 id="search-title" class="sr-only">站内搜索</h2>
           <div class="search-input-row">
             <span>🔍</span>
             <input id="search-input" type="text" placeholder="${config.searchPlaceholder}" autocomplete="off" />
@@ -58,16 +60,16 @@
         </div>
       </div>
 
-      <nav>
+      <nav aria-label="主导航">
         <a id="site-logo" class="nav-logo" href="${pageHref(config.rootPrefix, 'index.html')}">✦ 次元日记</a>
         <div class="nav-center">${navLinks}</div>
         <div class="nav-right">
-          <button class="nav-icon-btn search-trigger" type="button" title="搜索">🔍</button>
-          <button class="nav-icon-btn theme-toggle" type="button" title="切换主题">☀️</button>
+          <button class="nav-icon-btn search-trigger" type="button" title="搜索" aria-label="打开站内搜索">🔍</button>
+          <button class="nav-icon-btn theme-toggle" type="button" title="切换主题" aria-label="切换明暗主题">☀️</button>
         </div>
         <button class="nav-toggle" id="nav-toggle" type="button" aria-label="打开菜单">☰</button>
       </nav>
-      <div class="mobile-menu" id="mobile-menu">${navLinks}</div>
+      <div class="mobile-menu" id="mobile-menu" aria-label="移动端导航">${navLinks}</div>
     `;
   }
 

@@ -6,18 +6,42 @@
   <title>关于我 · 次元日记</title>
   <meta name="description" content="了解次元日记的作者、兴趣爱好、技能与个人成长时间线。" />
   <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/about.html" />
+  <meta property="og:url" content="https://yzh1019.top/pages/about.html" />
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="次元日记" />
   <meta property="og:title" content="关于我 · 次元日记" />
   <meta property="og:description" content="了解次元日记的作者、兴趣爱好、技能与个人成长时间线。" />
-  <meta property="og:image" content="../assets/avatar.png" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta property="og:image:alt" content="次元日记作者头像" />
   <meta property="og:locale" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="关于我 · 次元日记" />
   <meta name="twitter:description" content="了解次元日记的作者、兴趣爱好、技能与个人成长时间线。" />
-  <meta name="twitter:image" content="../assets/avatar.png" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta name="twitter:image:alt" content="次元日记作者头像" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      "url": "https://yzh1019.top/pages/about.html",
+      "name": "关于我 · 次元日记",
+      "mainEntity": {
+        "@type": "Person",
+        "name": "次元日记",
+        "alternateName": "@youzenghe",
+        "description": "动画、游戏、生活记录博客作者。",
+        "image": "https://yzh1019.top/assets/avatar.webp",
+        "sameAs": [
+          "https://github.com/youzenghe",
+          "https://space.bilibili.com/220928497"
+        ]
+      }
+    }
+  </script>
   <link rel="icon" type="image/png" href="../assets/avatar.png" />
   <link rel="stylesheet" href="../css/main.css" />
-  <script src="../js/site-shell.js"></script>
+  <script src="../js/site-shell.js" defer></script>
   <style>
     .about-layout { display: grid; grid-template-columns: 300px 1fr; gap: 3rem; padding-bottom: 5rem; align-items: start; }
     .about-card-main {
@@ -34,7 +58,7 @@
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      background-image: url('../assets/avatar.png');
+      background-image: url('../assets/avatar.webp');
       background-size: cover;
       background-position: center;
       display: flex;
@@ -144,7 +168,7 @@
 <body data-root-prefix="../" data-active-nav="about" data-loader-text="加载中...">
   <div id="site-shell-top"></div>
 
-  <div class="site-wrapper">
+  <main class="site-wrapper" id="main-content" tabindex="-1">
     <div class="page-hero reveal">
       <div class="section-label">About Me</div>
       <h1>关于我</h1>
@@ -171,7 +195,7 @@
         </div>
       </aside>
 
-      <main>
+      <div>
         <div class="about-content-block reveal">
           <h2>你好，</h2>
           <p>我是这个博客的主人，一个在次元世界里找到快乐与温暖的普通人。欢迎来到我的自留地。</p>
@@ -219,14 +243,14 @@
             <div class="tl-item"><div class="tl-date">2020 · 春</div><div class="tl-title">入坑二次元</div><div class="tl-body">因为一部动画踏进了这个让人上头的世界。</div></div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
-  </div>
+  </main>
 
   <div id="site-shell-bottom"></div>
 
-  <script src="../js/data.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/pages/about.js"></script>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/about.js" defer></script>
 </body>
 </html>

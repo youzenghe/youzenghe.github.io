@@ -10,6 +10,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 ROOT = Path(__file__).resolve().parents[1]
 
 RULES = [
+    ("assets/avatar.png", 640, 80),
     ("assets/projects/*.png", 1600, 82),
     ("assets/posts/*.jpg", 1200, 82),
     ("assets/game1.png", 1600, 82),

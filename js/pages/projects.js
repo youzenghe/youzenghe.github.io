@@ -1,4 +1,5 @@
 window.SiteApp.registerPage('projects', () => {
+  const absoluteBase = 'https://yzh1019.top';
   const awardClassMap = {
     gold: 'award-gold',
     silver: 'award-silver',
@@ -8,6 +9,33 @@ window.SiteApp.registerPage('projects', () => {
   const allCategories = ['全部', ...new Set(PROJECTS.map((project) => project.cat))];
   let currentProjectList = [];
   let projectLightboxIndex = 0;
+  let previousActiveElement = null;
+
+  function updateStructuredData() {
+    const script = document.getElementById('projects-structured-data');
+    if (!script) return;
+
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      url: `${absoluteBase}/pages/projects.html`,
+      name: '项目列表 · 次元日记',
+      description: '查看次元日记的项目作品、参赛经历、技术栈与成果展示。',
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: PROJECTS.map((project, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'CreativeWork',
+            name: project.title,
+            description: project.desc,
+            image: project.img ? `${absoluteBase}/${project.img.replace(/^\.\.\//, '')}` : undefined,
+          },
+        })),
+      },
+    });
+  }
 
   function renderProjectTabs(active) {
     const el = document.getElementById('tabs-el');
@@ -102,13 +130,20 @@ window.SiteApp.registerPage('projects', () => {
   }
 
   function openProjectLightbox(index) {
+    previousActiveElement = document.activeElement;
     projectLightboxIndex = index;
     renderProjectLightbox();
-    document.getElementById('lightbox').classList.add('open');
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.getElementById('lb-close')?.focus();
   }
 
   function closeProjectLightbox() {
-    document.getElementById('lightbox').classList.remove('open');
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    previousActiveElement?.focus?.();
   }
 
   function onKeyDown(event) {
@@ -143,6 +178,7 @@ window.SiteApp.registerPage('projects', () => {
   renderProjectStats();
   renderProjectTabs('全部');
   renderProjectGrid('全部');
+  updateStructuredData();
 
   return () => {
     closeProjectLightbox();

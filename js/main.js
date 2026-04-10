@@ -4,32 +4,57 @@
 
 const PAGE_SCRIPT_RE = /\/js\/pages\/[^/]+\.js(?:\?.*)?$/i;
 const PAGE_STYLE_ATTR = 'data-page-style';
+const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
 const MUSIC_STORAGE_KEY = 'acg-blog:music-state';
 const MUSIC_SAVE_INTERVAL = 800;
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+const LOW_DATA_CONNECTIONS = new Set(['slow-2g', '2g']);
 
 let currentPageCleanup = null;
 let currentNavigationId = 0;
 let live2dReady = false;
 let live2dLoading = false;
+let live2dIdleScheduled = false;
 let pendingPageRunRaf = 0;
-const BG_PREFETCH_POOL_SIZE = 3;
 const bgReadyQueue = [];
 const bgPendingUrls = new Set();
 let bgPoolFillPromise = null;
 let navigationPendingCount = 0;
 
+function prefersReducedMotion() {
+  return window.matchMedia?.(REDUCED_MOTION_QUERY).matches || false;
+}
+
+function prefersDataSaver() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  return Boolean(connection?.saveData || LOW_DATA_CONNECTIONS.has(connection?.effectiveType));
+}
+
+function getBgPrefetchPoolSize() {
+  if (prefersReducedMotion() || prefersDataSaver()) return 1;
+  return 2;
+}
+
+function requestIdleWork(callback, timeout = 1200) {
+  const run = window.requestIdleCallback;
+  if (typeof run === 'function') {
+    return run(callback, { timeout });
+  }
+  return window.setTimeout(callback, Math.min(timeout, 300));
+}
+
 function createBgUrl() {
   return `https://www.loliapi.com/acg/?t=${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function preloadBg(url) {
+function preloadBg(url, priority = 'auto') {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.decoding = 'async';
-    img.fetchPriority = 'high';
+    img.fetchPriority = priority;
     img.onload = async () => {
       try {
         if (typeof img.decode === 'function') {
@@ -59,18 +84,19 @@ function getNextBgCandidateUrl() {
 }
 
 function fillBgQueue() {
-  if (bgReadyQueue.length >= BG_PREFETCH_POOL_SIZE) {
+  const poolSize = getBgPrefetchPoolSize();
+  if (bgReadyQueue.length >= poolSize) {
     return Promise.resolve(bgReadyQueue[0] || null);
   }
 
   if (bgPoolFillPromise) return bgPoolFillPromise;
 
-  const missingCount = BG_PREFETCH_POOL_SIZE - bgReadyQueue.length;
+  const missingCount = poolSize - bgReadyQueue.length;
   const tasks = Array.from({ length: missingCount }, () => {
     const url = getNextBgCandidateUrl();
     bgPendingUrls.add(url);
 
-    return preloadBg(url)
+    return preloadBg(url, 'low')
       .then((readyBg) => {
         if (!bgReadyQueue.some((item) => item.url === readyBg.url)) {
           bgReadyQueue.push(readyBg);
@@ -87,7 +113,7 @@ function fillBgQueue() {
     .then(() => bgReadyQueue[0] || null)
     .finally(() => {
       bgPoolFillPromise = null;
-      if (bgReadyQueue.length < BG_PREFETCH_POOL_SIZE && !bgPendingUrls.size) {
+      if (bgReadyQueue.length < getBgPrefetchPoolSize() && !bgPendingUrls.size) {
         window.setTimeout(() => {
           fillBgQueue().catch(() => {});
         }, 0);
@@ -272,6 +298,8 @@ function initParticles(canvasId) {
 
   const ctx = canvas.getContext('2d');
   const particles = [];
+  const reducedMotionQuery = window.matchMedia?.(REDUCED_MOTION_QUERY) || null;
+  let rafId = 0;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -295,13 +323,14 @@ function initParticles(canvasId) {
   resize();
   window.addEventListener('resize', resize);
 
-  for (let i = 0; i < 28; i += 1) {
+  const particleCount = window.innerWidth <= 768 ? 16 : 24;
+  for (let i = 0; i < particleCount; i += 1) {
     const particle = createParticle();
     particle.y = Math.random() * canvas.height;
     particles.push(particle);
   }
 
-  function draw() {
+  function drawFrame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     particles.forEach((particle, index) => {
@@ -323,11 +352,51 @@ function initParticles(canvasId) {
       ctx.fill();
       ctx.restore();
     });
-
-    requestAnimationFrame(draw);
   }
 
-  draw();
+  function stopLoop() {
+    if (!rafId) return;
+    window.cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+
+  function startLoop() {
+    if (rafId || document.hidden || prefersReducedMotion()) {
+      drawFrame();
+      return;
+    }
+
+    const tick = () => {
+      rafId = 0;
+      if (document.hidden || prefersReducedMotion()) {
+        drawFrame();
+        return;
+      }
+
+      drawFrame();
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopLoop();
+      return;
+    }
+    startLoop();
+  });
+  reducedMotionQuery?.addEventListener?.('change', () => {
+    if (prefersReducedMotion()) {
+      stopLoop();
+      drawFrame();
+      return;
+    }
+    startLoop();
+  });
+
+  startLoop();
 }
 
 function initReveal() {
@@ -576,26 +645,37 @@ function initLive2DWidget() {
 }
 
 function initLive2D() {
-  if (!getSiteConfig().live2d || window.innerWidth <= 768 || live2dLoading) return;
+  if (!getSiteConfig().live2d || window.innerWidth <= 768 || live2dLoading || live2dIdleScheduled) return;
 
   if (window.L2Dwidget) {
     initLive2DWidget();
     return;
   }
 
-  live2dLoading = true;
-  document.body.classList.add('live2d-loading');
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/live2d-widget@3.0.4/lib/L2Dwidget.min.js';
-  script.onload = () => {
-    live2dLoading = false;
-    initLive2DWidget();
-  };
-  script.onerror = () => {
-    live2dLoading = false;
-    document.body.classList.remove('live2d-loading');
-  };
-  document.body.appendChild(script);
+  live2dIdleScheduled = true;
+  requestIdleWork(() => {
+    live2dIdleScheduled = false;
+    if (!getSiteConfig().live2d || window.innerWidth <= 768 || live2dReady || live2dLoading) return;
+
+    if (window.L2Dwidget) {
+      initLive2DWidget();
+      return;
+    }
+
+    live2dLoading = true;
+    document.body.classList.add('live2d-loading');
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/live2d-widget@3.0.4/lib/L2Dwidget.min.js';
+    script.onload = () => {
+      live2dLoading = false;
+      initLive2DWidget();
+    };
+    script.onerror = () => {
+      live2dLoading = false;
+      document.body.classList.remove('live2d-loading');
+    };
+    document.body.appendChild(script);
+  }, 1800);
 }
 
 function syncLive2DVisibility() {
@@ -622,7 +702,6 @@ function syncLive2DVisibility() {
 
   initLive2D();
 }
-
 function readMusicState() {
   try {
     const raw = localStorage.getItem(MUSIC_STORAGE_KEY);
@@ -913,9 +992,15 @@ function applyPageHead(doc) {
   document.title = doc.title;
 
   document.head.querySelectorAll(`style[${PAGE_STYLE_ATTR}]`).forEach((styleEl) => styleEl.remove());
+  document.head.querySelectorAll(`script[${PAGE_HEAD_JSON_LD_ATTR}]`).forEach((scriptEl) => scriptEl.remove());
   doc.head.querySelectorAll('style').forEach((styleEl) => {
     const clone = styleEl.cloneNode(true);
     clone.setAttribute(PAGE_STYLE_ATTR, 'true');
+    document.head.appendChild(clone);
+  });
+  doc.head.querySelectorAll('script[type="application/ld+json"]').forEach((scriptEl) => {
+    const clone = scriptEl.cloneNode(true);
+    clone.setAttribute(PAGE_HEAD_JSON_LD_ATTR, 'true');
     document.head.appendChild(clone);
   });
 
@@ -923,14 +1008,19 @@ function applyPageHead(doc) {
     'meta[name="description"]',
     'meta[name="theme-color"]',
     'meta[property="og:type"]',
+    'meta[property="og:site_name"]',
+    'meta[property="og:url"]',
     'meta[property="og:title"]',
     'meta[property="og:description"]',
     'meta[property="og:image"]',
+    'meta[property="og:image:alt"]',
     'meta[property="og:locale"]',
     'meta[name="twitter:card"]',
     'meta[name="twitter:title"]',
     'meta[name="twitter:description"]',
     'meta[name="twitter:image"]',
+    'meta[name="twitter:image:alt"]',
+    'link[rel="canonical"]',
     'link[rel="icon"]',
   ];
 
@@ -1148,14 +1238,13 @@ function initRouter() {
     navigateTo(location.href, { replaceHistory: true });
   });
 
-  const idle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 300));
-  idle(() => {
+  requestIdleWork(() => {
     const navLinks = new Set();
     document.querySelectorAll('nav a[href], #mobile-menu a[href]').forEach((link) => {
       navLinks.add(link.href);
     });
     navLinks.forEach((href) => prefetchPage(href));
-  });
+  }, 1000);
 }
 
 window.SiteApp = {

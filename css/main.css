@@ -55,6 +55,33 @@ body {
   overflow-x: hidden;
   transition: background var(--transition), color var(--transition);
 }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 1200;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: var(--ink-2);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  transform: translateY(-140%);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
 a { text-decoration: none; color: inherit; }
 img { display: block; max-width: 100%; }
 ul { list-style: none; }
@@ -700,7 +727,7 @@ footer a { color: var(--sakura); }
   height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--sakura-deep), var(--accent));
-  background-image: url('../assets/avatar.png');
+  background-image: url('../assets/avatar.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -821,6 +848,12 @@ footer a { color: var(--sakura); }
 @media (max-width: 480px) {
   .site-wrapper { padding: 0 1rem; }
   nav { padding: 0 1rem; }
+  .skip-link {
+    left: 0.75rem;
+    right: 0.75rem;
+    top: 0.75rem;
+    text-align: center;
+  }
   .music-player {
     right: 1rem;
     bottom: 1rem;

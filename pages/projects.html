@@ -6,18 +6,32 @@
   <title>项目列表 · 次元日记</title>
   <meta name="description" content="查看次元日记的项目作品、参赛经历、技术栈与成果展示。" />
   <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/projects.html" />
+  <meta property="og:url" content="https://yzh1019.top/pages/projects.html" />
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="次元日记" />
   <meta property="og:title" content="项目列表 · 次元日记" />
   <meta property="og:description" content="查看次元日记的项目作品、参赛经历、技术栈与成果展示。" />
-  <meta property="og:image" content="../assets/avatar.png" />
+  <meta property="og:image" content="https://yzh1019.top/assets/projects/legalmind.webp" />
+  <meta property="og:image:alt" content="次元日记项目页代表封面" />
   <meta property="og:locale" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="项目列表 · 次元日记" />
   <meta name="twitter:description" content="查看次元日记的项目作品、参赛经历、技术栈与成果展示。" />
-  <meta name="twitter:image" content="../assets/avatar.png" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/projects/legalmind.webp" />
+  <meta name="twitter:image:alt" content="次元日记项目页代表封面" />
+  <script id="projects-structured-data" type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "url": "https://yzh1019.top/pages/projects.html",
+      "name": "项目列表 · 次元日记",
+      "description": "查看次元日记的项目作品、参赛经历、技术栈与成果展示。"
+    }
+  </script>
   <link rel="icon" type="image/png" href="../assets/avatar.png" />
   <link rel="stylesheet" href="../css/main.css" />
-  <script src="../js/site-shell.js"></script>
+  <script src="../js/site-shell.js" defer></script>
   <style>
     .project-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
     .tab-btn {
@@ -296,17 +310,18 @@
 <body data-root-prefix="../" data-active-nav="projects" data-loader-text="加载项目中...">
   <div id="site-shell-top"></div>
 
-  <div id="lightbox">
+  <div id="lightbox" role="dialog" aria-modal="true" aria-labelledby="project-lightbox-title" aria-hidden="true">
     <div class="lb-wrap">
-      <button class="lb-close" id="lb-close" type="button">✕</button>
-      <button class="lb-nav lb-prev" id="lb-prev" type="button">←</button>
+      <h2 id="project-lightbox-title" class="sr-only">项目预览大图</h2>
+      <button class="lb-close" id="lb-close" type="button" aria-label="关闭项目预览">✕</button>
+      <button class="lb-nav lb-prev" id="lb-prev" type="button" aria-label="查看上一个项目">←</button>
       <div class="lb-img-box" id="lb-img-box"></div>
       <div class="lb-info" id="lb-info"></div>
-      <button class="lb-nav lb-next" id="lb-next" type="button">→</button>
+      <button class="lb-nav lb-next" id="lb-next" type="button" aria-label="查看下一个项目">→</button>
     </div>
   </div>
 
-  <div class="site-wrapper">
+  <main class="site-wrapper" id="main-content" tabindex="-1">
     <div class="page-hero reveal">
       <div class="section-label">Projects</div>
       <h1>项目作品</h1>
@@ -316,12 +331,12 @@
     <div class="stats-summary reveal" id="stats-el"></div>
     <div class="project-tabs reveal" id="tabs-el"></div>
     <div class="project-grid" id="project-grid"></div>
-  </div>
+  </main>
 
   <div id="site-shell-bottom"></div>
 
-  <script src="../js/data.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/pages/projects.js"></script>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/projects.js" defer></script>
 </body>
 </html>

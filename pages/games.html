@@ -6,18 +6,23 @@
   <title>我的游戏作品 · 次元日记</title>
   <meta name="description" content="查看次元日记收录的个人游戏作品、项目简介与下载入口。" />
   <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/games.html" />
+  <meta property="og:url" content="https://yzh1019.top/pages/games.html" />
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="次元日记" />
   <meta property="og:title" content="我的游戏作品 · 次元日记" />
   <meta property="og:description" content="查看次元日记收录的个人游戏作品、项目简介与下载入口。" />
-  <meta property="og:image" content="../assets/game1.webp" />
+  <meta property="og:image" content="https://yzh1019.top/assets/game1.webp" />
+  <meta property="og:image:alt" content="次元日记游戏页代表封面" />
   <meta property="og:locale" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="我的游戏作品 · 次元日记" />
   <meta name="twitter:description" content="查看次元日记收录的个人游戏作品、项目简介与下载入口。" />
-  <meta name="twitter:image" content="../assets/game1.webp" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/game1.webp" />
+  <meta name="twitter:image:alt" content="次元日记游戏页代表封面" />
   <link rel="icon" type="image/png" href="../assets/avatar.png" />
   <link rel="stylesheet" href="../css/main.css" />
-  <script src="../js/site-shell.js"></script>
+  <script src="../js/site-shell.js" defer></script>
   <style>
     .games-grid {
       display: grid;
@@ -209,7 +214,7 @@
 <body data-root-prefix="../" data-active-nav="games" data-loader-text="加载次元世界中...">
   <div id="site-shell-top"></div>
 
-  <div class="site-wrapper">
+  <main class="site-wrapper" id="main-content" tabindex="-1">
     <section class="page-hero reveal">
       <h1>我的游戏作品</h1>
       <p>这里展示了我个人开发的游戏项目。每一款都倾注了我的热情与创意，点击卡片可以查看详情并下载体验。</p>
@@ -227,13 +232,13 @@
       </div>
       <div class="games-grid" id="games-container"></div>
     </section>
-  </div>
+  </main>
 
-  <div class="modal" id="game-modal">
+  <div class="modal" id="game-modal" role="dialog" aria-modal="true" aria-labelledby="modal-game-title" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title" id="modal-game-title">游戏标题</h2>
-        <button class="modal-close" id="modal-close" type="button">×</button>
+        <button class="modal-close" id="modal-close" type="button" aria-label="关闭游戏详情">×</button>
       </div>
       <div class="modal-body">
         <div class="modal-image" id="modal-game-image">🎮</div>
@@ -251,8 +256,8 @@
 
   <div id="site-shell-bottom"></div>
 
-  <script src="../js/data.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/pages/games.js"></script>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/games.js" defer></script>
 </body>
 </html>

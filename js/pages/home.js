@@ -132,14 +132,38 @@ window.SiteApp.registerPage('home', () => {
     }
   }
 
-  rafId = window.requestAnimationFrame(() => {
-    renderHomeSections();
-  });
+  const secondary = document.getElementById('home-secondary');
+  let observer = null;
+
+  function scheduleRender() {
+    if (rafId || !secondary || secondary.dataset.rendered === 'true') return;
+    rafId = window.requestAnimationFrame(() => {
+      if (!secondary || secondary.dataset.rendered === 'true') {
+        rafId = 0;
+        return;
+      }
+      secondary.dataset.rendered = 'true';
+      renderHomeSections();
+    });
+  }
+
+  if (secondary && 'IntersectionObserver' in window) {
+    observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer?.disconnect();
+      observer = null;
+      scheduleRender();
+    }, { rootMargin: '240px 0px' });
+    observer.observe(secondary);
+  } else {
+    scheduleRender();
+  }
 
   return () => {
     if (rafId) {
       window.cancelAnimationFrame(rafId);
     }
+    observer?.disconnect();
     if (typeof stopTypewriter === 'function') {
       stopTypewriter();
     }

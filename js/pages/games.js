@@ -1,4 +1,6 @@
 window.SiteApp.registerPage('games', () => {
+  let previousActiveElement = null;
+
   function renderGames() {
     const container = document.getElementById('games-container');
     if (!container) return;
@@ -39,6 +41,7 @@ window.SiteApp.registerPage('games', () => {
   }
 
   function openGameModal(game) {
+    previousActiveElement = document.activeElement;
     document.getElementById('modal-game-title').textContent = game.title;
     document.getElementById('modal-game-description').textContent = game.description;
     document.getElementById('modal-game-type').textContent = game.type;
@@ -49,17 +52,29 @@ window.SiteApp.registerPage('games', () => {
     document.getElementById('modal-game-image').innerHTML = game.image
       ? `<img src="${game.image}" alt="${game.title}" decoding="async">`
       : game.previewEmoji;
-
-    document.getElementById('game-modal').style.display = 'flex';
+    const modal = document.getElementById('game-modal');
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    document.getElementById('modal-close')?.focus();
   }
 
   function closeGameModal() {
     const modal = document.getElementById('game-modal');
     if (modal) {
       modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
     }
     document.body.style.overflow = '';
+    previousActiveElement?.focus?.();
+  }
+
+  function onKeyDown(event) {
+    const modal = document.getElementById('game-modal');
+    if (modal?.style.display !== 'flex') return;
+    if (event.key === 'Escape') {
+      closeGameModal();
+    }
   }
 
   renderGames();
@@ -74,8 +89,10 @@ window.SiteApp.registerPage('games', () => {
       closeGameModal();
     }
   });
+  document.addEventListener('keydown', onKeyDown);
 
   return () => {
     closeGameModal();
+    document.removeEventListener('keydown', onKeyDown);
   };
 });

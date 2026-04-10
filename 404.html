@@ -6,9 +6,23 @@
   <title>页面未找到 · 次元日记</title>
   <meta name="description" content="你访问的页面不存在，返回次元日记首页继续浏览。" />
   <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/404.html" />
+  <meta property="og:url" content="https://yzh1019.top/404.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="次元日记" />
+  <meta property="og:title" content="页面未找到 · 次元日记" />
+  <meta property="og:description" content="你访问的页面不存在，返回次元日记首页继续浏览。" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta property="og:image:alt" content="次元日记站点头像" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="页面未找到 · 次元日记" />
+  <meta name="twitter:description" content="你访问的页面不存在，返回次元日记首页继续浏览。" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta name="twitter:image:alt" content="次元日记站点头像" />
   <link rel="icon" type="image/png" href="assets/avatar.png" />
   <link rel="stylesheet" href="css/main.css" />
-  <script src="js/site-shell.js"></script>
+  <script src="js/site-shell.js" defer></script>
   <style>
     .not-found {
       min-height: 100vh;
@@ -56,7 +70,7 @@
 <body data-root-prefix="" data-loader-text="页面加载中..." data-live2d="false">
   <div id="site-shell-top"></div>
 
-  <div class="site-wrapper not-found">
+  <main class="site-wrapper not-found" id="main-content" tabindex="-1">
     <div class="not-found-card reveal visible">
       <div class="not-found-code">404</div>
       <h1 class="not-found-title">你访问的页面不见了</h1>
@@ -67,11 +81,11 @@
         <a href="pages/projects.html" class="btn btn-ghost">查看项目</a>
       </div>
     </div>
-  </div>
+  </main>
 
   <div id="site-shell-bottom"></div>
 
-  <script src="js/data.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>

@@ -1,4 +1,28 @@
 window.SiteApp.registerPage('posts', () => {
+  const absoluteBase = 'https://yzh1019.top';
+
+  function updateStructuredData() {
+    const script = document.getElementById('posts-structured-data');
+    if (!script) return;
+
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      url: `${absoluteBase}/pages/posts.html`,
+      name: '文章 · 次元日记',
+      description: '浏览次元日记的全部文章内容，按分类、标签与推荐内容快速查找。',
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: POSTS.map((post, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `${absoluteBase}/pages/post.html?id=${post.id}`,
+          name: post.title,
+        })),
+      },
+    });
+  }
+
   function renderCard(post, simple = false, index = 0) {
     const eagerImage = index < 2;
     const thumbContent = post.cover
@@ -62,6 +86,7 @@ window.SiteApp.registerPage('posts', () => {
   }
 
   renderPosts('全部');
+  updateStructuredData();
 
   const popular = document.getElementById('sw-popular');
   if (popular) {

@@ -6,18 +6,39 @@
   <title>文章详情 · 次元日记</title>
   <meta name="description" content="阅读次元日记中的单篇文章内容，浏览目录、标签与相关文章。" />
   <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/post.html" />
+  <meta property="og:url" content="https://yzh1019.top/pages/post.html" />
   <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="次元日记" />
   <meta property="og:title" content="文章详情 · 次元日记" />
   <meta property="og:description" content="阅读次元日记中的单篇文章内容，浏览目录、标签与相关文章。" />
-  <meta property="og:image" content="../assets/avatar.png" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta property="og:image:alt" content="次元日记文章默认封面" />
   <meta property="og:locale" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="文章详情 · 次元日记" />
   <meta name="twitter:description" content="阅读次元日记中的单篇文章内容，浏览目录、标签与相关文章。" />
-  <meta name="twitter:image" content="../assets/avatar.png" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta name="twitter:image:alt" content="次元日记文章默认封面" />
+  <script id="post-structured-data" type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "文章详情 · 次元日记",
+      "url": "https://yzh1019.top/pages/post.html",
+      "author": {
+        "@type": "Person",
+        "name": "次元日记"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "次元日记"
+      }
+    }
+  </script>
   <link rel="icon" type="image/png" href="../assets/avatar.png" />
   <link rel="stylesheet" href="../css/main.css" />
-  <script src="../js/site-shell.js"></script>
+  <script src="../js/site-shell.js" defer></script>
   <style>
     .post-layout {
       display: grid;
@@ -243,7 +264,7 @@
 <body data-root-prefix="../" data-active-nav="posts" data-loader-text="加载中..." data-footer-html="&lt;a href=&quot;posts.html&quot;&gt;← 返回文章列表&lt;/a&gt;">
   <div id="site-shell-top"></div>
 
-  <div class="site-wrapper">
+  <main class="site-wrapper" id="main-content" tabindex="-1">
     <div class="post-header reveal" id="post-header"></div>
     <div class="post-layout">
       <article class="post-main">
@@ -265,12 +286,12 @@
         </div>
       </aside>
     </div>
-  </div>
+  </main>
 
   <div id="site-shell-bottom"></div>
 
-  <script src="../js/data.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/pages/post-detail.js"></script>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/post-detail.js" defer></script>
 </body>
 </html>
