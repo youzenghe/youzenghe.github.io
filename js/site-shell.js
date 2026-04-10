@@ -75,7 +75,6 @@
 
   function bottomMarkup(config) {
     const footerExtra = config.footerHtml ? `<span>${config.footerHtml}</span>` : '';
-    const musicSrc = encodeURI(pageHref(config.rootPrefix, 'music/温馨.mp3'));
 
     return `
       <footer>
@@ -84,18 +83,7 @@
           <span id="footer-extra">${footerExtra}</span>
         </div>
       </footer>
-      <div id="music-player" class="music-player" aria-label="全局音乐播放器">
-        <button id="music-toggle" class="music-toggle" type="button" aria-label="播放背景音乐">
-          <span class="music-disc" aria-hidden="true">
-            <span class="music-disc-core"></span>
-          </span>
-        </button>
-        <div class="music-popover">
-          <div id="music-title" class="music-title">要播放音乐嘛</div>
-          <div id="music-status" class="music-status" aria-live="polite">等待播放</div>
-        </div>
-        <audio id="global-audio" preload="none" playsinline src="${musicSrc}"></audio>
-      </div>
+      <div id="sakana-widget-root" class="sakana-widget-root" aria-label="右下角摇摇乐挂件"></div>
     `;
   }
 

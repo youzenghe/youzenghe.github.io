@@ -7,6 +7,10 @@ const PAGE_STYLE_ATTR = 'data-page-style';
 const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
 const MUSIC_STORAGE_KEY = 'acg-blog:music-state';
 const MUSIC_SAVE_INTERVAL = 800;
+const SAKANA_WIDGET_STYLE_ID = 'sakana-widget-style';
+const SAKANA_WIDGET_SCRIPT_ID = 'sakana-widget-script';
+const SAKANA_WIDGET_CSS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.css';
+const SAKANA_WIDGET_JS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.js';
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
@@ -18,6 +22,9 @@ let currentNavigationId = 0;
 let live2dReady = false;
 let live2dLoading = false;
 let live2dIdleScheduled = false;
+let sakanaWidgetLoadPromise = null;
+let sakanaWidgetInstance = null;
+let sakanaWidgetCharacter = 'takina';
 let pendingPageRunRaf = 0;
 const bgReadyQueue = [];
 const bgPendingUrls = new Set();
@@ -702,6 +709,141 @@ function syncLive2DVisibility() {
 
   initLive2D();
 }
+
+function loadExternalStylesheet(id, href) {
+  if (document.getElementById(id)) return;
+
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = href;
+  document.head.appendChild(link);
+}
+
+function loadExternalScript(id, src) {
+  const existing = document.getElementById(id);
+  if (existing) {
+    if (existing.dataset.loaded === 'true') return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      existing.addEventListener('load', resolve, { once: true });
+      existing.addEventListener('error', reject, { once: true });
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.id = id;
+    script.src = src;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = 'true';
+      resolve();
+    };
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
+function getSakanaWidgetCharacters() {
+  return ['takina', 'chisato'];
+}
+
+function createSakanaWidgetShell(root) {
+  root.replaceChildren();
+
+  const switchButton = document.createElement('button');
+  switchButton.type = 'button';
+  switchButton.className = 'sakana-widget-btn';
+  switchButton.textContent = '\u5207\u6362\u4eba\u7269';
+  switchButton.addEventListener('click', () => {
+    const characters = getSakanaWidgetCharacters();
+    const currentIndex = characters.indexOf(sakanaWidgetCharacter);
+    const nextIndex = (currentIndex + 1) % characters.length;
+    sakanaWidgetCharacter = characters[nextIndex];
+    initSakanaWidget();
+  });
+
+  const mountPoint = document.createElement('div');
+  mountPoint.className = 'sakana-widget-mount';
+
+  const githubCover = document.createElement('a');
+  githubCover.className = 'sakana-widget-github-cover';
+  githubCover.href = 'https://github.com/youzenghe';
+  githubCover.target = '_blank';
+  githubCover.rel = 'noreferrer noopener';
+  githubCover.setAttribute('aria-label', '?? youzenghe ? GitHub ??');
+
+  mountPoint.addEventListener('click', (event) => {
+    const widgetRect = mountPoint.getBoundingClientRect();
+    const clickY = event.clientY - widgetRect.top;
+    const coverHeight = 30;
+
+    if (clickY >= widgetRect.height - coverHeight) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.open('https://github.com/youzenghe', '_blank', 'noopener,noreferrer');
+    }
+  }, true);
+
+  mountPoint.appendChild(githubCover);
+  root.appendChild(mountPoint);
+  root.appendChild(switchButton);
+
+  return mountPoint;
+}
+
+function ensureSakanaWidgetRoot() {
+  let root = document.getElementById('sakana-widget-root');
+  if (root) return root;
+
+  root = document.createElement('div');
+  root.id = 'sakana-widget-root';
+  root.className = 'sakana-widget-root';
+  root.setAttribute('aria-label', '????????');
+
+  const footer = document.querySelector('body > footer');
+  if (footer?.nextSibling) {
+    document.body.insertBefore(root, footer.nextSibling);
+  } else {
+    document.body.appendChild(root);
+  }
+
+  return root;
+}
+
+function initSakanaWidget() {
+  const root = ensureSakanaWidgetRoot();
+  if (window.innerWidth <= 768) {
+    root.replaceChildren();
+    return;
+  }
+
+  loadExternalStylesheet(SAKANA_WIDGET_STYLE_ID, SAKANA_WIDGET_CSS_URL);
+
+  if (!sakanaWidgetLoadPromise) {
+    sakanaWidgetLoadPromise = loadExternalScript(SAKANA_WIDGET_SCRIPT_ID, SAKANA_WIDGET_JS_URL).catch((error) => {
+      sakanaWidgetLoadPromise = null;
+      throw error;
+    });
+  }
+
+  sakanaWidgetLoadPromise
+    .then(() => {
+      if (!document.getElementById('sakana-widget-root') || window.innerWidth <= 768) return;
+      if (!window.SakanaWidget) return;
+
+      const mountPoint = createSakanaWidgetShell(root);
+      sakanaWidgetInstance = new window.SakanaWidget({
+        size: 200,
+        controls: false,
+        character: sakanaWidgetCharacter,
+        draggable: true,
+        rod: true,
+      });
+      sakanaWidgetInstance.mount(mountPoint);
+    })
+    .catch(() => {});
+}
 function readMusicState() {
   try {
     const raw = localStorage.getItem(MUSIC_STORAGE_KEY);
@@ -942,7 +1084,8 @@ function ensureAppContentRoot() {
       child.id === 'particles' ||
       child.id === 'search-overlay' ||
       child.id === 'mobile-menu' ||
-      child.id === 'music-player'
+      child.id === 'music-player' ||
+      child.id === 'sakana-widget-root'
     ) {
       return;
     }
@@ -1105,6 +1248,7 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   document.getElementById('mobile-menu')?.classList.remove('open');
 
   await ensurePageScripts(doc);
+  initSakanaWidget();
   syncLive2DVisibility();
   scrollToNavigationTarget(hash);
 
@@ -1268,7 +1412,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileNav();
   initSearch();
   initTheme();
-  initMusicPlayer();
+  initSakanaWidget();
   applyShellConfig();
   initRouter();
   fillBgQueue().catch(() => {});
