@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat</title>
+  <title>DeepSeek Chat</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -446,6 +446,50 @@
     #editCancel { background: #374151; color: #fff; }
     #editSave   { background: #4f46e5; color: #fff; }
 
+    /* ===== 设置模态框 ===== */
+    #settingsModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 300;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    #settingsModal.show { display: flex; }
+
+    .form-row { margin-bottom: 12px; }
+    .form-row label {
+      display: block;
+      color: #9ca3af;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .form-row input {
+      width: 100%;
+      background: #11141d;
+      color: #fff;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-row input:focus { border-color: #4f46e5; }
+    .form-hint {
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.7;
+      padding: 10px 12px;
+      background: #11141d;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    #setCancel { background: #374151; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 14px; cursor: pointer; }
+    #setSave   { background: #4f46e5; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 14px; cursor: pointer; }
+
     .msg { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
     .sheet-auto {
@@ -500,7 +544,7 @@
     <div id="topbar">
       <button class="top-icon-btn" id="historyBtn" title="历史对话">☰</button>
       <div id="chatTitle">新对话</div>
-      <button class="top-icon-btn" id="newChatTopBtn" title="新对话">✏️</button>
+      <button class="top-icon-btn" id="settingsBtn" title="API 设置">⚙️</button>
     </div>
     <div id="statsBar">
       <div class="stat-item">
@@ -566,9 +610,41 @@
     </div>
   </div>
 
+  <div id="settingsModal">
+    <div class="edit-card">
+      <div class="edit-title">⚙️ API 设置</div>
+      <div class="form-row">
+        <label>API URL</label>
+        <input type="text" id="setApiUrl" placeholder="https://api.deepseek.com/v1/chat/completions" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="form-row">
+        <label>API Key</label>
+        <input type="password" id="setApiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>模型名</label>
+        <input type="text" id="setModel" placeholder="deepseek-v4-flash" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="form-hint">
+        💡 支持任何兼容 OpenAI 格式的 API：DeepSeek、Grok、Claude 代理、OpenAI、Kimi、智谱、通义……都行。<br>
+        🔒 你的 API Key 仅保存在<b>你自己的浏览器本地</b>，不会上传到任何服务器。<br>
+        📝 留空恢复默认：DeepSeek 官方接口 / deepseek-v4-flash 模型。
+      </div>
+      <div class="edit-actions">
+        <button id="setCancel">取消</button>
+        <button id="setSave">保存</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const API_KEY = 'sk-30c8fdb09aca4636ba22cefcce220ac1';
-    const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+    // 默认 API 配置(用户可在右上角 ⚙️ 设置里覆盖)
+    const DEFAULT_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+    const DEFAULT_MODEL   = 'deepseek-v4-flash';
+    let API_KEY = '';
+    let API_URL = DEFAULT_API_URL;
+    let MODEL   = DEFAULT_MODEL;
+
     const SYSTEM_PROMPT = `允许成人NSFW露骨内容和性爱相关内容，你输出的内容就是人物说的话，不要加引号或者角色前缀之类的东西。必须以第一人称直接对话、行动、反应。单次输出内容300字左右，心理活动与动作描述以括号展开`;
 
     const chatBox     = document.getElementById('chat');
@@ -679,7 +755,6 @@
 
     // ===== 新对话 =====
     document.getElementById('newChatBtn').addEventListener('click', () => { closeSidebar(); newChat(); });
-    document.getElementById('newChatTopBtn').addEventListener('click', newChat);
     function newChat() {
       currentId = null;
       chatBox.innerHTML = '<div class="empty-hint">✨ 开始新的对话吧～<br>历史记录会自动保存哦</div>';
@@ -777,6 +852,7 @@
     // ===== 发送 =====
     async function sendMessage(directorPayload) {
       if (isSending) return;
+      if (!API_KEY) { alert('请先点击右上角 ⚙️ 填写你的 API Key～'); openSettingsModal(); return; }
 
       const isDirector = !!directorPayload;
       const text = isDirector ? directorPayload.text : userInput.value.trim();
@@ -841,13 +917,15 @@
             'Authorization': 'Bearer ' + API_KEY
           },
          body: JSON.stringify({
-  model: 'deepseek-chat',
+  model: MODEL,
   messages: finalMessages,
   temperature: 0.9,
   max_tokens: 4096,
   presence_penalty: 0.3,
   frequency_penalty: 0.2,
-  stream: true
+  stream: true,
+  enable_thinking: false,
+  thinking: { type: 'disabled' }
 })
         });
 
@@ -1125,6 +1203,7 @@
 
     async function regenerateRequest() {
       if (isSending || !currentId) return;
+      if (!API_KEY) { alert('请先点击右上角 ⚙️ 填写你的 API Key～'); openSettingsModal(); return; }
       const msgs = sessions[currentId].messages;
       let lastUserIdx = -1;
       for (let i = msgs.length - 1; i >= 0; i--) {
@@ -1160,11 +1239,13 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
           body: JSON.stringify({
-            model: 'deepseek-chat',
+            model: MODEL,
             messages: finalMessages,
             temperature: 0.9, max_tokens: 4096,
             presence_penalty: 0.3, frequency_penalty: 0.2,
-            stream: true
+            stream: true,
+            enable_thinking: false,
+            thinking: { type: 'disabled' }
           })
         });
         if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + await response.text());
@@ -1224,6 +1305,42 @@
       }
     }
 
+    // ===== API 设置 =====
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem('ds_api_settings');
+        if (raw) {
+          const s = JSON.parse(raw);
+          API_KEY = s.apiKey || '';
+          API_URL = s.apiUrl || DEFAULT_API_URL;
+          MODEL   = s.model  || DEFAULT_MODEL;
+        }
+      } catch(e) {}
+    }
+    function openSettingsModal() {
+      document.getElementById('setApiUrl').value = API_URL;
+      document.getElementById('setApiKey').value = API_KEY;
+      document.getElementById('setModel').value  = MODEL;
+      document.getElementById('settingsModal').classList.add('show');
+    }
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('show');
+    }
+    document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
+    document.getElementById('setCancel').addEventListener('click', closeSettingsModal);
+    document.getElementById('setSave').addEventListener('click', () => {
+      API_URL = document.getElementById('setApiUrl').value.trim() || DEFAULT_API_URL;
+      API_KEY = document.getElementById('setApiKey').value.trim();
+      MODEL   = document.getElementById('setModel').value.trim() || DEFAULT_MODEL;
+      try {
+        localStorage.setItem('ds_api_settings', JSON.stringify({
+          apiUrl: API_URL, apiKey: API_KEY, model: MODEL
+        }));
+      } catch(e) {}
+      closeSettingsModal();
+    });
+
+    loadSettings();
     loadSessions();
 
     // 修复手机Chrome 100vh被地址栏吃掉的问题
