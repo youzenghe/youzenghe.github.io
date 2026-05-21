@@ -329,6 +329,35 @@
       opacity: 0.9;
     }
 
+    /* ===== 数值快捷操作气泡（! 前缀，前端直接改 stats，不走 AI） ===== */
+    .msg.statop {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid #8b5cf6;
+      color: #c4b5fd;
+      margin: 10px 24px;
+      font-size: 14px;
+      position: relative;
+      padding-top: 24px;
+      line-height: 1.6;
+    }
+    .msg.statop::before {
+      content: '⚡ 数值快捷操作 · 前端直接修改（不走AI）';
+      position: absolute;
+      top: 4px;
+      left: 12px;
+      font-size: 11px;
+      color: #8b5cf6;
+      font-weight: bold;
+      opacity: 0.9;
+    }
+
+    /* 可点击编辑的数字 */
+    .stat-value {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .stat-value:hover { text-decoration: underline; }
+
     /* ===== ⏩ 推进按钮 ===== */
     #progressBtn {
       border: none;
@@ -616,7 +645,7 @@
     </div>
     <div class="bottom">
       <button id="progressBtn" title="推进剧情">⏩</button>
-      <textarea id="userInput" rows="2" placeholder="输入消息  ·  / 开头=单次出戏问AI  ·  // 开头=永久世界规则"></textarea>
+      <textarea id="userInput" rows="2" placeholder="输入消息  ·  ! 数值操作  ·  / 出戏问AI  ·  // 永久世界规则"></textarea>
       <button id="sendBtn">发送</button>
     </div>
   </div>
@@ -831,6 +860,71 @@
       }
     }
 
+    // 解析 ! 前缀的数值快捷操作指令
+    // 支持格式：
+    //   !好感+1000 / !好感-50 / !好感=100 / !好感 100（无运算符视为=）
+    //   !信任±/=N（同理）
+    //   !重置 / !清零         → 好感、信任都归零
+    //   !好感重置 / !好感清零  → 仅重置好感
+    //   !信任重置             → 仅重置信任
+    function parseStatOp(text) {
+      const body = text.slice(1).trim();
+      if (!body) return null;
+      // 全部重置
+      if (/^(重置|清零|reset|clear)$/i.test(body)) {
+        return { op: 'reset', target: 'both' };
+      }
+      // 单项重置：好感重置 / 信任清零
+      let m = body.match(/^(好感(?:度)?|信任(?:度)?)\s*(?:重置|清零|reset|clear)$/i);
+      if (m) {
+        return { op: 'reset', target: m[1].includes('好感') ? 'af' : 'tr' };
+      }
+      // 主格式：好感±N / 好感=N / 好感 N
+      m = body.match(/^(好感(?:度)?|信任(?:度)?)\s*([+\-=])?\s*(-?\d+)$/);
+      if (m) {
+        const target = m[1].includes('好感') ? 'af' : 'tr';
+        const op = m[2] || '=';
+        const val = parseInt(m[3], 10);
+        return { op, target, val };
+      }
+      return null;
+    }
+
+    // 应用数值快捷操作并返回摘要文本
+    function applyStatOp(id, parsed) {
+      if (!sessions[id]) return '';
+      sessions[id].stats = sessions[id].stats || { affection: 0, trust: 0 };
+      const s = sessions[id].stats;
+      let summary = '';
+      if (parsed.op === 'reset') {
+        if (parsed.target === 'both') {
+          const oldAf = s.affection, oldTr = s.trust;
+          s.affection = 0;
+          s.trust = 0;
+          summary = `🔄 全部重置  |  好感: ${oldAf} → 0  |  信任: ${oldTr} → 0`;
+        } else if (parsed.target === 'af') {
+          const old = s.affection;
+          s.affection = 0;
+          summary = `🔄 好感重置: ${old} → 0`;
+        } else {
+          const old = s.trust;
+          s.trust = 0;
+          summary = `🔄 信任重置: ${old} → 0`;
+        }
+      } else {
+        const key = parsed.target === 'af' ? 'affection' : 'trust';
+        const label = parsed.target === 'af' ? '好感' : '信任';
+        const old = s[key];
+        if (parsed.op === '+') s[key] = old + parsed.val;
+        else if (parsed.op === '-') s[key] = old - parsed.val;
+        else s[key] = parsed.val;
+        const opTxt = parsed.op === '=' ? `设为 ${parsed.val}` : `${parsed.op}${parsed.val}`;
+        summary = `⚡ ${label} ${opTxt}: ${old} → ${s[key]}`;
+      }
+      renderStats(s);
+      return summary;
+    }
+
     // 动态注入给 AI 的"当前关系状态"提示（不修改原 SYSTEM_PROMPT 与 forceSuffix）
     function getStateHint(stats) {
       const af = stats ? stats.affection : 0;
@@ -893,6 +987,9 @@
         let div = null;
         if (m.meta && m.meta.director) {
           div = addDirectorEl(m.meta.label || '⏩ 推进剧情');
+        } else if (m.meta && m.meta.statOp) {
+          // 数值快捷操作：显示操作摘要
+          div = addStatOpEl(m.meta.summary || m.content);
         } else if (m.meta && m.meta.worldRule) {
           // 世界规则：显示规则文本
           div = addWorldRuleEl(m.meta.rule || m.content.replace(/^\/+/, '').trim());
@@ -977,6 +1074,19 @@
       return div;
     }
 
+    // 数值快捷操作气泡（紫色，前端直接修改 stats，不走 AI）
+    function addStatOpEl(summary) {
+      const hint = chatBox.querySelector('.empty-hint');
+      if (hint) hint.remove();
+      const div = document.createElement('div');
+      div.className = 'msg statop';
+      div.innerText = summary;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      bindLongPress(div);
+      return div;
+    }
+
     // ===== 智能构造请求体：根据模型名添加对应的"关闭思考"字段 =====
     // 不同 AI 厂家关闭思考的字段不同，乱加可能报错（比如 Grok 4 原版收到 reasoning_effort 会 400）
     function buildRequestBody(messages) {
@@ -1044,21 +1154,35 @@
       const text = isDirector ? directorPayload.text : userInput.value.trim();
       if (!text) return;
 
+      // 检测数值快捷操作（! 前缀，前端直接改 stats，不走 API）
+      const isStatOp = !isDirector && text.startsWith('!') && text.length > 1;
       // 检测世界规则注入（// 双斜杠开头，永久注入 system prompt）
-      const isWorldRule = !isDirector && text.startsWith('//') && text.length > 2;
+      const isWorldRule = !isDirector && !isStatOp && text.startsWith('//') && text.length > 2;
       // 检测元指令（单斜杠开头，单次出戏对话）
-      const isMeta = !isDirector && !isWorldRule && text.startsWith('/') && text.length > 1;
+      const isMeta = !isDirector && !isStatOp && !isWorldRule && text.startsWith('/') && text.length > 1;
+
+      // 数值操作先尝试解析，格式不对直接提示返回
+      let statOpParsed = null;
+      if (isStatOp) {
+        statOpParsed = parseStatOp(text);
+        if (!statOpParsed) {
+          alert('⚡ 数值操作格式不对哦～\n\n支持的格式：\n  !好感+1000   (加)\n  !好感-50     (减)\n  !好感=100    (直接设为)\n  !信任+/-/=N  (信任同理)\n  !重置  或  !清零   (好感和信任都归零)\n  !好感重置 / !信任重置 (单独重置)');
+          return;
+        }
+      }
 
       if (!currentId) {
         currentId = Date.now().toString();
         sessions[currentId] = {
           title: isDirector
             ? '剧情 · ' + (directorPayload.label || '推进')
-            : (isWorldRule
-                ? '世界规则 · ' + text.slice(2, 16) + (text.length > 17 ? '…' : '')
-                : isMeta
-                    ? '元指令 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
-                    : text.slice(0, 18) + (text.length > 18 ? '…' : '')),
+            : (isStatOp
+                ? '数值操作 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
+                : isWorldRule
+                    ? '世界规则 · ' + text.slice(2, 16) + (text.length > 17 ? '…' : '')
+                    : isMeta
+                        ? '元指令 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
+                        : text.slice(0, 18) + (text.length > 18 ? '…' : '')),
           messages: [],
           stats: { affection: 0, trust: 0 }
         };
@@ -1067,6 +1191,18 @@
       }
       // 兼容旧对话(没有 stats 字段)
       sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
+
+      // === 数值快捷操作：直接修改 stats，不走 API，立即返回 ===
+      if (isStatOp) {
+        const summary = applyStatOp(currentId, statOpParsed);
+        const div = addStatOpEl(summary);
+        const msgObj = { role: 'user', content: text, meta: { statOp: true, summary } };
+        sessions[currentId].messages.push(msgObj);
+        div.dataset.msgIdx = sessions[currentId].messages.length - 1;
+        userInput.value = '';
+        saveSessions();
+        return;
+      }
 
       // === 世界规则注入：不走 API，直接保存规则后立即返回 ===
       if (isWorldRule) {
@@ -1164,6 +1300,8 @@ ${worldRules.join('\n')}
         if (sessions[currentId].messages[i].role === 'user') { lastUserIdx = i; break; }
       }
       sessions[currentId].messages.forEach((m, i) => {
+        // 过滤数值快捷操作(完全不发给 AI，只是前端直接操作)
+        if (m.meta && m.meta.statOp) return;
         // 过滤世界规则消息(已合并到 system prompt，不作为 user 消息发送)
         if (m.meta && m.meta.worldRule) return;
         // 过滤历史 meta 对话(仅保留本次发送的这条 meta)，避免污染角色扮演上下文
@@ -1275,6 +1413,31 @@ ${worldRules.join('\n')}
     userInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
+
+    // 数字面板点击直接编辑：兜底救场（崩坏到 -5亿 也能秒救）
+    function bindStatClickEdit(elId, key, label) {
+      document.getElementById(elId).addEventListener('click', () => {
+        if (!currentId) { alert('请先开始一个对话'); return; }
+        sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
+        const cur = sessions[currentId].stats[key];
+        const input = prompt(`${label}度当前值：${cur}\n请输入新值（支持负数，仅整数）：`, String(cur));
+        if (input === null) return;
+        const v = parseInt(input.trim(), 10);
+        if (isNaN(v)) { alert('请输入合法的整数～'); return; }
+        sessions[currentId].stats[key] = v;
+        renderStats(sessions[currentId].stats);
+        // 留一条 statop 记录在 messages 里方便追溯
+        const summary = `⚡ ${label}度 手动设为 ${v}：${cur} → ${v}`;
+        const opCmd = key === 'affection' ? `!好感=${v}` : `!信任=${v}`;
+        const msgObj = { role: 'user', content: opCmd, meta: { statOp: true, summary } };
+        sessions[currentId].messages.push(msgObj);
+        const div = addStatOpEl(summary);
+        div.dataset.msgIdx = sessions[currentId].messages.length - 1;
+        saveSessions();
+      });
+    }
+    bindStatClickEdit('statAf', 'affection', '好感');
+    bindStatClickEdit('statTr', 'trust', '信任');
 
     // ===== 推进剧情面板 =====
     function openSheet()  { bottomSheet.classList.add('show');  sheetOverlay.classList.add('show'); }
@@ -1398,9 +1561,9 @@ ${worldRules.join('\n')}
       if (idx < 0) return;
       const msgs = sessions[currentId].messages;
       let from = idx, to = idx;
-      // 世界规则消息独立删除，不和前后消息配对
-      const isWorldRuleMsg = msgs[idx].meta && msgs[idx].meta.worldRule;
-      if (!isWorldRuleMsg) {
+      // 世界规则、数值快捷操作消息独立删除，不和前后消息配对
+      const isStandaloneMsg = msgs[idx].meta && (msgs[idx].meta.worldRule || msgs[idx].meta.statOp);
+      if (!isStandaloneMsg) {
         if (msgs[idx].role === 'user') {
           if (idx + 1 < msgs.length && msgs[idx + 1].role === 'assistant') to = idx + 1;
         } else if (msgs[idx].role === 'assistant') {
@@ -1510,7 +1673,10 @@ ${worldRules.join('\n')}
       const msgs = sessions[currentId].messages;
       let lastUserIdx = -1;
       for (let i = msgs.length - 1; i >= 0; i--) {
-        if (msgs[i].role === 'user') { lastUserIdx = i; break; }
+        const m = msgs[i];
+        // 跳过数值操作和世界规则(不是真正的角色扮演对话)
+        if (m.meta && (m.meta.statOp || m.meta.worldRule)) continue;
+        if (m.role === 'user') { lastUserIdx = i; break; }
       }
       if (lastUserIdx < 0) return;
 
@@ -1580,6 +1746,8 @@ ${worldRules.join('\n')}
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
       msgs.forEach((m, i) => {
+        // 过滤数值快捷操作(完全不发给 AI)
+        if (m.meta && m.meta.statOp) return;
         // 过滤世界规则消息(已合并到 system prompt)
         if (m.meta && m.meta.worldRule) return;
         // 过滤历史 meta 对话(仅保留本次重发的这条 meta)，避免污染角色扮演上下文
