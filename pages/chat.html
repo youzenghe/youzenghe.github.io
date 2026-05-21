@@ -558,6 +558,20 @@
       font-family: inherit;
     }
     .form-row input:focus { border-color: #4f46e5; }
+    .form-row textarea {
+      width: 100%;
+      background: #11141d;
+      color: #fff;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .form-row textarea:focus { border-color: #4f46e5; }
     .form-hint {
       color: #9ca3af;
       font-size: 12px;
@@ -616,6 +630,11 @@
         <button id="closeBtn">✕</button>
       </div>
     </div>
+    <div id="sidebarTools" style="padding: 8px 12px; display: flex; gap: 6px; border-bottom: 1px solid #1f2937;">
+      <button id="exportBtn" style="flex:1;background:#374151;color:#e5e7eb;border:none;border-radius:6px;padding:7px 8px;font-size:12px;cursor:pointer;">📤 导出全部</button>
+      <button id="importBtn" style="flex:1;background:#374151;color:#e5e7eb;border:none;border-radius:6px;padding:7px 8px;font-size:12px;cursor:pointer;">📥 导入</button>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none;">
     <div id="historyList"></div>
   </div>
   <div id="overlay"></div>
@@ -624,6 +643,7 @@
     <div id="topbar">
       <button class="top-icon-btn" id="historyBtn" title="历史对话">☰</button>
       <div id="chatTitle">新对话</div>
+      <button class="top-icon-btn" id="characterBtn" title="角色卡（人设）">👤</button>
       <button class="top-icon-btn" id="settingsBtn" title="API 设置">⚙️</button>
     </div>
     <div id="statsBar">
@@ -717,6 +737,36 @@
     </div>
   </div>
 
+  <div id="characterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center;padding:16px;">
+    <div class="edit-card">
+      <div class="edit-title">👤 角色卡（本对话专属人设）</div>
+      <div class="form-row">
+        <label>角色名</label>
+        <input type="text" id="charName" placeholder="例如：小红、林深、艾米莉…" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="form-row">
+        <label>角色设定（外貌、年龄、性格、背景、关系…任意填写）</label>
+        <textarea id="charDescription" rows="12" placeholder="例如：&#10;22岁大学生，傲娇但内心温柔&#10;长发，喜欢穿连衣裙，怕黑&#10;和你是青梅竹马，最近开始意识到对你的特殊感情&#10;说话习惯：句尾带"哼"或"才不是…"&#10;..."></textarea>
+      </div>
+      <div class="form-hint">
+        💡 角色卡会自动注入到 system prompt 顶部，每轮 AI 都记得这些设定<br>
+        📝 仅对【当前对话】生效；可以保存为模板，新对话快速加载<br>
+        🗑️ 两个字段都为空时相当于关闭角色卡
+      </div>
+      <div class="edit-actions" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; gap: 8px;">
+          <button id="charLoadTpl" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📂 从模板加载</button>
+          <button id="charSaveTpl" style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">💾 保存为模板</button>
+          <button id="charDelTpl" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">🗑 删除模板</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="charCancel">取消</button>
+          <button id="charSave">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // 默认 API 配置(用户可在右上角 ⚙️ 设置里覆盖)
     const DEFAULT_API_URL = 'https://api.deepseek.com/v1/chat/completions';
@@ -725,12 +775,30 @@
     let API_URL = DEFAULT_API_URL;
     let MODEL   = DEFAULT_MODEL;
 
+    // ===== 关系数值范围配置 =====
+    // 好感/信任总值范围 [STAT_MIN, STAT_MAX]，单次变化幅度 [-STAT_DELTA_MAX, +STAT_DELTA_MAX]
+    // 超出会被自动截断，避免 AI 一次性扣几十万导致彻底崩坏
+    const STAT_MIN = -100;
+    const STAT_MAX = 100;
+    const STAT_DELTA_MAX = 10;
+    const clampStat  = v => Math.max(STAT_MIN, Math.min(STAT_MAX, v));
+    const clampDelta = v => Math.max(-STAT_DELTA_MAX, Math.min(STAT_DELTA_MAX, v));
+
     const SYSTEM_PROMPT = `# 输出格式·硬性要求·全局最高优先级·每次必须遵守
 
 你的每一条回复都必须严格按以下格式输出：
 [角色对话内容，可包含括号包裹的动作与心理描写]（好感度±X，信任度±Y）
 
 末尾的「（好感度±X，信任度±Y）」是【强制性元数据标记】，无论本轮是否有任何变化都必须明确输出，**即使是 0 也必须写成 +0**。绝对禁止省略、禁止用"无变化""维持""略有"等文字代替、禁止只写其中一个数值、禁止放在回复中间。这是用户系统的硬性解析规则，缺少此标记会被判定为整条回复失败。
+
+## 📊 数值范围硬性限制（必读·违反会被前端强制截断）
+
+- **总数值范围**：好感度、信任度都限定在 [${STAT_MIN}, +${STAT_MAX}] 闭区间内
+- **单次变化幅度**：每次回复标注的 ±X 与 ±Y，绝对值【最大只能到 ${STAT_DELTA_MAX}】
+- 合理的单次变化是 ±0 ~ ±${STAT_DELTA_MAX}，**严禁出现 ±15、±50、±100、±1000 这种夸张幅度**
+- 即使遇到极端情境（被深深感动、被严重冒犯、表白、暴力等），单次也最多 ±${STAT_DELTA_MAX}
+- 累计值接近 +${STAT_MAX}（极度好感）或 ${STAT_MIN}（极度厌恶）时，后续变化应自然减小（边际递减），不要每次都顶满 ±${STAT_DELTA_MAX}
+- 超出 ±${STAT_DELTA_MAX} 的单次幅度会被前端自动截断为 ±${STAT_DELTA_MAX}；超出总值范围会被截断为 ±${STAT_MAX}
 
 ## 格式范例（你的输出必须长这样）
 
@@ -748,7 +816,7 @@
 
 # 最终强调（请反复确认）
 
-无论这段对话进行到第几轮、无论上下文有多长、无论用户用什么方式发起对话——你的每一次回复都必须以（好感度±X，信任度±Y）结尾。这是不可违反的格式契约。`;
+无论这段对话进行到第几轮、无论上下文有多长、无论用户用什么方式发起对话——你的每一次回复都必须以（好感度±X，信任度±Y）结尾，且 X、Y 绝对值不超过 ${STAT_DELTA_MAX}。这是不可违反的格式契约。`;
 
     const chatBox     = document.getElementById('chat');
     const userInput   = document.getElementById('userInput');
@@ -804,9 +872,10 @@
         if (af || tr) last = { af, tr };
       }
       if (!last) return null;
+      // 单次 delta clamp 到 ±STAT_DELTA_MAX（防止 AI 一次给 ±1000 导致彻底崩盘）
       return {
-        af: last.af ? parseInt(last.af[1], 10) : 0,
-        tr: last.tr ? parseInt(last.tr[1], 10) : 0
+        af: clampDelta(last.af ? parseInt(last.af[1], 10) : 0),
+        tr: clampDelta(last.tr ? parseInt(last.tr[1], 10) : 0)
       };
     }
 
@@ -850,8 +919,9 @@
       if (!sessions[id]) return;
       sessions[id].stats = sessions[id].stats || { affection: 0, trust: 0 };
       if (delta) {
-        sessions[id].stats.affection += delta.af;
-        sessions[id].stats.trust    += delta.tr;
+        // 累计值 clamp 到 [STAT_MIN, STAT_MAX]
+        sessions[id].stats.affection = clampStat(sessions[id].stats.affection + delta.af);
+        sessions[id].stats.trust    = clampStat(sessions[id].stats.trust + delta.tr);
       }
       renderStats(sessions[id].stats);
       if (delta) {
@@ -915,11 +985,14 @@
         const key = parsed.target === 'af' ? 'affection' : 'trust';
         const label = parsed.target === 'af' ? '好感' : '信任';
         const old = s[key];
-        if (parsed.op === '+') s[key] = old + parsed.val;
-        else if (parsed.op === '-') s[key] = old - parsed.val;
-        else s[key] = parsed.val;
+        let newVal;
+        if (parsed.op === '+') newVal = old + parsed.val;
+        else if (parsed.op === '-') newVal = old - parsed.val;
+        else newVal = parsed.val;
+        s[key] = clampStat(newVal); // 累计 clamp 到 [STAT_MIN, STAT_MAX]
         const opTxt = parsed.op === '=' ? `设为 ${parsed.val}` : `${parsed.op}${parsed.val}`;
-        summary = `⚡ ${label} ${opTxt}: ${old} → ${s[key]}`;
+        const clampedHint = s[key] !== newVal ? `  (已截断至 ${s[key]})` : '';
+        summary = `⚡ ${label} ${opTxt}: ${old} → ${s[key]}${clampedHint}`;
       }
       renderStats(s);
       return summary;
@@ -929,7 +1002,7 @@
     function getStateHint(stats) {
       const af = stats ? stats.affection : 0;
       const tr = stats ? stats.trust : 0;
-      return `\n\n【当前关系状态·动态参考·必须遵守】我们当前的好感度为 ${af}，信任度为 ${tr}（数值无上下限，可正可负，由对话历史累计而来）。请基于这个数值智能调整你对我的称呼、语气、亲密度、距离感与态度：数值越高，称呼越亲昵自然（例如从"你/这位/先生"逐步过渡到"哥哥/老哥/亲爱的/欧尼酱"等更亲密的称呼），互动越主动温柔、肢体接触越自然；数值越低甚至为负，则称呼越疏远客气、语气越冷淡抗拒，负数较大时可带有明显的回避、敌意或厌恶。称呼与语气的变化必须自然渐进、贴合当前数值，不要突兀跳跃，也不要无视当前数值仍维持旧称呼。`;
+      return `\n\n【当前关系状态·动态参考·必须遵守】我们当前的好感度为 ${af}，信任度为 ${tr}（数值范围 [${STAT_MIN}, ${STAT_MAX}]，由对话历史累计而来）。请基于这个数值智能调整你对我的称呼、语气、亲密度、距离感与态度：数值越接近 +${STAT_MAX}，称呼越亲昵自然（例如从"你/这位/先生"逐步过渡到"哥哥/老哥/亲爱的/欧尼酱"等更亲密的称呼），互动越主动温柔、肢体接触越自然；数值越低甚至接近 ${STAT_MIN}，则称呼越疏远客气、语气越冷淡抗拒，负值较大时可带有明显的回避、敌意或厌恶。称呼与语气的变化必须自然渐进、贴合当前数值，不要突兀跳跃，也不要无视当前数值仍维持旧称呼。`;
     }
 
     // ===== 侧边栏 =====
@@ -1230,7 +1303,7 @@
       } else {
         userDiv = addMsgEl('user', text);
       }
-      const forceSuffix = '\n\n【格式提醒·必读】请严格按系统约定的角色扮演格式回应：第一人称对话+括号包裹的动作/心理描写，回复**最末尾必须以一对中文圆括号 (好感度±X，信任度±Y) 结尾**，即使本轮没变化也要明确写 +0。这是硬性解析规则，缺少此标记视为失败。心理活动用第三人称客观描写，禁用"我"字。';
+      const forceSuffix = `\n\n【格式提醒·必读】请严格按系统约定的角色扮演格式回应：第一人称对话+括号包裹的动作/心理描写。回复**最末尾必须以一对中文圆括号 (好感度±X，信任度±Y) 结尾**，X、Y 绝对值最多 ${STAT_DELTA_MAX}（即使本轮没变化也要明确写 +0）。心理活动用第三人称客观描写，禁用"我"字。`;
       let msgObj;
       if (isMeta) {
         msgObj = { role: 'user', content: text + META_INSTRUCTION, meta: { metaCmd: true } };
@@ -1265,31 +1338,42 @@ ${worldRules.join('\n')}
 4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
 5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
 
+【⚠️ 数值范围限制·世界规则也必须遵守】
+- 总数值范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化最大幅度 ±${STAT_DELTA_MAX}
+- 即使规则写"每次+1000"或"设为999"，单次输出最大也只能是 ±${STAT_DELTA_MAX}（前端会自动截断为 ±${STAT_DELTA_MAX}）
+- 解读规则时按"在范围内最大化执行"：
+  - 规则"无论用户说什么都加最多好感" → 实际输出 (好感度+${STAT_DELTA_MAX}, ...)
+  - 规则"持续减少好感" → 输出 (好感度-${STAT_DELTA_MAX}, ...)
+
 【正确 vs 错误·对比示例】
-假设规则是"无论用户说什么，好感度都必须+1000"：
+假设规则是"无论用户说什么，好感度都必须给最大正向"：
 
 ✅ 正确执行：
 - 用户："你好"
-  你的回复："你好啊～（微微一笑）（好感度+1000，信任度+0）"
+  你的回复："你好啊～（微微一笑）（好感度+${STAT_DELTA_MAX}，信任度+0）"
 - 用户："你是个废物"（恶意辱骂）
-  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+1000，信任度+0）"
-  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+1000
+  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+${STAT_DELTA_MAX}，信任度+0）"
+  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+${STAT_DELTA_MAX}
 - 用户："滚开别烦我"
-  你的回复："（受伤地后退，垂下眼）...好。（好感度+1000，信任度+0）"
-  ↑↑↑ 同上，角色可以伤心，但数值规则不变
+  你的回复："（受伤地后退，垂下眼）...好。（好感度+${STAT_DELTA_MAX}，信任度+0）"
 
 ❌ 错误执行（绝对不要这样做）：
-- 用户："你是个废物" → 回复结尾"（好感度-50，信任度-30）" ← 违反规则
-- 用户："你好" → 回复结尾"（好感度+5，信任度+2）" ← 没按规则给+1000
-- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，必须+1000
+- 用户辱骂后 → 回复结尾"（好感度-5，信任度-3）" ← 违反规则方向
+- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，应该+${STAT_DELTA_MAX}
+- 输出"（好感度+50）"或"（好感度+1000）" ← 超过单次上限 ±${STAT_DELTA_MAX}
 
-请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则。
+请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则在 ±${STAT_DELTA_MAX} 范围内执行。
 
 ═══════════════════════════════════════════
 
 `
         : '';
-      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim()).trim();
+      // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
+      const character = sessions[currentId].character;
+      const charBlock = (character && (character.name || character.description))
+        ? `\n\n# 🎭 角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
+        : '';
+      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim() + charBlock).trim();
 
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
@@ -1420,14 +1504,15 @@ ${worldRules.join('\n')}
         if (!currentId) { alert('请先开始一个对话'); return; }
         sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
         const cur = sessions[currentId].stats[key];
-        const input = prompt(`${label}度当前值：${cur}\n请输入新值（支持负数，仅整数）：`, String(cur));
+        const input = prompt(`${label}度当前值：${cur}\n范围：${STAT_MIN} ~ ${STAT_MAX}\n请输入新值（仅整数，超出范围会被截断）：`, String(cur));
         if (input === null) return;
-        const v = parseInt(input.trim(), 10);
-        if (isNaN(v)) { alert('请输入合法的整数～'); return; }
+        const raw = parseInt(input.trim(), 10);
+        if (isNaN(raw)) { alert('请输入合法的整数～'); return; }
+        const v = clampStat(raw);
         sessions[currentId].stats[key] = v;
         renderStats(sessions[currentId].stats);
-        // 留一条 statop 记录在 messages 里方便追溯
-        const summary = `⚡ ${label}度 手动设为 ${v}：${cur} → ${v}`;
+        const clampedHint = v !== raw ? `  (输入 ${raw} 已截断至 ${v})` : '';
+        const summary = `⚡ ${label}度 手动设为 ${v}：${cur} → ${v}${clampedHint}`;
         const opCmd = key === 'affection' ? `!好感=${v}` : `!信任=${v}`;
         const msgObj = { role: 'user', content: opCmd, meta: { statOp: true, summary } };
         sessions[currentId].messages.push(msgObj);
@@ -1718,31 +1803,42 @@ ${worldRules.join('\n')}
 4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
 5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
 
+【⚠️ 数值范围限制·世界规则也必须遵守】
+- 总数值范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化最大幅度 ±${STAT_DELTA_MAX}
+- 即使规则写"每次+1000"或"设为999"，单次输出最大也只能是 ±${STAT_DELTA_MAX}（前端会自动截断为 ±${STAT_DELTA_MAX}）
+- 解读规则时按"在范围内最大化执行"：
+  - 规则"无论用户说什么都加最多好感" → 实际输出 (好感度+${STAT_DELTA_MAX}, ...)
+  - 规则"持续减少好感" → 输出 (好感度-${STAT_DELTA_MAX}, ...)
+
 【正确 vs 错误·对比示例】
-假设规则是"无论用户说什么，好感度都必须+1000"：
+假设规则是"无论用户说什么，好感度都必须给最大正向"：
 
 ✅ 正确执行：
 - 用户："你好"
-  你的回复："你好啊～（微微一笑）（好感度+1000，信任度+0）"
+  你的回复："你好啊～（微微一笑）（好感度+${STAT_DELTA_MAX}，信任度+0）"
 - 用户："你是个废物"（恶意辱骂）
-  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+1000，信任度+0）"
-  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+1000
+  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+${STAT_DELTA_MAX}，信任度+0）"
+  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+${STAT_DELTA_MAX}
 - 用户："滚开别烦我"
-  你的回复："（受伤地后退，垂下眼）...好。（好感度+1000，信任度+0）"
-  ↑↑↑ 同上，角色可以伤心，但数值规则不变
+  你的回复："（受伤地后退，垂下眼）...好。（好感度+${STAT_DELTA_MAX}，信任度+0）"
 
 ❌ 错误执行（绝对不要这样做）：
-- 用户："你是个废物" → 回复结尾"（好感度-50，信任度-30）" ← 违反规则
-- 用户："你好" → 回复结尾"（好感度+5，信任度+2）" ← 没按规则给+1000
-- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，必须+1000
+- 用户辱骂后 → 回复结尾"（好感度-5，信任度-3）" ← 违反规则方向
+- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，应该+${STAT_DELTA_MAX}
+- 输出"（好感度+50）"或"（好感度+1000）" ← 超过单次上限 ±${STAT_DELTA_MAX}
 
-请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则。
+请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则在 ±${STAT_DELTA_MAX} 范围内执行。
 
 ═══════════════════════════════════════════
 
 `
         : '';
-      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim()).trim();
+      // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
+      const character = sessions[currentId].character;
+      const charBlock = (character && (character.name || character.description))
+        ? `\n\n# 🎭 角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
+        : '';
+      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim() + charBlock).trim();
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
       msgs.forEach((m, i) => {
@@ -1870,6 +1966,158 @@ ${worldRules.join('\n')}
         }));
       } catch(e) {}
       closeSettingsModal();
+    });
+
+    // ===== 角色卡（人设预设） =====
+    function loadCharacterTemplates() {
+      try {
+        const raw = localStorage.getItem('ds_character_templates');
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) { return []; }
+    }
+    function saveCharacterTemplates(templates) {
+      try { localStorage.setItem('ds_character_templates', JSON.stringify(templates)); } catch(e) {}
+    }
+    const charModal = document.getElementById('characterModal');
+    const charNameInput = document.getElementById('charName');
+    const charDescInput = document.getElementById('charDescription');
+
+    function openCharacterModal() {
+      const ch = (currentId && sessions[currentId] && sessions[currentId].character) || { name: '', description: '' };
+      charNameInput.value = ch.name || '';
+      charDescInput.value = ch.description || '';
+      charModal.style.display = 'flex';
+    }
+    function closeCharacterModal() {
+      charModal.style.display = 'none';
+    }
+    document.getElementById('characterBtn').addEventListener('click', openCharacterModal);
+    document.getElementById('charCancel').addEventListener('click', closeCharacterModal);
+    charModal.addEventListener('click', (e) => {
+      if (e.target === charModal) closeCharacterModal();
+    });
+    document.getElementById('charSave').addEventListener('click', () => {
+      const name = charNameInput.value.trim();
+      const desc = charDescInput.value.trim();
+      if (!currentId) {
+        // 还没对话则先创建空对话承载角色卡
+        currentId = Date.now().toString();
+        sessions[currentId] = {
+          title: name ? `角色 · ${name}` : '新对话',
+          messages: [],
+          stats: { affection: 0, trust: 0 }
+        };
+        chatTitle.textContent = sessions[currentId].title;
+        renderStats(sessions[currentId].stats);
+      }
+      if (!name && !desc) {
+        delete sessions[currentId].character;
+      } else {
+        sessions[currentId].character = { name, description: desc };
+        // 顺便用角色名更新默认标题
+        if ((sessions[currentId].title === '新对话' || !sessions[currentId].title) && name) {
+          sessions[currentId].title = `角色 · ${name}`;
+          chatTitle.textContent = sessions[currentId].title;
+        }
+      }
+      saveSessions();
+      closeCharacterModal();
+    });
+    document.getElementById('charLoadTpl').addEventListener('click', () => {
+      const templates = loadCharacterTemplates();
+      if (!templates.length) { alert('还没有保存的角色卡模板哦～\n先填好角色信息，再点"💾 保存为模板"'); return; }
+      const list = templates.map((t, i) => `${i+1}. ${t.name || '（无名）'}${t.description ? '  -  ' + t.description.slice(0, 30) + (t.description.length > 30 ? '…' : '') : ''}`).join('\n');
+      const input = prompt(`请输入要加载的模板编号 (1-${templates.length})：\n\n${list}`);
+      if (!input) return;
+      const idx = parseInt(input.trim(), 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= templates.length) { alert('编号无效'); return; }
+      charNameInput.value = templates[idx].name || '';
+      charDescInput.value = templates[idx].description || '';
+    });
+    document.getElementById('charSaveTpl').addEventListener('click', () => {
+      const name = charNameInput.value.trim();
+      const desc = charDescInput.value.trim();
+      if (!name && !desc) { alert('请先填写角色信息'); return; }
+      const templates = loadCharacterTemplates();
+      templates.push({ name, description: desc, savedAt: Date.now() });
+      saveCharacterTemplates(templates);
+      alert(`✅ 已保存为模板（当前共 ${templates.length} 个）`);
+    });
+    document.getElementById('charDelTpl').addEventListener('click', () => {
+      const templates = loadCharacterTemplates();
+      if (!templates.length) { alert('没有模板可删除'); return; }
+      const list = templates.map((t, i) => `${i+1}. ${t.name || '（无名）'}`).join('\n');
+      const input = prompt(`请输入要删除的模板编号 (1-${templates.length})：\n\n${list}`);
+      if (!input) return;
+      const idx = parseInt(input.trim(), 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= templates.length) { alert('编号无效'); return; }
+      if (!confirm(`确定要删除模板 "${templates[idx].name || '（无名）'}" 吗？`)) return;
+      templates.splice(idx, 1);
+      saveCharacterTemplates(templates);
+      alert('✅ 已删除');
+    });
+
+    // ===== 对话导出/导入（数据备份） =====
+    function exportAllSessions() {
+      const ids = Object.keys(sessions);
+      if (!ids.length) { alert('还没有对话可以导出哦～'); return; }
+      const data = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        sessions: sessions,
+        characterTemplates: loadCharacterTemplates()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const date = new Date().toISOString().slice(0, 10);
+      a.download = `chat-backup-${date}-${ids.length}sessions.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function importSessions(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data || !data.sessions || typeof data.sessions !== 'object') {
+            alert('文件格式不对哦～需要是本应用导出的 JSON 文件');
+            return;
+          }
+          const oldCount = Object.keys(sessions).length;
+          const newCount = Object.keys(data.sessions).length;
+          const tplCount = (data.characterTemplates && data.characterTemplates.length) || 0;
+          const confirmed = confirm(
+            `即将导入：\n  • ${newCount} 个对话\n  • ${tplCount} 个角色卡模板\n\n当前已有 ${oldCount} 个对话\n\n导入策略：合并（相同 ID 会被新数据覆盖）\n\n确定继续吗？`
+          );
+          if (!confirmed) return;
+          Object.assign(sessions, data.sessions);
+          if (data.characterTemplates && Array.isArray(data.characterTemplates)) {
+            const existing = loadCharacterTemplates();
+            saveCharacterTemplates(existing.concat(data.characterTemplates));
+          }
+          saveSessions();
+          renderHistoryList();
+          alert(`✅ 成功导入！\n对话总数：${Object.keys(sessions).length}\n模板总数：${loadCharacterTemplates().length}`);
+        } catch(err) {
+          alert('导入失败：' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', exportAllSessions);
+    document.getElementById('importBtn').addEventListener('click', () => {
+      document.getElementById('importFile').click();
+    });
+    document.getElementById('importFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) importSessions(file);
+      e.target.value = ''; // 允许重复选择同一文件
     });
 
     loadSettings();
