@@ -849,6 +849,64 @@
       return div;
     }
 
+    // ===== 智能构造请求体：根据模型名添加对应的"关闭思考"字段 =====
+    // 不同 AI 厂家关闭思考的字段不同，乱加可能报错（比如 Grok 4 原版收到 reasoning_effort 会 400）
+    function buildRequestBody(messages) {
+      const m = (MODEL || '').toLowerCase();
+      const body = {
+        model: MODEL,
+        messages: messages,
+        temperature: 0.9,
+        max_tokens: 4096,
+        presence_penalty: 0.3,
+        frequency_penalty: 0.2,
+        stream: true
+      };
+
+      // 1. DeepSeek V4 / 智谱 GLM / Anthropic Claude
+      //    DeepSeek V4 Flash 默认开启思考，必须显式关闭
+      if (m.includes('deepseek') || m.includes('glm') || m.includes('chatglm') ||
+          m.includes('zhipu')    || m.includes('claude') || m.includes('anthropic')) {
+        body.thinking = { type: 'disabled' };
+      }
+
+      // 2. Qwen3 / 通义千问：必须套在 chat_template_kwargs 里才生效
+      if (m.includes('qwen') || m.includes('tongyi')) {
+        body.chat_template_kwargs = { enable_thinking: false };
+        body.enable_thinking = false; // 部分代理也认平铺
+      }
+
+      // 3. Grok：4.3 / 3-mini 支持 reasoning_effort:"none"
+      //    但 grok-4 原版、grok-4-fast 等不支持参数（会报错），需排除
+      if (m.includes('grok')) {
+        const isGrok4Original     = m === 'grok-4' || m === 'grok-4-latest' || /^grok-4-\d{4}/.test(m);
+        const isGrok4Fast         = m.includes('grok-4-fast') || m.includes('grok-4-1-fast') || m.includes('grok-4.20');
+        const isAlreadyNonReason  = m.includes('non-reasoning');
+        if (!isGrok4Original && !isGrok4Fast && !isAlreadyNonReason) {
+          body.reasoning_effort = 'none';
+        }
+      }
+
+      // 4. Gemini 2.5 Flash / Flash-Lite：OpenAI 兼容端用 reasoning_effort，原生端用 thinking_config
+      //    Gemini 2.5 Pro / 3.x 无法关闭思考，加了也无效但不报错
+      if (m.includes('gemini')) {
+        body.reasoning_effort = 'none';
+        body.thinking_config  = { thinking_budget: 0 };
+      }
+
+      // 5. OpenAI GPT-5 系列：reasoning_effort:"minimal"
+      if (m.startsWith('gpt-5') || m.includes('gpt5')) {
+        body.reasoning_effort = 'minimal';
+      }
+
+      // 6. OpenAI o 系列（o1/o3/o4）：最低 low，不支持 none/minimal
+      if (/^o[134]([-\d]|$)/.test(m)) {
+        body.reasoning_effort = 'low';
+      }
+
+      return body;
+    }
+
     // ===== 发送 =====
     async function sendMessage(directorPayload) {
       if (isSending) return;
@@ -916,17 +974,7 @@
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + API_KEY
           },
-         body: JSON.stringify({
-  model: MODEL,
-  messages: finalMessages,
-  temperature: 0.9,
-  max_tokens: 4096,
-  presence_penalty: 0.3,
-  frequency_penalty: 0.2,
-  stream: true,
-  enable_thinking: false,
-  thinking: { type: 'disabled' }
-})
+         body: JSON.stringify(buildRequestBody(finalMessages))
         });
 
         if (!response.ok) {
@@ -1238,15 +1286,7 @@
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
-          body: JSON.stringify({
-            model: MODEL,
-            messages: finalMessages,
-            temperature: 0.9, max_tokens: 4096,
-            presence_penalty: 0.3, frequency_penalty: 0.2,
-            stream: true,
-            enable_thinking: false,
-            thinking: { type: 'disabled' }
-          })
+          body: JSON.stringify(buildRequestBody(finalMessages))
         });
         if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + await response.text());
         const reader = response.body.getReader();
