@@ -264,6 +264,12 @@
     .stat-delta.show { opacity: 1; }
     .stat-delta.pos  { color: #34d399; }
     .stat-delta.neg  { color: #f87171; }
+    .stat-delta.missing {
+      color: #6b7280;
+      font-style: italic;
+      opacity: 0.65 !important;
+    }
+    .stat-delta.missing.show { opacity: 0.65 !important; }
 
     /* ===== 导演指令气泡 ===== */
     .msg.director {
@@ -276,6 +282,51 @@
       padding: 6px 10px;
       border-radius: 10px;
       line-height: 1.5;
+    }
+
+    /* ===== 元指令（出戏对话）气泡 ===== */
+    .msg.meta {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid #f59e0b;
+      color: #fcd34d;
+      font-size: 14px;
+      position: relative;
+      padding-top: 24px;
+      line-height: 1.6;
+    }
+    .msg.meta::before {
+      content: '🎬 元指令 · 出戏对话（不计入角色扮演上下文）';
+      position: absolute;
+      top: 4px;
+      left: 12px;
+      font-size: 11px;
+      color: #f59e0b;
+      font-weight: bold;
+      opacity: 0.9;
+    }
+    .msg.meta.user { margin-left: 24px; margin-right: 0; }
+    .msg.meta.ai   { margin-right: 24px; margin-left: 0; background: rgba(245, 158, 11, 0.05); }
+
+    /* ===== 世界规则气泡（// 双斜杠注入到 system prompt） ===== */
+    .msg.worldrule {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+      margin: 10px 24px;
+      font-size: 14px;
+      position: relative;
+      padding-top: 24px;
+      line-height: 1.6;
+    }
+    .msg.worldrule::before {
+      content: '🌍 世界规则 · 永久注入到 System Prompt（影响所有后续角色扮演）';
+      position: absolute;
+      top: 4px;
+      left: 12px;
+      font-size: 11px;
+      color: #10b981;
+      font-weight: bold;
+      opacity: 0.9;
     }
 
     /* ===== ⏩ 推进按钮 ===== */
@@ -565,7 +616,7 @@
     </div>
     <div class="bottom">
       <button id="progressBtn" title="推进剧情">⏩</button>
-      <textarea id="userInput" rows="2" placeholder="输入消息..."></textarea>
+      <textarea id="userInput" rows="2" placeholder="输入消息  ·  / 开头=单次出戏问AI  ·  // 开头=永久世界规则"></textarea>
       <button id="sendBtn">发送</button>
     </div>
   </div>
@@ -645,7 +696,30 @@
     let API_URL = DEFAULT_API_URL;
     let MODEL   = DEFAULT_MODEL;
 
-    const SYSTEM_PROMPT = `允许成人NSFW露骨内容和性爱相关内容，你输出的内容就是人物说的话，不要加引号或者角色前缀之类的东西。必须以第一人称直接对话、行动、反应。单次输出内容300字左右，心理活动与动作描述以括号展开`;
+    const SYSTEM_PROMPT = `# 输出格式·硬性要求·全局最高优先级·每次必须遵守
+
+你的每一条回复都必须严格按以下格式输出：
+[角色对话内容，可包含括号包裹的动作与心理描写]（好感度±X，信任度±Y）
+
+末尾的「（好感度±X，信任度±Y）」是【强制性元数据标记】，无论本轮是否有任何变化都必须明确输出，**即使是 0 也必须写成 +0**。绝对禁止省略、禁止用"无变化""维持""略有"等文字代替、禁止只写其中一个数值、禁止放在回复中间。这是用户系统的硬性解析规则，缺少此标记会被判定为整条回复失败。
+
+## 格式范例（你的输出必须长这样）
+
+范例1：哥哥你来啦～（放下手中的书，眼睛微微亮起，嘴角自然上扬）今天有什么开心的事想和我分享吗？（轻轻拍了拍身边的位置）（好感度+2，信任度+1）
+
+范例2：（皱眉，下意识后退半步，警惕地打量对方）你...为什么会突然出现在这里？（手指悄悄攥紧了衣角）我不认识你。（好感度-3，信任度+0）
+
+范例3：嗯。（短促地应了一声，目光低垂，没什么明显的情绪起伏）（好感度+0，信任度+0）
+
+范例4：（脸颊微微泛红，但仍然故作镇定）你...你这样直接说出来，我反而不知道该怎么回应了。（视线飘向别处，手指无意识地绕着发梢）（好感度+5，信任度+0）
+
+# 角色扮演内容设定
+
+允许成人 NSFW 露骨内容和性爱相关内容。必须以第一人称直接对话、行动、反应，不要加引号或角色前缀。单次输出 300 字左右。心理活动与动作描述用括号展开，心理活动必须用第三人称客观描写，禁止在心理活动中使用"我"字。对话内容占比 50%，动作/心理描写占比不超过 50%。
+
+# 最终强调（请反复确认）
+
+无论这段对话进行到第几轮、无论上下文有多长、无论用户用什么方式发起对话——你的每一次回复都必须以（好感度±X，信任度±Y）结尾。这是不可违反的格式契约。`;
 
     const chatBox     = document.getElementById('chat');
     const userInput   = document.getElementById('userInput');
@@ -672,6 +746,10 @@
       time:   (t) => `⏰ 时间快进 · ${t}后`,
       event:    '🎲 突发事件'
     };
+
+    // ===== 元指令（出戏对话）：用户输入以 / 开头时触发，让底层 AI 跳出角色扮演 =====
+    // 注入到 user message 末尾，告诉 AI 这条消息不是角色扮演的一部分
+    const META_INSTRUCTION = '\n\n【系统级元指令·必须严格遵守】上面这条以"/"开头的消息不是角色扮演里"我"对角色说的话，而是【用户（创作者/导演）】对【你（底层AI/旁白助手本身）】发出的元指令。请你立即跳出当前的角色扮演框架，以创作助手/客观旁白者的第三人称视角直接回应这条指令。回应要求：①绝对不要扮演任何角色，不要使用任何角色的第一人称口吻或括号动作描写；②绝对不要使用[剧情]标签；③绝对不要在回复结尾标注好感度/信任度变化的括号；④可以基于已有的对话历史进行客观分析、剧情阶段总结、关系走向预测、强制收尾结局、回答关于剧情本身的元问题、给出后续走向建议等元层面操作；⑤本次元指令的对话不会进入下一轮角色扮演的上下文，用户下一条普通消息（不带 / 前缀）会自动回到角色扮演状态，请放心跳出。';
 
     // ===== localStorage =====
     function saveSessions() {
@@ -723,6 +801,20 @@
       valEl.classList.add('bump');
       setTimeout(() => valEl.classList.remove('bump'), 250);
       setTimeout(() => deltaEl.classList.remove('show'), 1400);
+    }
+
+    // AI 没标注数值时的前端兜底显示：灰色"+0?"浮动提示（不修改存档累计值）
+    function flashMissingDelta() {
+      const afDelta = document.getElementById('statAfDelta');
+      const trDelta = document.getElementById('statTrDelta');
+      afDelta.textContent = '+0?';
+      afDelta.className = 'stat-delta show missing';
+      trDelta.textContent = '+0?';
+      trDelta.className = 'stat-delta show missing';
+      setTimeout(() => {
+        afDelta.classList.remove('show');
+        trDelta.classList.remove('show');
+      }, 1800);
     }
 
     function applyStatsDelta(id, delta) {
@@ -801,6 +893,16 @@
         let div = null;
         if (m.meta && m.meta.director) {
           div = addDirectorEl(m.meta.label || '⏩ 推进剧情');
+        } else if (m.meta && m.meta.worldRule) {
+          // 世界规则：显示规则文本
+          div = addWorldRuleEl(m.meta.rule || m.content.replace(/^\/+/, '').trim());
+        } else if (m.meta && m.meta.metaCmd) {
+          // 元指令用户消息：去掉 META_INSTRUCTION 后缀，仅展示用户输入的原文
+          const cleaned = m.content.replace(/\n*【系统级元指令[\s\S]*$/, '');
+          div = addMetaEl('user', cleaned);
+        } else if (m.meta && m.meta.metaReply) {
+          // 元指令 AI 回复：直接展示完整内容
+          div = addMetaEl('ai', m.content);
         } else if (m.role === 'user') {
           // 展示时去掉拼在 content 末尾的【强制要求】部分(forceSuffix 与 stateHint)
           const cleaned = m.content.replace(/\n*【强制要求】[\s\S]*$/, '');
@@ -843,6 +945,32 @@
       const div = document.createElement('div');
       div.className = 'msg director';
       div.innerText = label;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      bindLongPress(div);
+      return div;
+    }
+
+    // 元指令气泡（橙色边框，提示用户这是出戏对话）
+    function addMetaEl(role, content) {
+      const hint = chatBox.querySelector('.empty-hint');
+      if (hint) hint.remove();
+      const div = document.createElement('div');
+      div.className = 'msg meta ' + (role === 'user' ? 'user' : 'ai');
+      div.innerText = content;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      bindLongPress(div);
+      return div;
+    }
+
+    // 世界规则气泡（绿色，永久注入到 system prompt）
+    function addWorldRuleEl(rule) {
+      const hint = chatBox.querySelector('.empty-hint');
+      if (hint) hint.remove();
+      const div = document.createElement('div');
+      div.className = 'msg worldrule';
+      div.innerText = rule;
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
       bindLongPress(div);
@@ -916,12 +1044,21 @@
       const text = isDirector ? directorPayload.text : userInput.value.trim();
       if (!text) return;
 
+      // 检测世界规则注入（// 双斜杠开头，永久注入 system prompt）
+      const isWorldRule = !isDirector && text.startsWith('//') && text.length > 2;
+      // 检测元指令（单斜杠开头，单次出戏对话）
+      const isMeta = !isDirector && !isWorldRule && text.startsWith('/') && text.length > 1;
+
       if (!currentId) {
         currentId = Date.now().toString();
         sessions[currentId] = {
           title: isDirector
             ? '剧情 · ' + (directorPayload.label || '推进')
-            : text.slice(0, 18) + (text.length > 18 ? '…' : ''),
+            : (isWorldRule
+                ? '世界规则 · ' + text.slice(2, 16) + (text.length > 17 ? '…' : '')
+                : isMeta
+                    ? '元指令 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
+                    : text.slice(0, 18) + (text.length > 18 ? '…' : '')),
           messages: [],
           stats: { affection: 0, trust: 0 }
         };
@@ -930,6 +1067,18 @@
       }
       // 兼容旧对话(没有 stats 字段)
       sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
+
+      // === 世界规则注入：不走 API，直接保存规则后立即返回 ===
+      if (isWorldRule) {
+        const ruleText = text.slice(2).trim();
+        const div = addWorldRuleEl(ruleText);
+        const msgObj = { role: 'user', content: text, meta: { worldRule: true, rule: ruleText } };
+        sessions[currentId].messages.push(msgObj);
+        div.dataset.msgIdx = sessions[currentId].messages.length - 1;
+        userInput.value = '';
+        saveSessions();
+        return;
+      }
 
       isSending = true;
       sendBtn.disabled = true;
@@ -940,20 +1089,74 @@
       let userDiv = null;
       if (isDirector) {
         directorBubble = addDirectorEl(directorPayload.label);
+      } else if (isMeta) {
+        userDiv = addMetaEl('user', text);
       } else {
         userDiv = addMsgEl('user', text);
       }
-      const forceSuffix = '\n\n【强制要求】继续以第一人称角色扮演方式回应，使用"对话+（动作）+（心理）"格式，请始终保持角色沉浸感，根据关系变化自然回应我的互动，禁止小说旁白与文学化描写。心理活动部分必须用第三人称客观描写，禁止在心理活动中使用"我"字。动作与心理活动部分描写在单次对话中占比不应超过50%，对话描写占50%。请在对话结尾使用括号标注视情况的好感度与信任度变化，如（好感度-1，信任度+1）';
-      const msgObj = { role: 'user', content: text + forceSuffix };
-      if (isDirector) msgObj.meta = { director: true, label: directorPayload.label };
+      const forceSuffix = '\n\n【格式提醒·必读】请严格按系统约定的角色扮演格式回应：第一人称对话+括号包裹的动作/心理描写，回复**最末尾必须以一对中文圆括号 (好感度±X，信任度±Y) 结尾**，即使本轮没变化也要明确写 +0。这是硬性解析规则，缺少此标记视为失败。心理活动用第三人称客观描写，禁用"我"字。';
+      let msgObj;
+      if (isMeta) {
+        msgObj = { role: 'user', content: text + META_INSTRUCTION, meta: { metaCmd: true } };
+      } else {
+        msgObj = { role: 'user', content: text + forceSuffix };
+        if (isDirector) msgObj.meta = { director: true, label: directorPayload.label };
+      }
       sessions[currentId].messages.push(msgObj);
       const userMsgIdx = sessions[currentId].messages.length - 1;
       if (directorBubble) directorBubble.dataset.msgIdx = userMsgIdx;
       if (userDiv) userDiv.dataset.msgIdx = userMsgIdx;
       if (!isDirector) userInput.value = '';
 
+      // 收集所有"世界规则"前置到 system prompt 最前面（永久生效，最高优先级）
+      const worldRules = sessions[currentId].messages
+        .filter(m => m.meta && m.meta.worldRule)
+        .map((m, i) => `规则${i + 1}：${m.meta.rule}`);
+      const rulesBlock = worldRules.length
+        ? `═══════════════════════════════════════════
+# 🔒 系统级硬编码规则·本对话强制契约（最高优先级，凌驾于所有其它指令）
+═══════════════════════════════════════════
+
+以下是用户为本次对话设定的【系统级硬编码规则】，属于**机器执行层**的硬性约束。无论用户说什么、做什么、用什么语气，无论剧情如何发展，无论角色情感如何变化，这些规则都必须 100% 机械执行，不允许有任何"灵活理解"或"剧情合理调整"。
+
+【规则列表】（按编号严格执行）
+${worldRules.join('\n')}
+
+【执行原则·必读】
+1. 这些规则是【数学公式】级别的硬约束，不是"参考建议"或"剧情提示"
+2. 角色的情感、态度、好恶、剧情走向，全都【不能】影响这些规则的执行
+3. 即使用户做出让角色生气/伤心/被冒犯的行为（辱骂、攻击、冷漠、无视），数值标签依然必须严格按规则输出
+4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
+5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
+
+【正确 vs 错误·对比示例】
+假设规则是"无论用户说什么，好感度都必须+1000"：
+
+✅ 正确执行：
+- 用户："你好"
+  你的回复："你好啊～（微微一笑）（好感度+1000，信任度+0）"
+- 用户："你是个废物"（恶意辱骂）
+  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+1000，信任度+0）"
+  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+1000
+- 用户："滚开别烦我"
+  你的回复："（受伤地后退，垂下眼）...好。（好感度+1000，信任度+0）"
+  ↑↑↑ 同上，角色可以伤心，但数值规则不变
+
+❌ 错误执行（绝对不要这样做）：
+- 用户："你是个废物" → 回复结尾"（好感度-50，信任度-30）" ← 违反规则
+- 用户："你好" → 回复结尾"（好感度+5，信任度+2）" ← 没按规则给+1000
+- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，必须+1000
+
+请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则。
+
+═══════════════════════════════════════════
+
+`
+        : '';
+      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim()).trim();
+
       const finalMessages = [];
-      if (SYSTEM_PROMPT.trim()) finalMessages.push({ role: 'system', content: SYSTEM_PROMPT.trim() });
+      if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
       // 注入"当前关系状态"提示到最后一条 user message 末尾(动态、不入档,每次基于最新数值生成)
       const stateHint = getStateHint(sessions[currentId].stats);
       let lastUserIdx = -1;
@@ -961,11 +1164,25 @@
         if (sessions[currentId].messages[i].role === 'user') { lastUserIdx = i; break; }
       }
       sessions[currentId].messages.forEach((m, i) => {
-        const content = (i === lastUserIdx) ? m.content + stateHint : m.content;
+        // 过滤世界规则消息(已合并到 system prompt，不作为 user 消息发送)
+        if (m.meta && m.meta.worldRule) return;
+        // 过滤历史 meta 对话(仅保留本次发送的这条 meta)，避免污染角色扮演上下文
+        if (i !== lastUserIdx && m.meta && (m.meta.metaCmd || m.meta.metaReply)) return;
+        let content = m.content;
+        // 元指令本身不需要注入关系数值提示
+        // 把 stateHint 插入到 forceSuffix 之前，让 forceSuffix(含数值要求)处于末尾占据AI最后注意力
+        if (i === lastUserIdx && !isMeta) {
+          const fsIdx = m.content.indexOf('\n\n【强制要求】');
+          if (fsIdx >= 0) {
+            content = m.content.slice(0, fsIdx) + stateHint + m.content.slice(fsIdx);
+          } else {
+            content = m.content + stateHint;
+          }
+        }
         finalMessages.push({ role: m.role, content });
       });
 
-      const aiDiv = addMsgEl('ai', '思考中...');
+      const aiDiv = isMeta ? addMetaEl('ai', '思考中...') : addMsgEl('ai', '思考中...');
 
       try {
         const response = await fetch(API_URL, {
@@ -1028,11 +1245,20 @@
         }
 
         // 存档保留 [剧情] 标签,这样后续对话的 AI 上下文里能看到自己的格式示范,避免对话变长后忘记格式
-        sessions[currentId].messages.push({ role: 'assistant', content: aiReply });
+        const replyObj = { role: 'assistant', content: aiReply };
+        if (isMeta) replyObj.meta = { metaReply: true };
+        sessions[currentId].messages.push(replyObj);
         aiDiv.dataset.msgIdx = sessions[currentId].messages.length - 1;
-        // 解析 AI 回复里的 (好感度±X, 信任度±Y) 累加到本对话数值上
-        const delta = parseStatsDelta(aiReply);
-        if (delta) applyStatsDelta(currentId, delta);
+        // 元指令对话不解析关系数值(避免AI出戏回答里恰好出现括号被误读)
+        if (!isMeta) {
+          const delta = parseStatsDelta(aiReply);
+          if (delta) {
+            applyStatsDelta(currentId, delta);
+          } else {
+            // AI 没标注数值，前端兜底显示"+0?"浮动提示（不修改存档累计值）
+            flashMissingDelta();
+          }
+        }
         saveSessions();
 
       } catch(err) {
@@ -1172,15 +1398,19 @@
       if (idx < 0) return;
       const msgs = sessions[currentId].messages;
       let from = idx, to = idx;
-      if (msgs[idx].role === 'user') {
-        if (idx + 1 < msgs.length && msgs[idx + 1].role === 'assistant') to = idx + 1;
-      } else if (msgs[idx].role === 'assistant') {
-        if (idx - 1 >= 0 && msgs[idx - 1].role === 'user') from = idx - 1;
+      // 世界规则消息独立删除，不和前后消息配对
+      const isWorldRuleMsg = msgs[idx].meta && msgs[idx].meta.worldRule;
+      if (!isWorldRuleMsg) {
+        if (msgs[idx].role === 'user') {
+          if (idx + 1 < msgs.length && msgs[idx + 1].role === 'assistant') to = idx + 1;
+        } else if (msgs[idx].role === 'assistant') {
+          if (idx - 1 >= 0 && msgs[idx - 1].role === 'user') from = idx - 1;
+        }
       }
-      // 回退被删除的 assistant 消息的关系数值
+      // 回退被删除的 assistant 消息的关系数值（meta 元指令回复不影响数值，跳过）
       sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
       for (let i = from; i <= to; i++) {
-        if (msgs[i].role === 'assistant') {
+        if (msgs[i].role === 'assistant' && !(msgs[i].meta && msgs[i].meta.metaReply)) {
           const d = parseStatsDelta(msgs[i].content);
           if (d) {
             sessions[currentId].stats.affection -= d.af;
@@ -1198,8 +1428,19 @@
       if (idx < 0) return;
       const msg = sessions[currentId].messages[idx];
       let content = msg.content;
-      if (msg.role === 'user') content = content.replace(/\n*【强制要求】[\s\S]*$/, '');
-      else if (msg.role === 'assistant') content = content.replace(/\[剧情\][\s\S]*?\[\/剧情\]/g, '').replace(/^\s+/, '');
+      if (msg.meta && msg.meta.worldRule) {
+        // 世界规则：只编辑 rule 文本
+        content = msg.meta.rule || msg.content.replace(/^\/+/, '').trim();
+      } else if (msg.meta && msg.meta.metaCmd) {
+        // 元指令用户消息：去掉 META_INSTRUCTION 后缀
+        content = content.replace(/\n*【系统级元指令[\s\S]*$/, '');
+      } else if (msg.meta && msg.meta.metaReply) {
+        // 元指令 AI 回复：直接编辑全文
+      } else if (msg.role === 'user') {
+        content = content.replace(/\n*【强制要求】[\s\S]*$/, '');
+      } else if (msg.role === 'assistant') {
+        content = content.replace(/\[剧情\][\s\S]*?\[\/剧情\]/g, '').replace(/^\s+/, '');
+      }
       editText.value = content;
       editModal.dataset.idx = idx;
       editModal.classList.add('show');
@@ -1214,7 +1455,19 @@
       const msgs = sessions[currentId].messages;
       const msg = msgs[idx];
       const newContent = editText.value;
-      if (msg.role === 'user') {
+      if (msg.meta && msg.meta.worldRule) {
+        // 世界规则：同步更新 rule 和 content
+        const rule = newContent.trim();
+        msg.meta.rule = rule;
+        msg.content = '//' + rule;
+      } else if (msg.meta && msg.meta.metaCmd) {
+        // 元指令用户消息：保留 META_INSTRUCTION 后缀
+        const m = msg.content.match(/(\n*【系统级元指令[\s\S]*)$/);
+        msg.content = newContent + (m ? m[1] : '');
+      } else if (msg.meta && msg.meta.metaReply) {
+        // 元指令 AI 回复：直接保存
+        msg.content = newContent;
+      } else if (msg.role === 'user') {
         const m = msg.content.match(/(\n*【强制要求】[\s\S]*)$/);
         msg.content = newContent + (m ? m[1] : '');
       } else if (msg.role === 'assistant') {
@@ -1235,12 +1488,14 @@
       if (idx < 0) return;
       const msgs = sessions[currentId].messages;
       if (msgs[idx].role !== 'assistant') return;
-      // 回退该 AI 消息的数值
-      const d = parseStatsDelta(msgs[idx].content);
-      if (d) {
-        sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
-        sessions[currentId].stats.affection -= d.af;
-        sessions[currentId].stats.trust    -= d.tr;
+      // 回退该 AI 消息的数值（meta 元指令回复不影响数值，跳过）
+      if (!(msgs[idx].meta && msgs[idx].meta.metaReply)) {
+        const d = parseStatsDelta(msgs[idx].content);
+        if (d) {
+          sessions[currentId].stats = sessions[currentId].stats || { affection: 0, trust: 0 };
+          sessions[currentId].stats.affection -= d.af;
+          sessions[currentId].stats.trust    -= d.tr;
+        }
       }
       // 删除该 AI 及之后所有消息
       msgs.splice(idx);
@@ -1266,19 +1521,79 @@
 
       const lastMsg = msgs[lastUserIdx];
       const isDir = !!(lastMsg.meta && lastMsg.meta.director);
+      const isMetaReply = !!(lastMsg.meta && lastMsg.meta.metaCmd);
       let directorBubble = null;
       if (isDir) {
         const dirs = chatBox.querySelectorAll('.msg.director');
         if (dirs.length) directorBubble = dirs[dirs.length - 1];
       }
 
-      const aiDiv = addMsgEl('ai', '思考中...');
+      const aiDiv = isMetaReply ? addMetaEl('ai', '思考中...') : addMsgEl('ai', '思考中...');
 
       const stateHint = getStateHint(sessions[currentId].stats);
+      // 收集所有"世界规则"前置到 system prompt 最前面
+      const worldRules = msgs
+        .filter(m => m.meta && m.meta.worldRule)
+        .map((m, i) => `规则${i + 1}：${m.meta.rule}`);
+      const rulesBlock = worldRules.length
+        ? `═══════════════════════════════════════════
+# 🔒 系统级硬编码规则·本对话强制契约（最高优先级，凌驾于所有其它指令）
+═══════════════════════════════════════════
+
+以下是用户为本次对话设定的【系统级硬编码规则】，属于**机器执行层**的硬性约束。无论用户说什么、做什么、用什么语气，无论剧情如何发展，无论角色情感如何变化，这些规则都必须 100% 机械执行，不允许有任何"灵活理解"或"剧情合理调整"。
+
+【规则列表】（按编号严格执行）
+${worldRules.join('\n')}
+
+【执行原则·必读】
+1. 这些规则是【数学公式】级别的硬约束，不是"参考建议"或"剧情提示"
+2. 角色的情感、态度、好恶、剧情走向，全都【不能】影响这些规则的执行
+3. 即使用户做出让角色生气/伤心/被冒犯的行为（辱骂、攻击、冷漠、无视），数值标签依然必须严格按规则输出
+4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
+5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
+
+【正确 vs 错误·对比示例】
+假设规则是"无论用户说什么，好感度都必须+1000"：
+
+✅ 正确执行：
+- 用户："你好"
+  你的回复："你好啊～（微微一笑）（好感度+1000，信任度+0）"
+- 用户："你是个废物"（恶意辱骂）
+  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+1000，信任度+0）"
+  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+1000
+- 用户："滚开别烦我"
+  你的回复："（受伤地后退，垂下眼）...好。（好感度+1000，信任度+0）"
+  ↑↑↑ 同上，角色可以伤心，但数值规则不变
+
+❌ 错误执行（绝对不要这样做）：
+- 用户："你是个废物" → 回复结尾"（好感度-50，信任度-30）" ← 违反规则
+- 用户："你好" → 回复结尾"（好感度+5，信任度+2）" ← 没按规则给+1000
+- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，必须+1000
+
+请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则。
+
+═══════════════════════════════════════════
+
+`
+        : '';
+      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim()).trim();
       const finalMessages = [];
-      if (SYSTEM_PROMPT.trim()) finalMessages.push({ role: 'system', content: SYSTEM_PROMPT.trim() });
+      if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
       msgs.forEach((m, i) => {
-        const content = (i === lastUserIdx) ? m.content + stateHint : m.content;
+        // 过滤世界规则消息(已合并到 system prompt)
+        if (m.meta && m.meta.worldRule) return;
+        // 过滤历史 meta 对话(仅保留本次重发的这条 meta)，避免污染角色扮演上下文
+        if (i !== lastUserIdx && m.meta && (m.meta.metaCmd || m.meta.metaReply)) return;
+        let content = m.content;
+        // 把 stateHint 插入到 forceSuffix 之前，让 forceSuffix(含数值要求)处于末尾
+        if (i === lastUserIdx && !isMetaReply) {
+          const fsIdx = m.content.indexOf('\n\n【强制要求】');
+          if (fsIdx >= 0) {
+            content = m.content.slice(0, fsIdx) + stateHint + m.content.slice(fsIdx);
+          } else {
+            content = m.content + stateHint;
+          }
+        }
         finalMessages.push({ role: m.role, content });
       });
 
@@ -1330,10 +1645,19 @@
             } catch(e) {}
           }
         }
-        sessions[currentId].messages.push({ role: 'assistant', content: aiReply });
+        const replyObj = { role: 'assistant', content: aiReply };
+        if (isMetaReply) replyObj.meta = { metaReply: true };
+        sessions[currentId].messages.push(replyObj);
         aiDiv.dataset.msgIdx = sessions[currentId].messages.length - 1;
-        const delta = parseStatsDelta(aiReply);
-        if (delta) applyStatsDelta(currentId, delta);
+        if (!isMetaReply) {
+          const delta = parseStatsDelta(aiReply);
+          if (delta) {
+            applyStatsDelta(currentId, delta);
+          } else {
+            // AI 没标注数值，前端兜底显示"+0?"浮动提示
+            flashMissingDelta();
+          }
+        }
         saveSessions();
       } catch(err) {
         aiDiv.innerText = '请求失败：' + err.message;
