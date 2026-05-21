@@ -1074,8 +1074,8 @@
           // 元指令 AI 回复：直接展示完整内容
           div = addMetaEl('ai', m.content);
         } else if (m.role === 'user') {
-          // 展示时去掉拼在 content 末尾的【强制要求】部分(forceSuffix 与 stateHint)
-          const cleaned = m.content.replace(/\n*【强制要求】[\s\S]*$/, '');
+          // 展示时去掉拼在 content 末尾的 forceSuffix 部分（兼容新旧标记：【格式提醒·必读】或旧版【强制要求】）
+          const cleaned = m.content.replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
           div = addMsgEl('user', cleaned);
         } else if (m.role === 'assistant') {
           // 展示时去掉 [剧情] 标签部分(只在显示层过滤,存档里保留)
@@ -1394,7 +1394,7 @@ ${worldRules.join('\n')}
         // 元指令本身不需要注入关系数值提示
         // 把 stateHint 插入到 forceSuffix 之前，让 forceSuffix(含数值要求)处于末尾占据AI最后注意力
         if (i === lastUserIdx && !isMeta) {
-          const fsIdx = m.content.indexOf('\n\n【强制要求】');
+          const fsIdx = m.content.search(/\n\n【(?:强制要求|格式提醒·必读)】/);
           if (fsIdx >= 0) {
             content = m.content.slice(0, fsIdx) + stateHint + m.content.slice(fsIdx);
           } else {
@@ -1590,8 +1590,10 @@ ${worldRules.join('\n')}
       actionTarget = div;
       const isAi = div.classList.contains('ai');
       const isDir = div.classList.contains('director');
+      const isStatOp = div.classList.contains('statop');
       actRegen.style.display = isAi ? 'block' : 'none';
-      actEdit.style.display  = isDir ? 'none' : 'block';
+      // director 和 statop 不允许编辑(编辑没意义,只会破坏数据一致性)
+      actEdit.style.display  = (isDir || isStatOp) ? 'none' : 'block';
       msgActionSheet.classList.add('show');
       sheetOverlay.classList.add('show');
     }
@@ -1685,7 +1687,7 @@ ${worldRules.join('\n')}
       } else if (msg.meta && msg.meta.metaReply) {
         // 元指令 AI 回复：直接编辑全文
       } else if (msg.role === 'user') {
-        content = content.replace(/\n*【强制要求】[\s\S]*$/, '');
+        content = content.replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
       } else if (msg.role === 'assistant') {
         content = content.replace(/\[剧情\][\s\S]*?\[\/剧情\]/g, '').replace(/^\s+/, '');
       }
@@ -1716,7 +1718,7 @@ ${worldRules.join('\n')}
         // 元指令 AI 回复：直接保存
         msg.content = newContent;
       } else if (msg.role === 'user') {
-        const m = msg.content.match(/(\n*【强制要求】[\s\S]*)$/);
+        const m = msg.content.match(/(\n*【(?:强制要求|格式提醒·必读)】[\s\S]*)$/);
         msg.content = newContent + (m ? m[1] : '');
       } else if (msg.role === 'assistant') {
         // 保留原有 [剧情] 标签(如果原来有)
@@ -1851,7 +1853,7 @@ ${worldRules.join('\n')}
         let content = m.content;
         // 把 stateHint 插入到 forceSuffix 之前，让 forceSuffix(含数值要求)处于末尾
         if (i === lastUserIdx && !isMetaReply) {
-          const fsIdx = m.content.indexOf('\n\n【强制要求】');
+          const fsIdx = m.content.search(/\n\n【(?:强制要求|格式提醒·必读)】/);
           if (fsIdx >= 0) {
             content = m.content.slice(0, fsIdx) + stateHint + m.content.slice(fsIdx);
           } else {
