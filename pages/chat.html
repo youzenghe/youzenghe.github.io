@@ -221,7 +221,7 @@
     .empty-hint {
       text-align: center;
       color: #374151;
-      margin-top: 80px;
+      margin-top: 10vh;
       font-size: 14px;
       line-height: 2.2;
     }
@@ -643,6 +643,7 @@
     <div id="topbar">
       <button class="top-icon-btn" id="historyBtn" title="历史对话">☰</button>
       <div id="chatTitle">新对话</div>
+      <button class="top-icon-btn" id="exportCurrentBtn" title="导出当前对话">📤</button>
       <button class="top-icon-btn" id="characterBtn" title="角色卡（人设）">👤</button>
       <button class="top-icon-btn" id="settingsBtn" title="API 设置">⚙️</button>
     </div>
@@ -808,7 +809,6 @@
 
 范例3：嗯。（短促地应了一声，目光低垂，没什么明显的情绪起伏）（好感度+0，信任度+0）
 
-范例4：（脸颊微微泛红，但仍然故作镇定）你...你这样直接说出来，我反而不知道该怎么回应了。（视线飘向别处，手指无意识地绕着发梢）（好感度+5，信任度+0）
 
 # 角色扮演内容设定
 
@@ -996,6 +996,57 @@
       }
       renderStats(s);
       return summary;
+    }
+
+    // 构造"世界规则"system prompt 注入块（sendMessage 和 regenerateRequest 共用，避免双份维护）
+    // 注意：此函数仅做文本拼装，内容与原 inline 版本完全一致，AI 收到的字节零差异
+    function buildWorldRulesBlock(worldRules) {
+      if (!worldRules || !worldRules.length) return '';
+      return `═══════════════════════════════════════════
+# 🔒 系统级硬编码规则·本对话强制契约（最高优先级，凌驾于所有其它指令）
+═══════════════════════════════════════════
+
+以下是用户为本次对话设定的【系统级硬编码规则】，属于**机器执行层**的硬性约束。无论用户说什么、做什么、用什么语气，无论剧情如何发展，无论角色情感如何变化，这些规则都必须 100% 机械执行，不允许有任何"灵活理解"或"剧情合理调整"。
+
+【规则列表】（按编号严格执行）
+${worldRules.join('\n')}
+
+【执行原则·必读】
+1. 这些规则是【数学公式】级别的硬约束，不是"参考建议"或"剧情提示"
+2. 角色的情感、态度、好恶、剧情走向，全都【不能】影响这些规则的执行
+3. 即使用户做出让角色生气/伤心/被冒犯的行为（辱骂、攻击、冷漠、无视），数值标签依然必须严格按规则输出
+4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
+5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
+
+【⚠️ 数值范围限制·世界规则也必须遵守】
+- 总数值范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化最大幅度 ±${STAT_DELTA_MAX}
+- 即使规则写"每次+1000"或"设为999"，单次输出最大也只能是 ±${STAT_DELTA_MAX}（前端会自动截断为 ±${STAT_DELTA_MAX}）
+- 解读规则时按"在范围内最大化执行"：
+  - 规则"无论用户说什么都加最多好感" → 实际输出 (好感度+${STAT_DELTA_MAX}, ...)
+  - 规则"持续减少好感" → 输出 (好感度-${STAT_DELTA_MAX}, ...)
+
+【正确 vs 错误·对比示例】
+假设规则是"无论用户说什么，好感度都必须给最大正向"：
+
+✅ 正确执行：
+- 用户："你好"
+  你的回复："你好啊～（微微一笑）（好感度+${STAT_DELTA_MAX}，信任度+0）"
+- 用户："你是个废物"（恶意辱骂）
+  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+${STAT_DELTA_MAX}，信任度+0）"
+  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+${STAT_DELTA_MAX}
+- 用户："滚开别烦我"
+  你的回复："（受伤地后退，垂下眼）...好。（好感度+${STAT_DELTA_MAX}，信任度+0）"
+
+❌ 错误执行（绝对不要这样做）：
+- 用户辱骂后 → 回复结尾"（好感度-5，信任度-3）" ← 违反规则方向
+- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，应该+${STAT_DELTA_MAX}
+- 输出"（好感度+50）"或"（好感度+1000）" ← 超过单次上限 ±${STAT_DELTA_MAX}
+
+请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则在 ±${STAT_DELTA_MAX} 范围内执行。
+
+═══════════════════════════════════════════
+
+`;
     }
 
     // 动态注入给 AI 的"当前关系状态"提示（不修改原 SYSTEM_PROMPT 与 forceSuffix）
@@ -1321,53 +1372,7 @@
       const worldRules = sessions[currentId].messages
         .filter(m => m.meta && m.meta.worldRule)
         .map((m, i) => `规则${i + 1}：${m.meta.rule}`);
-      const rulesBlock = worldRules.length
-        ? `═══════════════════════════════════════════
-# 🔒 系统级硬编码规则·本对话强制契约（最高优先级，凌驾于所有其它指令）
-═══════════════════════════════════════════
-
-以下是用户为本次对话设定的【系统级硬编码规则】，属于**机器执行层**的硬性约束。无论用户说什么、做什么、用什么语气，无论剧情如何发展，无论角色情感如何变化，这些规则都必须 100% 机械执行，不允许有任何"灵活理解"或"剧情合理调整"。
-
-【规则列表】（按编号严格执行）
-${worldRules.join('\n')}
-
-【执行原则·必读】
-1. 这些规则是【数学公式】级别的硬约束，不是"参考建议"或"剧情提示"
-2. 角色的情感、态度、好恶、剧情走向，全都【不能】影响这些规则的执行
-3. 即使用户做出让角色生气/伤心/被冒犯的行为（辱骂、攻击、冷漠、无视），数值标签依然必须严格按规则输出
-4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
-5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
-
-【⚠️ 数值范围限制·世界规则也必须遵守】
-- 总数值范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化最大幅度 ±${STAT_DELTA_MAX}
-- 即使规则写"每次+1000"或"设为999"，单次输出最大也只能是 ±${STAT_DELTA_MAX}（前端会自动截断为 ±${STAT_DELTA_MAX}）
-- 解读规则时按"在范围内最大化执行"：
-  - 规则"无论用户说什么都加最多好感" → 实际输出 (好感度+${STAT_DELTA_MAX}, ...)
-  - 规则"持续减少好感" → 输出 (好感度-${STAT_DELTA_MAX}, ...)
-
-【正确 vs 错误·对比示例】
-假设规则是"无论用户说什么，好感度都必须给最大正向"：
-
-✅ 正确执行：
-- 用户："你好"
-  你的回复："你好啊～（微微一笑）（好感度+${STAT_DELTA_MAX}，信任度+0）"
-- 用户："你是个废物"（恶意辱骂）
-  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+${STAT_DELTA_MAX}，信任度+0）"
-  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+${STAT_DELTA_MAX}
-- 用户："滚开别烦我"
-  你的回复："（受伤地后退，垂下眼）...好。（好感度+${STAT_DELTA_MAX}，信任度+0）"
-
-❌ 错误执行（绝对不要这样做）：
-- 用户辱骂后 → 回复结尾"（好感度-5，信任度-3）" ← 违反规则方向
-- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，应该+${STAT_DELTA_MAX}
-- 输出"（好感度+50）"或"（好感度+1000）" ← 超过单次上限 ±${STAT_DELTA_MAX}
-
-请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则在 ±${STAT_DELTA_MAX} 范围内执行。
-
-═══════════════════════════════════════════
-
-`
-        : '';
+      const rulesBlock = buildWorldRulesBlock(worldRules);
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
       const charBlock = (character && (character.name || character.description))
@@ -1788,53 +1793,7 @@ ${worldRules.join('\n')}
       const worldRules = msgs
         .filter(m => m.meta && m.meta.worldRule)
         .map((m, i) => `规则${i + 1}：${m.meta.rule}`);
-      const rulesBlock = worldRules.length
-        ? `═══════════════════════════════════════════
-# 🔒 系统级硬编码规则·本对话强制契约（最高优先级，凌驾于所有其它指令）
-═══════════════════════════════════════════
-
-以下是用户为本次对话设定的【系统级硬编码规则】，属于**机器执行层**的硬性约束。无论用户说什么、做什么、用什么语气，无论剧情如何发展，无论角色情感如何变化，这些规则都必须 100% 机械执行，不允许有任何"灵活理解"或"剧情合理调整"。
-
-【规则列表】（按编号严格执行）
-${worldRules.join('\n')}
-
-【执行原则·必读】
-1. 这些规则是【数学公式】级别的硬约束，不是"参考建议"或"剧情提示"
-2. 角色的情感、态度、好恶、剧情走向，全都【不能】影响这些规则的执行
-3. 即使用户做出让角色生气/伤心/被冒犯的行为（辱骂、攻击、冷漠、无视），数值标签依然必须严格按规则输出
-4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
-5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
-
-【⚠️ 数值范围限制·世界规则也必须遵守】
-- 总数值范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化最大幅度 ±${STAT_DELTA_MAX}
-- 即使规则写"每次+1000"或"设为999"，单次输出最大也只能是 ±${STAT_DELTA_MAX}（前端会自动截断为 ±${STAT_DELTA_MAX}）
-- 解读规则时按"在范围内最大化执行"：
-  - 规则"无论用户说什么都加最多好感" → 实际输出 (好感度+${STAT_DELTA_MAX}, ...)
-  - 规则"持续减少好感" → 输出 (好感度-${STAT_DELTA_MAX}, ...)
-
-【正确 vs 错误·对比示例】
-假设规则是"无论用户说什么，好感度都必须给最大正向"：
-
-✅ 正确执行：
-- 用户："你好"
-  你的回复："你好啊～（微微一笑）（好感度+${STAT_DELTA_MAX}，信任度+0）"
-- 用户："你是个废物"（恶意辱骂）
-  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+${STAT_DELTA_MAX}，信任度+0）"
-  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+${STAT_DELTA_MAX}
-- 用户："滚开别烦我"
-  你的回复："（受伤地后退，垂下眼）...好。（好感度+${STAT_DELTA_MAX}，信任度+0）"
-
-❌ 错误执行（绝对不要这样做）：
-- 用户辱骂后 → 回复结尾"（好感度-5，信任度-3）" ← 违反规则方向
-- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，应该+${STAT_DELTA_MAX}
-- 输出"（好感度+50）"或"（好感度+1000）" ← 超过单次上限 ±${STAT_DELTA_MAX}
-
-请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则在 ±${STAT_DELTA_MAX} 范围内执行。
-
-═══════════════════════════════════════════
-
-`
-        : '';
+      const rulesBlock = buildWorldRulesBlock(worldRules);
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
       const charBlock = (character && (character.name || character.description))
@@ -2081,6 +2040,33 @@ ${worldRules.join('\n')}
       URL.revokeObjectURL(url);
     }
 
+    // 导出当前单个对话（格式与全量导出一致，导入时自动合并）
+    function exportCurrentSession() {
+      if (!currentId || !sessions[currentId]) {
+        alert('当前还没有打开任何对话哦～\n请先在 ☰ 历史里选一个，或开始一段新对话～');
+        return;
+      }
+      const s = sessions[currentId];
+      const data = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        sessions: { [currentId]: s },
+        characterTemplates: [] // 单对话导出不带模板（避免重复污染）
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const date = new Date().toISOString().slice(0, 10);
+      // 文件名带对话标题，方便区分；剔除非法字符
+      const safeTitle = (s.title || '对话').replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      a.download = `chat-${date}-${safeTitle}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     function importSessions(file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -2113,6 +2099,7 @@ ${worldRules.join('\n')}
     }
 
     document.getElementById('exportBtn').addEventListener('click', exportAllSessions);
+    document.getElementById('exportCurrentBtn').addEventListener('click', exportCurrentSession);
     document.getElementById('importBtn').addEventListener('click', () => {
       document.getElementById('importFile').click();
     });
