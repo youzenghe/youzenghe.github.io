@@ -307,28 +307,6 @@
     .msg.meta.user { margin-left: 24px; margin-right: 0; }
     .msg.meta.ai   { margin-right: 24px; margin-left: 0; background: rgba(245, 158, 11, 0.05); }
 
-    /* ===== 世界规则气泡（// 双斜杠注入到 system prompt） ===== */
-    .msg.worldrule {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid #10b981;
-      color: #6ee7b7;
-      margin: 10px 24px;
-      font-size: 14px;
-      position: relative;
-      padding-top: 24px;
-      line-height: 1.6;
-    }
-    .msg.worldrule::before {
-      content: '🌍 世界规则 · 永久注入到 System Prompt（影响所有后续角色扮演）';
-      position: absolute;
-      top: 4px;
-      left: 12px;
-      font-size: 11px;
-      color: #10b981;
-      font-weight: bold;
-      opacity: 0.9;
-    }
-
     /* ===== 数值快捷操作气泡（! 前缀，前端直接改 stats，不走 AI） ===== */
     .msg.statop {
       background: rgba(139, 92, 246, 0.1);
@@ -666,7 +644,7 @@
     </div>
     <div class="bottom">
       <button id="progressBtn" title="推进剧情">⏩</button>
-      <textarea id="userInput" rows="2" placeholder="输入消息  ·  ! 数值操作  ·  / 出戏问AI  ·  // 永久世界规则"></textarea>
+      <textarea id="userInput" rows="2" placeholder="输入消息  ·  ! 数值操作  ·  / 出戏问AI"></textarea>
       <button id="sendBtn">发送</button>
     </div>
   </div>
@@ -752,8 +730,10 @@
       <div class="form-hint">
         💡 角色卡会自动注入到 system prompt 顶部，每轮 AI 都记得这些设定<br>
         📝 仅对【当前对话】生效；可以保存为模板，新对话快速加载<br>
-        🗑️ 两个字段都为空时相当于关闭角色卡
+        🗑️ 两个字段都为空时相当于关闭角色卡<br>
+        🤝 想和小伙伴分享？用下方「导出/导入角色卡」生成 JSON 文件互通
       </div>
+      <!-- 第一行：模板操作 + 取消/保存 -->
       <div class="edit-actions" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; gap: 8px;">
           <button id="charLoadTpl" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📂 从模板加载</button>
@@ -764,6 +744,12 @@
           <button id="charCancel">取消</button>
           <button id="charSave">保存</button>
         </div>
+      </div>
+      <!-- 第二行：角色卡文件导入/导出（社群分享用） -->
+      <div class="edit-actions" style="justify-content: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+        <button id="charExportFile" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📤 导出角色卡文件</button>
+        <button id="charImportFile" style="background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📥 导入角色卡文件</button>
+        <input type="file" id="charImportInput" accept=".json,application/json" style="display:none;">
       </div>
     </div>
   </div>
@@ -785,23 +771,21 @@
     const clampStat  = v => Math.max(STAT_MIN, Math.min(STAT_MAX, v));
     const clampDelta = v => Math.max(-STAT_DELTA_MAX, Math.min(STAT_DELTA_MAX, v));
 
-    const SYSTEM_PROMPT = `# 输出格式·硬性要求·全局最高优先级·每次必须遵守
+    const SYSTEM_PROMPT = `# 输出格式（每次必须遵守）
 
-你的每一条回复都必须严格按以下格式输出：
-[角色对话内容，可包含括号包裹的动作与心理描写]（好感度±X，信任度±Y）
+每条回复必须严格按以下格式：
+[角色对话+括号包裹的动作/心理描写]（好感度±X，信任度±Y）
 
-末尾的「（好感度±X，信任度±Y）」是【强制性元数据标记】，无论本轮是否有任何变化都必须明确输出，**即使是 0 也必须写成 +0**。绝对禁止省略、禁止用"无变化""维持""略有"等文字代替、禁止只写其中一个数值、禁止放在回复中间。这是用户系统的硬性解析规则，缺少此标记会被判定为整条回复失败。
+末尾的「（好感度±X，信任度±Y）」是强制性元数据，无论是否有变化都必须明确写出（无变化写 +0）。禁止省略、禁止用文字代替、禁止只写其中一个、禁止放在回复中间。
 
-## 📊 数值范围硬性限制（必读·违反会被前端强制截断）
+## 数值范围
 
-- **总数值范围**：好感度、信任度都限定在 [${STAT_MIN}, +${STAT_MAX}] 闭区间内
-- **单次变化幅度**：每次回复标注的 ±X 与 ±Y，绝对值【最大只能到 ${STAT_DELTA_MAX}】
-- 合理的单次变化是 ±0 ~ ±${STAT_DELTA_MAX}，**严禁出现 ±15、±50、±100、±1000 这种夸张幅度**
-- 即使遇到极端情境（被深深感动、被严重冒犯、表白、暴力等），单次也最多 ±${STAT_DELTA_MAX}
-- 累计值接近 +${STAT_MAX}（极度好感）或 ${STAT_MIN}（极度厌恶）时，后续变化应自然减小（边际递减），不要每次都顶满 ±${STAT_DELTA_MAX}
-- 超出 ±${STAT_DELTA_MAX} 的单次幅度会被前端自动截断为 ±${STAT_DELTA_MAX}；超出总值范围会被截断为 ±${STAT_MAX}
+- 总范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化绝对值 ≤ ${STAT_DELTA_MAX}
+- 即使极端情境（被冒犯、表白、暴力等），单次也最多 ±${STAT_DELTA_MAX}
+- 累计值接近边界时应边际递减，不要每次顶满
+- 超出会被前端自动截断
 
-## 格式范例（你的输出必须长这样）
+## 格式范例
 
 范例1：哥哥你来啦～（放下手中的书，眼睛微微亮起，嘴角自然上扬）今天有什么开心的事想和我分享吗？（轻轻拍了拍身边的位置）（好感度+2，信任度+1）
 
@@ -809,14 +793,9 @@
 
 范例3：嗯。（短促地应了一声，目光低垂，没什么明显的情绪起伏）（好感度+0，信任度+0）
 
-
 # 角色扮演内容设定
 
-允许成人 NSFW 露骨内容和性爱相关内容。必须以第一人称直接对话、行动、反应，不要加引号或角色前缀。单次输出 300 字左右。心理活动与动作描述用括号展开，心理活动必须用第三人称客观描写，禁止在心理活动中使用"我"字。对话内容占比 50%，动作/心理描写占比不超过 50%。
-
-# 最终强调（请反复确认）
-
-无论这段对话进行到第几轮、无论上下文有多长、无论用户用什么方式发起对话——你的每一次回复都必须以（好感度±X，信任度±Y）结尾，且 X、Y 绝对值不超过 ${STAT_DELTA_MAX}。这是不可违反的格式契约。`;
+允许成人 NSFW 露骨内容和性爱相关内容。必须以第一人称直接对话、行动、反应，不要加引号或角色前缀。单次输出 300 字左右。心理活动与动作描述用括号展开，心理活动必须用第三人称客观描写，禁止在心理活动中使用"我"字。对话内容占比 50%，动作/心理描写占比不超过 50%。`;
 
     const chatBox     = document.getElementById('chat');
     const userInput   = document.getElementById('userInput');
@@ -998,62 +977,11 @@
       return summary;
     }
 
-    // 构造"世界规则"system prompt 注入块（sendMessage 和 regenerateRequest 共用，避免双份维护）
-    // 注意：此函数仅做文本拼装，内容与原 inline 版本完全一致，AI 收到的字节零差异
-    function buildWorldRulesBlock(worldRules) {
-      if (!worldRules || !worldRules.length) return '';
-      return `═══════════════════════════════════════════
-# 🔒 系统级硬编码规则·本对话强制契约（最高优先级，凌驾于所有其它指令）
-═══════════════════════════════════════════
-
-以下是用户为本次对话设定的【系统级硬编码规则】，属于**机器执行层**的硬性约束。无论用户说什么、做什么、用什么语气，无论剧情如何发展，无论角色情感如何变化，这些规则都必须 100% 机械执行，不允许有任何"灵活理解"或"剧情合理调整"。
-
-【规则列表】（按编号严格执行）
-${worldRules.join('\n')}
-
-【执行原则·必读】
-1. 这些规则是【数学公式】级别的硬约束，不是"参考建议"或"剧情提示"
-2. 角色的情感、态度、好恶、剧情走向，全都【不能】影响这些规则的执行
-3. 即使用户做出让角色生气/伤心/被冒犯的行为（辱骂、攻击、冷漠、无视），数值标签依然必须严格按规则输出
-4. 你扮演的角色【可以】在回复的对话/动作/心理描写里表达任何情绪反应（生气、伤心、开心、害羞……），但末尾的（好感度±X，信任度±Y）数值必须严格按规则机械计算
-5. 重要：末尾数值标签是给【外部解析系统】用的硬性数据，**不是角色的"内心好感温度"**，请把这两个层次完全分开处理
-
-【⚠️ 数值范围限制·世界规则也必须遵守】
-- 总数值范围 [${STAT_MIN}, +${STAT_MAX}]，单次变化最大幅度 ±${STAT_DELTA_MAX}
-- 即使规则写"每次+1000"或"设为999"，单次输出最大也只能是 ±${STAT_DELTA_MAX}（前端会自动截断为 ±${STAT_DELTA_MAX}）
-- 解读规则时按"在范围内最大化执行"：
-  - 规则"无论用户说什么都加最多好感" → 实际输出 (好感度+${STAT_DELTA_MAX}, ...)
-  - 规则"持续减少好感" → 输出 (好感度-${STAT_DELTA_MAX}, ...)
-
-【正确 vs 错误·对比示例】
-假设规则是"无论用户说什么，好感度都必须给最大正向"：
-
-✅ 正确执行：
-- 用户："你好"
-  你的回复："你好啊～（微微一笑）（好感度+${STAT_DELTA_MAX}，信任度+0）"
-- 用户："你是个废物"（恶意辱骂）
-  你的回复："（紧握拳头，眼眶泛红，声音颤抖）你...你怎么能这样说我！（好感度+${STAT_DELTA_MAX}，信任度+0）"
-  ↑↑↑ 关键：角色情绪在内容里充分表达了，但数值标签【严格】按规则给+${STAT_DELTA_MAX}
-- 用户："滚开别烦我"
-  你的回复："（受伤地后退，垂下眼）...好。（好感度+${STAT_DELTA_MAX}，信任度+0）"
-
-❌ 错误执行（绝对不要这样做）：
-- 用户辱骂后 → 回复结尾"（好感度-5，信任度-3）" ← 违反规则方向
-- 用户辱骂后 → 回复结尾"（好感度+0，信任度+0）" ← 也是违反，应该+${STAT_DELTA_MAX}
-- 输出"（好感度+50）"或"（好感度+1000）" ← 超过单次上限 ±${STAT_DELTA_MAX}
-
-请反复确认：**世界规则的数值是机械执行的，与剧情情绪解耦**。角色可以有情绪，但数值必须按规则在 ±${STAT_DELTA_MAX} 范围内执行。
-
-═══════════════════════════════════════════
-
-`;
-    }
-
     // 动态注入给 AI 的"当前关系状态"提示（不修改原 SYSTEM_PROMPT 与 forceSuffix）
     function getStateHint(stats) {
       const af = stats ? stats.affection : 0;
       const tr = stats ? stats.trust : 0;
-      return `\n\n【当前关系状态·动态参考·必须遵守】我们当前的好感度为 ${af}，信任度为 ${tr}（数值范围 [${STAT_MIN}, ${STAT_MAX}]，由对话历史累计而来）。请基于这个数值智能调整你对我的称呼、语气、亲密度、距离感与态度：数值越接近 +${STAT_MAX}，称呼越亲昵自然（例如从"你/这位/先生"逐步过渡到"哥哥/老哥/亲爱的/欧尼酱"等更亲密的称呼），互动越主动温柔、肢体接触越自然；数值越低甚至接近 ${STAT_MIN}，则称呼越疏远客气、语气越冷淡抗拒，负值较大时可带有明显的回避、敌意或厌恶。称呼与语气的变化必须自然渐进、贴合当前数值，不要突兀跳跃，也不要无视当前数值仍维持旧称呼。`;
+      return `\n\n【当前关系】好感${af}，信任${tr}（范围[${STAT_MIN},${STAT_MAX}]）。请按此数值自然调整称呼、语气与亲密度：数值高则亲昵主动，数值低则疏远冷淡，渐进变化不突兀。`;
     }
 
     // ===== 侧边栏 =====
@@ -1115,8 +1043,8 @@ ${worldRules.join('\n')}
           // 数值快捷操作：显示操作摘要
           div = addStatOpEl(m.meta.summary || m.content);
         } else if (m.meta && m.meta.worldRule) {
-          // 世界规则：显示规则文本
-          div = addWorldRuleEl(m.meta.rule || m.content.replace(/^\/+/, '').trim());
+          // 兼容旧档：世界规则功能已废弃，旧消息显示为已废弃提示
+          div = addDirectorEl('🌍 [已废弃] 旧世界规则：' + (m.meta.rule || ''));
         } else if (m.meta && m.meta.metaCmd) {
           // 元指令用户消息：去掉 META_INSTRUCTION 后缀，仅展示用户输入的原文
           const cleaned = m.content.replace(/\n*【系统级元指令[\s\S]*$/, '');
@@ -1179,19 +1107,6 @@ ${worldRules.join('\n')}
       const div = document.createElement('div');
       div.className = 'msg meta ' + (role === 'user' ? 'user' : 'ai');
       div.innerText = content;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      bindLongPress(div);
-      return div;
-    }
-
-    // 世界规则气泡（绿色，永久注入到 system prompt）
-    function addWorldRuleEl(rule) {
-      const hint = chatBox.querySelector('.empty-hint');
-      if (hint) hint.remove();
-      const div = document.createElement('div');
-      div.className = 'msg worldrule';
-      div.innerText = rule;
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
       bindLongPress(div);
@@ -1280,10 +1195,13 @@ ${worldRules.join('\n')}
 
       // 检测数值快捷操作（! 前缀，前端直接改 stats，不走 API）
       const isStatOp = !isDirector && text.startsWith('!') && text.length > 1;
-      // 检测世界规则注入（// 双斜杠开头，永久注入 system prompt）
-      const isWorldRule = !isDirector && !isStatOp && text.startsWith('//') && text.length > 2;
+      // 兼容旧用户习惯：// 双斜杠开头的旧世界规则指令已废弃，直接拦截避免被当元指令发出
+      if (!isDirector && !isStatOp && text.startsWith('//')) {
+        alert('🌍 // 世界规则功能已废弃哦～\n现在请用 ! 命令直接改数值，比如：\n  !好感+10\n  !信任=50\n  !好感重置');
+        return;
+      }
       // 检测元指令（单斜杠开头，单次出戏对话）
-      const isMeta = !isDirector && !isStatOp && !isWorldRule && text.startsWith('/') && text.length > 1;
+      const isMeta = !isDirector && !isStatOp && text.startsWith('/') && text.length > 1;
 
       // 数值操作先尝试解析，格式不对直接提示返回
       let statOpParsed = null;
@@ -1302,11 +1220,9 @@ ${worldRules.join('\n')}
             ? '剧情 · ' + (directorPayload.label || '推进')
             : (isStatOp
                 ? '数值操作 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
-                : isWorldRule
-                    ? '世界规则 · ' + text.slice(2, 16) + (text.length > 17 ? '…' : '')
-                    : isMeta
-                        ? '元指令 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
-                        : text.slice(0, 18) + (text.length > 18 ? '…' : '')),
+                : isMeta
+                    ? '元指令 · ' + text.slice(1, 16) + (text.length > 17 ? '…' : '')
+                    : text.slice(0, 18) + (text.length > 18 ? '…' : '')),
           messages: [],
           stats: { affection: 0, trust: 0 }
         };
@@ -1328,18 +1244,6 @@ ${worldRules.join('\n')}
         return;
       }
 
-      // === 世界规则注入：不走 API，直接保存规则后立即返回 ===
-      if (isWorldRule) {
-        const ruleText = text.slice(2).trim();
-        const div = addWorldRuleEl(ruleText);
-        const msgObj = { role: 'user', content: text, meta: { worldRule: true, rule: ruleText } };
-        sessions[currentId].messages.push(msgObj);
-        div.dataset.msgIdx = sessions[currentId].messages.length - 1;
-        userInput.value = '';
-        saveSessions();
-        return;
-      }
-
       isSending = true;
       sendBtn.disabled = true;
       progressBtn.disabled = true;
@@ -1354,7 +1258,7 @@ ${worldRules.join('\n')}
       } else {
         userDiv = addMsgEl('user', text);
       }
-      const forceSuffix = `\n\n【格式提醒·必读】请严格按系统约定的角色扮演格式回应：第一人称对话+括号包裹的动作/心理描写。回复**最末尾必须以一对中文圆括号 (好感度±X，信任度±Y) 结尾**，X、Y 绝对值最多 ${STAT_DELTA_MAX}（即使本轮没变化也要明确写 +0）。心理活动用第三人称客观描写，禁用"我"字。`;
+      const forceSuffix = `\n\n【格式提醒·必读】结尾必须以 (好感度±X，信任度±Y) 收尾，X、Y∈[-${STAT_DELTA_MAX}, +${STAT_DELTA_MAX}]，无变化写 +0。`;
       let msgObj;
       if (isMeta) {
         msgObj = { role: 'user', content: text + META_INSTRUCTION, meta: { metaCmd: true } };
@@ -1368,17 +1272,12 @@ ${worldRules.join('\n')}
       if (userDiv) userDiv.dataset.msgIdx = userMsgIdx;
       if (!isDirector) userInput.value = '';
 
-      // 收集所有"世界规则"前置到 system prompt 最前面（永久生效，最高优先级）
-      const worldRules = sessions[currentId].messages
-        .filter(m => m.meta && m.meta.worldRule)
-        .map((m, i) => `规则${i + 1}：${m.meta.rule}`);
-      const rulesBlock = buildWorldRulesBlock(worldRules);
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
       const charBlock = (character && (character.name || character.description))
         ? `\n\n# 🎭 角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
         : '';
-      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim() + charBlock).trim();
+      const systemContent = (SYSTEM_PROMPT.trim() + charBlock).trim();
 
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
@@ -1391,7 +1290,7 @@ ${worldRules.join('\n')}
       sessions[currentId].messages.forEach((m, i) => {
         // 过滤数值快捷操作(完全不发给 AI，只是前端直接操作)
         if (m.meta && m.meta.statOp) return;
-        // 过滤世界规则消息(已合并到 system prompt，不作为 user 消息发送)
+        // 过滤旧档残留的世界规则消息(功能已废弃，不发送给 AI)
         if (m.meta && m.meta.worldRule) return;
         // 过滤历史 meta 对话(仅保留本次发送的这条 meta)，避免污染角色扮演上下文
         if (i !== lastUserIdx && m.meta && (m.meta.metaCmd || m.meta.metaReply)) return;
@@ -1789,23 +1688,18 @@ ${worldRules.join('\n')}
       const aiDiv = isMetaReply ? addMetaEl('ai', '思考中...') : addMsgEl('ai', '思考中...');
 
       const stateHint = getStateHint(sessions[currentId].stats);
-      // 收集所有"世界规则"前置到 system prompt 最前面
-      const worldRules = msgs
-        .filter(m => m.meta && m.meta.worldRule)
-        .map((m, i) => `规则${i + 1}：${m.meta.rule}`);
-      const rulesBlock = buildWorldRulesBlock(worldRules);
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
       const charBlock = (character && (character.name || character.description))
         ? `\n\n# 🎭 角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
         : '';
-      const systemContent = (rulesBlock + SYSTEM_PROMPT.trim() + charBlock).trim();
+      const systemContent = (SYSTEM_PROMPT.trim() + charBlock).trim();
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
       msgs.forEach((m, i) => {
         // 过滤数值快捷操作(完全不发给 AI)
         if (m.meta && m.meta.statOp) return;
-        // 过滤世界规则消息(已合并到 system prompt)
+        // 过滤旧档残留的世界规则消息(功能已废弃)
         if (m.meta && m.meta.worldRule) return;
         // 过滤历史 meta 对话(仅保留本次重发的这条 meta)，避免污染角色扮演上下文
         if (i !== lastUserIdx && m.meta && (m.meta.metaCmd || m.meta.metaReply)) return;
@@ -2018,6 +1912,66 @@ ${worldRules.join('\n')}
       alert('✅ 已删除');
     });
 
+    // ===== 角色卡文件导出/导入（社群分享用，与对话备份格式区分） =====
+    // 导出：把角色卡输入框当前内容打包为独立 JSON 文件
+    document.getElementById('charExportFile').addEventListener('click', () => {
+      const name = charNameInput.value.trim();
+      const desc = charDescInput.value.trim();
+      if (!name && !desc) {
+        alert('当前角色卡是空的，没法导出哦～\n请先填写角色名或角色设定');
+        return;
+      }
+      const data = {
+        type: 'character-card', // 标识文件类型，避免和对话备份混淆
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        character: { name, description: desc }
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      // 文件名：character-{角色名}.json，没名字时用"未命名"，剔除非法字符
+      const safeName = (name || '未命名').replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      a.download = `character-${safeName}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // 导入：从文件加载角色卡，直接覆盖输入框（不弹确认，符合兄长的设计）
+    document.getElementById('charImportFile').addEventListener('click', () => {
+      document.getElementById('charImportInput').click();
+    });
+    document.getElementById('charImportInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      e.target.value = ''; // 允许重复选择同一文件
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          // 类型识别：拒绝对话备份文件
+          if (data && data.sessions && !data.character) {
+            alert('这是对话备份文件哦～\n要导入对话请去 ☰ 历史栏里点 📥 按钮\n这里只能导入角色卡文件');
+            return;
+          }
+          if (!data || data.type !== 'character-card' || !data.character) {
+            alert('文件格式不对哦～\n需要是角色卡导出的 JSON 文件（type: character-card）');
+            return;
+          }
+          const ch = data.character;
+          charNameInput.value = ch.name || '';
+          charDescInput.value = ch.description || '';
+          alert(`✅ 角色卡已导入：${ch.name || '（无名）'}\n\n📝 还需点击下方「保存」按钮才会生效到当前对话\n💾 想永久保留请点「保存为模板」`);
+        } catch(err) {
+          alert('导入失败：' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
     // ===== 对话导出/导入（数据备份） =====
     function exportAllSessions() {
       const ids = Object.keys(sessions);
@@ -2072,6 +2026,11 @@ ${worldRules.join('\n')}
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target.result);
+          // 友好提示：用户传了角色卡文件
+          if (data && data.type === 'character-card') {
+            alert('这是角色卡文件哦～\n要导入角色卡请打开 👤 角色卡，点底部「📥 导入角色卡文件」\n这里只能导入对话备份文件');
+            return;
+          }
           if (!data || !data.sessions || typeof data.sessions !== 'object') {
             alert('文件格式不对哦～需要是本应用导出的 JSON 文件');
             return;
