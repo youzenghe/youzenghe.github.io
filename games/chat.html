@@ -129,6 +129,7 @@
     }
 
     #topbar {
+      position: relative;
       display: flex;
       align-items: center;
       padding: 10px 12px;
@@ -137,6 +138,9 @@
       gap: 10px;
       flex-shrink: 0;
     }
+
+    /* 让左侧 ☰ 按钮和右侧 3 个按钮分到两边 */
+    #historyBtn { margin-right: auto; }
 
     .top-icon-btn {
       background: none;
@@ -152,13 +156,18 @@
     .top-icon-btn:hover { background: #1f2937; }
 
     #chatTitle {
-      flex: 1;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       font-size: 14px;
       color: #9ca3af;
+      text-align: center;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      text-align: center;
+      pointer-events: none;
+      max-width: 60%;
     }
 
     #chat {
@@ -596,6 +605,95 @@
       font-size: 12px;
       text-align: center;
     }
+
+    /* ===== 文件附件 ===== */
+    #attachBtn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #374151;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+    #attachBtn:hover:not(:disabled) { background: #4b5563; }
+    #attachBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    #fileChips {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 10px 0;
+      background: #171923;
+      border-top: 1px solid #1f2937;
+    }
+    #fileChips.show { display: flex; }
+
+    .file-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid #8b5cf6;
+      border-radius: 16px;
+      padding: 5px 6px 5px 10px;
+      font-size: 12px;
+      color: #c4b5fd;
+      max-width: 100%;
+    }
+    .file-chip .fc-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
+    }
+    .file-chip .fc-size {
+      color: #9ca3af;
+      font-size: 11px;
+      margin-left: 2px;
+    }
+    .file-chip .fc-del {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 4px;
+      line-height: 1;
+      border-radius: 50%;
+    }
+    .file-chip .fc-del:hover { color: #f87171; background: rgba(239,68,68,0.15); }
+    .file-chip.parsing {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: #f59e0b;
+      color: #fcd34d;
+    }
+    .file-chip.error {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* 用户消息气泡里的附件标签栏 */
+    .msg-attach {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
+    }
+    .msg-attach .attach-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -642,9 +740,12 @@
     <div id="chat">
       <div class="empty-hint">✨ 开始新的对话吧～<br>历史记录会自动保存哦</div>
     </div>
+    <div id="fileChips"></div>
     <div class="bottom">
       <button id="progressBtn" title="推进剧情">⏩</button>
-      <textarea id="userInput" rows="2" placeholder="输入消息  ·  ! 数值操作  ·  / 出戏问AI"></textarea>
+      <button id="attachBtn" title="上传文件（txt/md/json/csv/代码/PDF/Word/Excel）">📎</button>
+      <input type="file" id="fileInput" multiple accept=".txt,.md,.markdown,.json,.csv,.tsv,.html,.htm,.xml,.log,.yml,.yaml,.toml,.ini,.cfg,.conf,.js,.mjs,.cjs,.ts,.tsx,.jsx,.py,.java,.kt,.go,.rs,.rb,.php,.swift,.c,.cpp,.h,.hpp,.cs,.scala,.dart,.lua,.pl,.r,.sql,.sh,.bash,.zsh,.ps1,.bat,.cmd,.env,.vue,.svelte,.astro,.tex,.rst,.adoc,.pdf,.docx,.xlsx,.xls,.xlsm,.ods,text/*" style="display:none;">
+      <textarea id="userInput" rows="2" placeholder="输入消息  ·  ! 数值操作  ·  / 出戏问AI  ·  📎 附件"></textarea>
       <button id="sendBtn">发送</button>
     </div>
   </div>
@@ -828,8 +929,20 @@
     const META_INSTRUCTION = '\n\n【系统级元指令·必须严格遵守】上面这条以"/"开头的消息不是角色扮演里"我"对角色说的话，而是【用户（创作者/导演）】对【你（底层AI/旁白助手本身）】发出的元指令。请你立即跳出当前的角色扮演框架，以创作助手/客观旁白者的第三人称视角直接回应这条指令。回应要求：①绝对不要扮演任何角色，不要使用任何角色的第一人称口吻或括号动作描写；②绝对不要使用[剧情]标签；③绝对不要在回复结尾标注好感度/信任度变化的括号；④可以基于已有的对话历史进行客观分析、剧情阶段总结、关系走向预测、强制收尾结局、回答关于剧情本身的元问题、给出后续走向建议等元层面操作；⑤本次元指令的对话不会进入下一轮角色扮演的上下文，用户下一条普通消息（不带 / 前缀）会自动回到角色扮演状态，请放心跳出。';
 
     // ===== localStorage =====
+    let _quotaAlerted = false; // 配额提示去抖，避免连续弹窗轰炸
     function saveSessions() {
-      try { localStorage.setItem('ds_sessions', JSON.stringify(sessions)); } catch(e) {}
+      try {
+        localStorage.setItem('ds_sessions', JSON.stringify(sessions));
+        _quotaAlerted = false;
+      } catch(e) {
+        const isQuota = e.name === 'QuotaExceededError' ||
+                        e.code === 22 || e.code === 1014 ||
+                        (e.message && e.message.toLowerCase().includes('quota'));
+        if (isQuota && !_quotaAlerted) {
+          _quotaAlerted = true;
+          alert('⚠️ 浏览器本地存储空间已满，刚才的内容未能保存！\n\n常见原因：\n  • 上传的附件文件太大\n  • 历史对话累积过多\n\n建议：\n  • 用 ☰ 侧栏的 📤 导出按钮备份后，再删除旧对话\n  • 减小上传文件大小或拆分多次上传');
+        }
+      }
     }
     function loadSessions() {
       try {
@@ -1046,16 +1159,18 @@
           // 兼容旧档：世界规则功能已废弃，旧消息显示为已废弃提示
           div = addDirectorEl('🌍 [已废弃] 旧世界规则：' + (m.meta.rule || ''));
         } else if (m.meta && m.meta.metaCmd) {
-          // 元指令用户消息：去掉 META_INSTRUCTION 后缀，仅展示用户输入的原文
-          const cleaned = m.content.replace(/\n*【系统级元指令[\s\S]*$/, '');
+          // 元指令用户消息：剥离附件区 + META_INSTRUCTION 后缀
+          const cleaned = stripAttachBlock(m.content).replace(/\n*【系统级元指令[\s\S]*$/, '');
           div = addMetaEl('user', cleaned);
+          renderAttachTags(div, m.attachNames);
         } else if (m.meta && m.meta.metaReply) {
           // 元指令 AI 回复：直接展示完整内容
           div = addMetaEl('ai', m.content);
         } else if (m.role === 'user') {
-          // 展示时去掉拼在 content 末尾的 forceSuffix 部分（兼容新旧标记：【格式提醒·必读】或旧版【强制要求】）
-          const cleaned = m.content.replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
+          // 展示时剥离附件区和 forceSuffix（兼容新旧标记：【格式提醒·必读】或旧版【强制要求】）
+          const cleaned = stripAttachBlock(m.content).replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
           div = addMsgEl('user', cleaned);
+          renderAttachTags(div, m.attachNames);
         } else if (m.role === 'assistant') {
           // 展示时去掉 [剧情] 标签部分(只在显示层过滤,存档里保留)
           const cleaned = m.content.replace(/\[剧情\][\s\S]*?\[\/剧情\]/g, '').replace(/^\s+/, '');
@@ -1213,6 +1328,16 @@
         }
       }
 
+      // 检查是否有文件还在解析中（普通消息和元指令场景）：避免用户没察觉到附件被"漏发"
+      if (!isDirector && !isStatOp) {
+        const parsingFiles = pendingFiles.filter(f => f.status === 'parsing');
+        if (parsingFiles.length > 0) {
+          alert(`⏳ 还有 ${parsingFiles.length} 个文件正在解析中，请等解析完再发送～\n\n（解析完文件标签会从黄色变成紫色）\n\n` +
+                parsingFiles.map(f => '  • ' + f.name).join('\n'));
+          return;
+        }
+      }
+
       if (!currentId) {
         currentId = Date.now().toString();
         sessions[currentId] = {
@@ -1249,28 +1374,35 @@
       progressBtn.disabled = true;
       sendBtn.innerText = '发送中';
 
+      // 普通消息和元指令时附加已上传的文件内容（导演/数值操作不带附件）
+      const attach = (!isDirector && !isStatOp) ? buildAttachContext() : { text: '', names: [] };
+
       let directorBubble = null;
       let userDiv = null;
       if (isDirector) {
         directorBubble = addDirectorEl(directorPayload.label);
       } else if (isMeta) {
         userDiv = addMetaEl('user', text);
+        renderAttachTags(userDiv, attach.names);
       } else {
         userDiv = addMsgEl('user', text);
+        renderAttachTags(userDiv, attach.names);
       }
       const forceSuffix = `\n\n【格式提醒·必读】结尾必须以 (好感度±X，信任度±Y) 收尾，X、Y∈[-${STAT_DELTA_MAX}, +${STAT_DELTA_MAX}]，无变化写 +0。`;
       let msgObj;
       if (isMeta) {
-        msgObj = { role: 'user', content: text + META_INSTRUCTION, meta: { metaCmd: true } };
+        msgObj = { role: 'user', content: attach.text + text + META_INSTRUCTION, meta: { metaCmd: true } };
       } else {
-        msgObj = { role: 'user', content: text + forceSuffix };
+        msgObj = { role: 'user', content: attach.text + text + forceSuffix };
         if (isDirector) msgObj.meta = { director: true, label: directorPayload.label };
       }
+      if (attach.names.length) msgObj.attachNames = attach.names;
       sessions[currentId].messages.push(msgObj);
       const userMsgIdx = sessions[currentId].messages.length - 1;
       if (directorBubble) directorBubble.dataset.msgIdx = userMsgIdx;
       if (userDiv) userDiv.dataset.msgIdx = userMsgIdx;
       if (!isDirector) userInput.value = '';
+      if (attach.names.length) clearSentAttachments();
 
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
@@ -1586,12 +1718,12 @@
         // 世界规则：只编辑 rule 文本
         content = msg.meta.rule || msg.content.replace(/^\/+/, '').trim();
       } else if (msg.meta && msg.meta.metaCmd) {
-        // 元指令用户消息：去掉 META_INSTRUCTION 后缀
-        content = content.replace(/\n*【系统级元指令[\s\S]*$/, '');
+        // 元指令用户消息：剥离附件区 + META_INSTRUCTION 后缀
+        content = stripAttachBlock(content).replace(/\n*【系统级元指令[\s\S]*$/, '');
       } else if (msg.meta && msg.meta.metaReply) {
         // 元指令 AI 回复：直接编辑全文
       } else if (msg.role === 'user') {
-        content = content.replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
+        content = stripAttachBlock(content).replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
       } else if (msg.role === 'assistant') {
         content = content.replace(/\[剧情\][\s\S]*?\[\/剧情\]/g, '').replace(/^\s+/, '');
       }
@@ -1615,15 +1747,17 @@
         msg.meta.rule = rule;
         msg.content = '//' + rule;
       } else if (msg.meta && msg.meta.metaCmd) {
-        // 元指令用户消息：保留 META_INSTRUCTION 后缀
+        // 元指令用户消息：保留附件前缀 + META_INSTRUCTION 后缀
+        const attachPrefix = getAttachPrefix(msg.content);
         const m = msg.content.match(/(\n*【系统级元指令[\s\S]*)$/);
-        msg.content = newContent + (m ? m[1] : '');
+        msg.content = attachPrefix + newContent + (m ? m[1] : '');
       } else if (msg.meta && msg.meta.metaReply) {
         // 元指令 AI 回复：直接保存
         msg.content = newContent;
       } else if (msg.role === 'user') {
+        const attachPrefix = getAttachPrefix(msg.content);
         const m = msg.content.match(/(\n*【(?:强制要求|格式提醒·必读)】[\s\S]*)$/);
-        msg.content = newContent + (m ? m[1] : '');
+        msg.content = attachPrefix + newContent + (m ? m[1] : '');
       } else if (msg.role === 'assistant') {
         // 保留原有 [剧情] 标签(如果原来有)
         const m = msg.content.match(/^(\s*\[剧情\][\s\S]*?\[\/剧情\])/);
@@ -2067,6 +2201,232 @@
       if (file) importSessions(file);
       e.target.value = ''; // 允许重复选择同一文件
     });
+
+    // ===== 文件附件（上传文本/PDF/Word/Excel，解析后随消息一起发给 AI） =====
+    const MAX_FILE_CHARS = 100000;   // 单文件上限 10w 字符,超长截断（防止爆 token）
+    const ATTACH_START = '【📎附件区开始】';
+    const ATTACH_END   = '【📎附件区结束】';
+
+    // 纯文本类扩展名（零依赖直接 FileReader 读）
+    const TEXT_EXTS = new Set([
+      'txt','md','markdown','json','csv','tsv','html','htm','xml','log',
+      'yml','yaml','toml','ini','cfg','conf','env',
+      'js','mjs','cjs','ts','tsx','jsx','vue','svelte','astro',
+      'py','java','kt','go','rs','rb','php','swift','c','cpp','h','hpp',
+      'cs','scala','dart','lua','pl','r','sql','sh','bash','zsh','ps1','bat','cmd',
+      'tex','rst','adoc'
+    ]);
+
+    // CDN 懒加载（首次需要时再下载,避免拖慢首屏）
+    const CDN_LIBS = {
+      pdf:        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+      pdfWorker:  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+      mammoth:    'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',
+      xlsx:       'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    };
+    const _loadingScripts = {};
+    function loadScript(src) {
+      if (_loadingScripts[src]) return _loadingScripts[src];
+      _loadingScripts[src] = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => { delete _loadingScripts[src]; reject(new Error('CDN 加载失败（请检查网络）：' + src)); };
+        document.head.appendChild(s);
+      });
+      return _loadingScripts[src];
+    }
+    async function ensurePdfLib() {
+      await loadScript(CDN_LIBS.pdf);
+      if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = CDN_LIBS.pdfWorker;
+    }
+    async function ensureMammothLib() { await loadScript(CDN_LIBS.mammoth); }
+    async function ensureXlsxLib()    { await loadScript(CDN_LIBS.xlsx); }
+
+    function getFileExt(name) {
+      const i = name.lastIndexOf('.');
+      return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
+    }
+
+    async function parseFile(file) {
+      const ext = getFileExt(file.name);
+      const lowerName = file.name.toLowerCase();
+      // 1. 纯文本
+      if (TEXT_EXTS.has(ext) || (file.type || '').startsWith('text/') ||
+          lowerName === 'dockerfile' || lowerName === 'makefile' || lowerName === '.gitignore') {
+        return await file.text();
+      }
+      // 2. PDF
+      if (ext === 'pdf') {
+        await ensurePdfLib();
+        const buffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += `--- 第 ${i} 页 ---\n` + content.items.map(it => it.str).join(' ') + '\n\n';
+        }
+        return text.trim();
+      }
+      // 3. Word
+      if (ext === 'docx') {
+        await ensureMammothLib();
+        const buffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+        return result.value;
+      }
+      if (ext === 'doc') throw new Error('暂不支持旧版 .doc，请另存为 .docx 再上传');
+      // 4. Excel
+      if (ext === 'xlsx' || ext === 'xls' || ext === 'xlsm' || ext === 'ods') {
+        await ensureXlsxLib();
+        const buffer = await file.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: 'array' });
+        let text = '';
+        wb.SheetNames.forEach(sheetName => {
+          text += `--- 工作表：${sheetName} ---\n` + XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]) + '\n\n';
+        });
+        return text.trim();
+      }
+      // 兜底：尝试当文本读
+      try {
+        const t = await file.text();
+        if (t && t.length > 0) return t;
+      } catch(e) {}
+      throw new Error(`不支持的文件格式：.${ext}`);
+    }
+
+    // ===== 待发送附件状态 =====
+    let pendingFiles = []; // [{ id, name, size, content, truncated, status: 'parsing'|'ok'|'error', error }]
+    const fileInput = document.getElementById('fileInput');
+    const attachBtn = document.getElementById('attachBtn');
+    const fileChips = document.getElementById('fileChips');
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + 'B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+      return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+    }
+    function fileIcon(ext) {
+      if (ext === 'pdf') return '📕';
+      if (['docx','doc'].includes(ext)) return '📘';
+      if (['xlsx','xls','xlsm','ods','csv'].includes(ext)) return '📗';
+      if (['json','xml','yml','yaml','toml','ini'].includes(ext)) return '⚙️';
+      if (['js','ts','py','java','go','rs','c','cpp','rb','php','sh'].includes(ext)) return '💻';
+      return '📄';
+    }
+
+    function renderFileChips() {
+      if (!pendingFiles.length) {
+        fileChips.classList.remove('show');
+        fileChips.innerHTML = '';
+        return;
+      }
+      fileChips.classList.add('show');
+      fileChips.innerHTML = '';
+      pendingFiles.forEach(f => {
+        const chip = document.createElement('div');
+        chip.className = 'file-chip' + (f.status === 'parsing' ? ' parsing' : f.status === 'error' ? ' error' : '');
+        const ext = getFileExt(f.name);
+        const status = f.status === 'parsing' ? ' (解析中…)' : f.status === 'error' ? ' (失败)' : (f.truncated ? ' ⚠️截断' : '');
+
+        // 用 DOM API 创建避免文件名含 < > & 等字符引发的显示错乱/XSS
+        const iconSpan = document.createElement('span');
+        iconSpan.textContent = fileIcon(ext);
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'fc-name';
+        nameSpan.title = f.error ? f.name + ' - ' + f.error : f.name;
+        nameSpan.textContent = f.name + status;
+
+        const sizeSpan = document.createElement('span');
+        sizeSpan.className = 'fc-size';
+        sizeSpan.textContent = formatFileSize(f.size);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'fc-del';
+        delBtn.title = '移除';
+        delBtn.textContent = '✕';
+        delBtn.addEventListener('click', () => {
+          pendingFiles = pendingFiles.filter(x => x.id !== f.id);
+          renderFileChips();
+        });
+
+        chip.appendChild(iconSpan);
+        chip.appendChild(nameSpan);
+        chip.appendChild(sizeSpan);
+        chip.appendChild(delBtn);
+        fileChips.appendChild(chip);
+      });
+    }
+
+    attachBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      e.target.value = '';
+      for (const file of files) {
+        const id = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        const entry = { id, name: file.name, size: file.size, content: '', status: 'parsing' };
+        pendingFiles.push(entry);
+        renderFileChips();
+        try {
+          let text = await parseFile(file);
+          if (text.length > MAX_FILE_CHARS) {
+            text = text.slice(0, MAX_FILE_CHARS);
+            entry.truncated = true;
+          }
+          entry.content = text;
+          entry.status = 'ok';
+        } catch(err) {
+          entry.status = 'error';
+          entry.error = err.message;
+          alert(`解析失败【${file.name}】：${err.message}`);
+        }
+        renderFileChips();
+      }
+    });
+
+    // 构造拼接到 user message 前面的附件区文本（只取解析成功的）
+    function buildAttachContext() {
+      const ready = pendingFiles.filter(f => f.status === 'ok');
+      if (!ready.length) return { text: '', names: [] };
+      const parts = ready.map(f => {
+        const hint = f.truncated ? `（⚠️ 文件超长，仅保留前 ${MAX_FILE_CHARS} 字符）` : '';
+        return `\n----- 文件：${f.name}${hint} -----\n${f.content}`;
+      });
+      const text = `${ATTACH_START}\n用户附加了 ${ready.length} 个文件，请结合内容回应：${parts.join('\n')}\n${ATTACH_END}\n\n`;
+      const names = ready.map(f => ({ name: f.name, truncated: !!f.truncated, size: f.size }));
+      return { text, names };
+    }
+    // 清空已成功发送的附件（保留失败的让用户可见/可手动删）
+    function clearSentAttachments() {
+      pendingFiles = pendingFiles.filter(f => f.status !== 'ok');
+      renderFileChips();
+    }
+    // 在用户气泡里渲染附件文件名标签（小标签链）
+    function renderAttachTags(parentEl, names) {
+      if (!names || !names.length) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-attach';
+      names.forEach(n => {
+        const tag = document.createElement('span');
+        tag.className = 'attach-tag';
+        tag.textContent = (n.truncated ? '⚠️' : '📎') + ' ' + n.name;
+        wrap.appendChild(tag);
+      });
+      parentEl.insertBefore(wrap, parentEl.firstChild);
+    }
+    // 从 content 里剥离附件区文本（用于历史显示和编辑框）
+    function getAttachPrefix(content) {
+      const reStart = ATTACH_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const reEnd   = ATTACH_END.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const m = content.match(new RegExp('^(' + reStart + '[\\s\\S]*?' + reEnd + '\\n*)'));
+      return m ? m[1] : '';
+    }
+    function stripAttachBlock(content) {
+      const prefix = getAttachPrefix(content);
+      return prefix ? content.slice(prefix.length) : content;
+    }
 
     loadSettings();
     loadSessions();
