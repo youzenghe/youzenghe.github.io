@@ -694,6 +694,100 @@
       padding: 2px 8px;
       font-size: 12px;
     }
+
+    /* ===== 记忆压缩 ===== */
+    #memoryBtn {
+      background: none;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #d1d5db;
+      font-size: 14px;
+      padding: 3px 8px;
+      cursor: pointer;
+      line-height: 1.2;
+      margin-left: 6px;
+    }
+    #memoryBtn:hover { background: #1f2937; }
+    #memoryBtn.has-memory { border-color: #6366f1; color: #a5b4fc; }
+    #memoryBtn.compressing {
+      border-color: #f59e0b;
+      color: #fcd34d;
+      animation: mem-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes mem-pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.45; }
+    }
+
+    /* 记忆压缩进度小气泡（插在聊天区） */
+    .msg.memcompress {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px dashed #6366f1;
+      color: #a5b4fc;
+      margin: 10px 24px;
+      text-align: center;
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+    .msg.memcompress.error {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* 记忆面板的大文本区 */
+    #memText {
+      width: 100%;
+      min-height: 280px;
+      background: #11141d;
+      color: #fff;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      resize: vertical;
+      outline: none;
+      font-family: inherit;
+    }
+    #memText:focus { border-color: #6366f1; }
+    .mem-meta {
+      color: #9ca3af;
+      font-size: 12px;
+      margin-bottom: 8px;
+      padding: 8px 10px;
+      background: #11141d;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+    .mem-meta b { color: #d1d5db; }
+
+    /* 设置面板压缩分区 */
+    .form-section-title {
+      color: #d1d5db;
+      font-size: 13px;
+      font-weight: bold;
+      margin: 16px 0 8px;
+      padding-top: 14px;
+      border-top: 1px solid #374151;
+    }
+    .form-row.inline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .form-row.inline label {
+      margin-bottom: 0;
+      flex: 1;
+    }
+    .form-row.inline input[type=number] {
+      width: 100px;
+    }
+    .form-row.inline input[type=checkbox] {
+      width: 18px; height: 18px;
+      accent-color: #6366f1;
+    }
   </style>
 </head>
 <body>
@@ -736,6 +830,7 @@
         <span class="stat-value zero" id="statTr">0</span>
         <span class="stat-delta" id="statTrDelta"></span>
       </div>
+      <button id="memoryBtn" title="长期记忆 / 剧情压缩">🧠 记忆</button>
     </div>
     <div id="chat">
       <div class="empty-hint">✨ 开始新的对话吧～<br>历史记录会自动保存哦</div>
@@ -810,6 +905,26 @@
         🔒 你的 API Key 仅保存在<b>你自己的浏览器本地</b>，不会上传到任何服务器。<br>
         📝 留空恢复默认：DeepSeek 官方接口 / deepseek-v4-flash 模型。
       </div>
+
+      <div class="form-section-title">🧠 长期记忆 / 剧情压缩</div>
+      <div class="form-row inline">
+        <label for="setMemAuto">自动压缩（AI 回复后超阈值自动触发）</label>
+        <input type="checkbox" id="setMemAuto">
+      </div>
+      <div class="form-row inline">
+        <label for="setMemThreshold">触发阈值（聊天字符总数，约 4 字符 = 1 token）</label>
+        <input type="number" id="setMemThreshold" min="2000" max="200000" step="1000">
+      </div>
+      <div class="form-row inline">
+        <label for="setMemKeepRecent">保留最近多少条原文不压缩（保持口吻连续）</label>
+        <input type="number" id="setMemKeepRecent" min="2" max="50" step="2">
+      </div>
+      <div class="form-hint">
+        💡 阈值越大压缩越晚（默认 12000 ≈ 6k token，约 30-50 条消息）<br>
+        💡 保留最近 N 条让 AI 看到原话不脱口吻（默认 8 条 ≈ 4 轮对话）<br>
+        💡 点 statsBar 上的 🧠 记忆 按钮可查看/编辑/手动触发压缩
+      </div>
+
       <div class="edit-actions">
         <button id="setCancel">取消</button>
         <button id="setSave">保存</button>
@@ -851,6 +966,33 @@
         <button id="charExportFile" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📤 导出角色卡文件</button>
         <button id="charImportFile" style="background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📥 导入角色卡文件</button>
         <input type="file" id="charImportInput" accept=".json,application/json" style="display:none;">
+      </div>
+    </div>
+  </div>
+
+  <div id="memoryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center;padding:16px;">
+    <div class="edit-card">
+      <div class="edit-title">🧠 长期记忆 / 剧情压缩</div>
+      <div class="mem-meta" id="memMeta">尚未生成剧情大纲</div>
+      <div class="form-row">
+        <label>剧情大纲（AI 自动生成，可手动编辑修正）</label>
+        <textarea id="memText" placeholder="还没生成剧情大纲～&#10;条件触发后会自动压缩，也可以点下方「立即压缩」手动触发"></textarea>
+      </div>
+      <div class="form-hint">
+        💡 这段大纲会作为「长期记忆」注入到每次 AI 的 system prompt，让 AI 记住早期剧情<br>
+        🔄 多次压缩会基于已有大纲整合新对话，<b>不会丢失旧剧情</b><br>
+        ✏️ 可手动编辑大纲补充/修正关键信息（保存后立即生效）<br>
+        ⚠️ 清空大纲后 AI 会失去早期剧情记忆，谨慎操作
+      </div>
+      <div class="edit-actions" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; gap: 8px;">
+          <button id="memCompressNow" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">⚡ 立即压缩</button>
+          <button id="memClear" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">🗑 清空大纲</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="memCancel" style="background:#374151;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;">取消</button>
+          <button id="memSave" style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;">保存</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1111,6 +1253,7 @@
       chatBox.innerHTML = '<div class="empty-hint">✨ 开始新的对话吧～<br>历史记录会自动保存哦</div>';
       chatTitle.textContent = '新对话';
       renderStats(null);
+      updateMemoryBtn();
     }
 
     // ===== 渲染历史列表 =====
@@ -1179,6 +1322,7 @@
         if (div) div.dataset.msgIdx = i;
       });
       renderStats(s.stats);
+      updateMemoryBtn();
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
@@ -1413,13 +1557,22 @@
 
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
+      // 注入"长期剧情记忆"(早期对话压缩后的大纲，如果有)
+      const memBlock = buildMemorySystemBlock(sessions[currentId].memory);
+      if (memBlock) finalMessages.push({ role: 'system', content: memBlock });
+      // 已被压缩的消息不再重复发送(它们的信息已经在 memory.summary 里)
+      let memStart = (sessions[currentId].memory && sessions[currentId].memory.compressedUntilIdx) || 0;
       // 注入"当前关系状态"提示到最后一条 user message 末尾(动态、不入档,每次基于最新数值生成)
       const stateHint = getStateHint(sessions[currentId].stats);
       let lastUserIdx = -1;
       for (let i = sessions[currentId].messages.length - 1; i >= 0; i--) {
         if (sessions[currentId].messages[i].role === 'user') { lastUserIdx = i; break; }
       }
+      // 防御性 clamp：边界场景(如 regenerate 早期消息)下确保最后一条 user 消息一定能发给 AI
+      if (lastUserIdx >= 0 && memStart > lastUserIdx) memStart = lastUserIdx;
       sessions[currentId].messages.forEach((m, i) => {
+        // 跳过已被压缩成大纲的早期消息
+        if (i < memStart) return;
         // 过滤数值快捷操作(完全不发给 AI，只是前端直接操作)
         if (m.meta && m.meta.statOp) return;
         // 过滤旧档残留的世界规则消息(功能已废弃，不发送给 AI)
@@ -1526,6 +1679,8 @@
         sendBtn.disabled = false;
         progressBtn.disabled = false;
         sendBtn.innerText = '发送';
+        // AI 回复完成后,检查是否需要自动压缩历史
+        maybeAutoCompress();
       }
     }
 
@@ -1705,6 +1860,13 @@
         }
       }
       msgs.splice(from, to - from + 1);
+      // 同步修正 memory.compressedUntilIdx,避免删除后索引指向错位的消息
+      const mem1 = sessions[currentId].memory;
+      if (mem1 && typeof mem1.compressedUntilIdx === 'number') {
+        const removeCount = to - from + 1;
+        if (mem1.compressedUntilIdx > to)        mem1.compressedUntilIdx -= removeCount;
+        else if (mem1.compressedUntilIdx > from) mem1.compressedUntilIdx = from;
+      }
       saveSessions();
       rerenderCurrent();
     }
@@ -1787,6 +1949,11 @@
       }
       // 删除该 AI 及之后所有消息
       msgs.splice(idx);
+      // 同步修正 memory.compressedUntilIdx
+      const mem2 = sessions[currentId].memory;
+      if (mem2 && typeof mem2.compressedUntilIdx === 'number' && mem2.compressedUntilIdx > idx) {
+        mem2.compressedUntilIdx = idx;
+      }
       saveSessions();
       rerenderCurrent();
       await regenerateRequest();
@@ -1830,7 +1997,15 @@
       const systemContent = (SYSTEM_PROMPT.trim() + charBlock).trim();
       const finalMessages = [];
       if (systemContent) finalMessages.push({ role: 'system', content: systemContent });
+      // 注入长期记忆大纲(如果有)
+      const memBlock = buildMemorySystemBlock(sessions[currentId].memory);
+      if (memBlock) finalMessages.push({ role: 'system', content: memBlock });
+      let memStart = (sessions[currentId].memory && sessions[currentId].memory.compressedUntilIdx) || 0;
+      // 防御性 clamp：确保最后一条 user 消息一定能发给 AI(对应 regenerate 早期 AI 消息等边界场景)
+      if (lastUserIdx >= 0 && memStart > lastUserIdx) memStart = lastUserIdx;
       msgs.forEach((m, i) => {
+        // 跳过已被压缩成大纲的早期消息
+        if (i < memStart) return;
         // 过滤数值快捷操作(完全不发给 AI)
         if (m.meta && m.meta.statOp) return;
         // 过滤旧档残留的世界规则消息(功能已废弃)
@@ -1938,6 +2113,9 @@
       document.getElementById('setApiUrl').value = API_URL;
       document.getElementById('setApiKey').value = API_KEY;
       document.getElementById('setModel').value  = MODEL;
+      document.getElementById('setMemAuto').checked       = !!memSettings.enabled;
+      document.getElementById('setMemThreshold').value    = memSettings.threshold;
+      document.getElementById('setMemKeepRecent').value   = memSettings.keepRecent;
       document.getElementById('settingsModal').classList.add('show');
     }
     function closeSettingsModal() {
@@ -1954,6 +2132,13 @@
           apiUrl: API_URL, apiKey: API_KEY, model: MODEL
         }));
       } catch(e) {}
+      // 记忆压缩设置
+      const thRaw = parseInt(document.getElementById('setMemThreshold').value, 10);
+      const krRaw = parseInt(document.getElementById('setMemKeepRecent').value, 10);
+      memSettings.enabled    = document.getElementById('setMemAuto').checked;
+      memSettings.threshold  = (!isNaN(thRaw) && thRaw >= 2000 && thRaw <= 200000) ? thRaw : MEM_DEFAULTS.threshold;
+      memSettings.keepRecent = (!isNaN(krRaw) && krRaw >= 2    && krRaw <= 50)     ? krRaw : MEM_DEFAULTS.keepRecent;
+      saveMemSettings();
       closeSettingsModal();
     });
 
@@ -2427,6 +2612,291 @@
       const prefix = getAttachPrefix(content);
       return prefix ? content.slice(prefix.length) : content;
     }
+
+    // ===== 长期记忆 / 剧情压缩 =====
+    const MEM_DEFAULTS = {
+      enabled: true,
+      threshold: 12000,   // 字符阈值（≈ 6k tokens，约 30-50 条消息）
+      keepRecent: 8       // 保留最近 N 条原文不压缩
+    };
+    let memSettings = { ...MEM_DEFAULTS };
+    function loadMemSettings() {
+      try {
+        const raw = localStorage.getItem('ds_mem_settings');
+        if (raw) {
+          const s = JSON.parse(raw);
+          memSettings.enabled    = typeof s.enabled === 'boolean' ? s.enabled : MEM_DEFAULTS.enabled;
+          memSettings.threshold  = (s.threshold  >= 2000 && s.threshold  <= 200000) ? s.threshold  : MEM_DEFAULTS.threshold;
+          memSettings.keepRecent = (s.keepRecent >= 2    && s.keepRecent <= 50)     ? s.keepRecent : MEM_DEFAULTS.keepRecent;
+        }
+      } catch(e) {}
+    }
+    function saveMemSettings() {
+      try { localStorage.setItem('ds_mem_settings', JSON.stringify(memSettings)); } catch(e) {}
+    }
+
+    // 统计当前 session 未压缩部分的总字符数
+    function calcUncompressedChars(s) {
+      if (!s || !s.messages) return 0;
+      const startIdx = (s.memory && s.memory.compressedUntilIdx) || 0;
+      let total = 0;
+      for (let i = startIdx; i < s.messages.length; i++) {
+        const m = s.messages[i];
+        if (!m) continue;
+        // 跳过不计入 AI 上下文的消息(数值操作/废弃世界规则/出戏元指令)
+        if (m.meta && (m.meta.statOp || m.meta.worldRule || m.meta.metaCmd || m.meta.metaReply)) continue;
+        total += (m.content || '').length;
+      }
+      return total;
+    }
+
+    // 把要压缩的对话转成纯文本喂给 AI（剥离所有内部标记）
+    function buildCompressPrompt(prevSummary, messagesToCompress) {
+      const reStart = ATTACH_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const reEnd   = ATTACH_END.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const attachRe = new RegExp('^' + reStart + '[\\s\\S]*?' + reEnd + '\\n*');
+
+      const convo = messagesToCompress.map(m => {
+        if (!m || !m.role) return null;
+        // 出戏元指令、数值操作、废弃世界规则都不能进剧情大纲(它们不是剧情)
+        if (m.meta && (m.meta.statOp || m.meta.worldRule || m.meta.metaCmd || m.meta.metaReply)) return null;
+        let content = m.content || '';
+        content = content.replace(/\n*【(?:强制要求|格式提醒·必读)】[\s\S]*$/, '');
+        content = content.replace(/\n*【系统级元指令[\s\S]*$/, '');
+        content = content.replace(attachRe, '[本轮附带了附件文件,内容已省略]\n');
+        let role;
+        if (m.meta && m.meta.director) role = '【导演指令/旁白】';
+        else if (m.role === 'user') role = '【用户/玩家】';
+        else role = '【角色/AI】';
+        return role + '\n' + content.trim();
+      }).filter(Boolean).join('\n\n---\n\n');
+
+      const prevBlock = prevSummary
+        ? `【已有剧情大纲】（请基于此整合新对话,务必不要丢弃这段已有的旧信息）\n${prevSummary}\n\n`
+        : '';
+
+      return `你是一个专业的剧情总结助手。请把下面的角色扮演对话压缩成一份「高保真剧情大纲」,用于让另一个 AI 后续继续扮演时还能记得发生过什么。
+
+# 核心要求（必须遵守）
+- **保留所有关键事件、转折、承诺、秘密、伏笔、约定**
+- **保留角色之间的关系发展轨迹**（如何从陌生 → 信任 → 亲密 等）
+- **保留角色当前的心理状态、立场、想法**
+- **保留重要的物品、地点、人物、术语、设定**
+- **保留用户(玩家)说过的关键话语**(尤其会被对方记在心里的)
+- 使用**第三人称客观叙述**,不要用第一人称
+- 按时间顺序组织
+- 篇幅 800~1500 字
+- **不要使用** [剧情]/[/剧情] 标签
+- **不要在结尾**标注好感度/信任度数值
+- **不要扮演任何角色**,你只是总结者
+
+# 输出格式
+直接输出整合后的完整剧情大纲,不要任何前言、后语、解释、Markdown 代码块。
+
+${prevBlock}【新增对话内容】
+${convo}
+
+请输出整合后的完整剧情大纲：`;
+    }
+
+    // 显示压缩中/完成的小气泡
+    function addCompressEl(text) {
+      const hint = chatBox.querySelector('.empty-hint');
+      if (hint) hint.remove();
+      const div = document.createElement('div');
+      div.className = 'msg memcompress';
+      div.innerText = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return div;
+    }
+
+    // 更新 statsBar 上 🧠 按钮的视觉状态
+    function updateMemoryBtn(state) {
+      const btn = document.getElementById('memoryBtn');
+      if (!btn) return;
+      btn.classList.remove('compressing', 'has-memory');
+      if (state === 'compressing') {
+        btn.classList.add('compressing');
+        btn.textContent = '🧠 整理中…';
+        return;
+      }
+      const s = currentId && sessions[currentId];
+      if (s && s.memory && s.memory.summary) {
+        btn.classList.add('has-memory');
+        btn.textContent = '🧠 记忆 ✓';
+      } else {
+        btn.textContent = '🧠 记忆';
+      }
+    }
+
+    // 核心：调 AI 把历史对话压缩成剧情大纲
+    let isCompressing = false;
+    async function compressMemory(sessionId, manualTrigger = false) {
+      if (isCompressing) return false;
+      const s = sessions[sessionId];
+      if (!s || !s.messages) return false;
+      if (!API_KEY) {
+        if (manualTrigger) { alert('请先在 ⚙️ 设置中填写 API Key～'); openSettingsModal(); }
+        return false;
+      }
+
+      const keepRecent = memSettings.keepRecent || MEM_DEFAULTS.keepRecent;
+      const startIdx = (s.memory && s.memory.compressedUntilIdx) || 0;
+      const endIdx   = s.messages.length - keepRecent;
+      if (endIdx <= startIdx) {
+        if (manualTrigger) alert('当前对话还不够长,暂时不需要压缩～\n(保留最近 ' + keepRecent + ' 条原文外,前面没有可压缩的内容)');
+        return false;
+      }
+      const messagesToCompress = s.messages.slice(startIdx, endIdx);
+      const prevSummary = (s.memory && s.memory.summary) || '';
+
+      isCompressing = true;
+      const compressDiv = addCompressEl(`🧠 整理长期记忆中…(把 ${messagesToCompress.length} 条历史压缩成剧情大纲)`);
+      updateMemoryBtn('compressing');
+
+      try {
+        const compressPrompt = buildCompressPrompt(prevSummary, messagesToCompress);
+        const body = {
+          model: MODEL,
+          messages: [{ role: 'user', content: compressPrompt }],
+          temperature: 0.3,
+          max_tokens: 4096,
+          stream: false
+        };
+        // 同样应用模型对应的"关闭思考"参数（节省时间/钱）
+        const m = (MODEL || '').toLowerCase();
+        if (m.includes('deepseek') || m.includes('glm') || m.includes('chatglm') ||
+            m.includes('zhipu') || m.includes('claude') || m.includes('anthropic')) {
+          body.thinking = { type: 'disabled' };
+        }
+        if (m.includes('qwen') || m.includes('tongyi')) {
+          body.chat_template_kwargs = { enable_thinking: false };
+          body.enable_thinking = false;
+        }
+        if (m.includes('gemini')) {
+          body.reasoning_effort = 'none';
+          body.thinking_config  = { thinking_budget: 0 };
+        }
+        if (m.startsWith('gpt-5') || m.includes('gpt5')) body.reasoning_effort = 'minimal';
+        if (/^o[134]([-\d]|$)/.test(m))                  body.reasoning_effort = 'low';
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+          body: JSON.stringify(body)
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + await response.text());
+        const data = await response.json();
+        const summary = (data.choices?.[0]?.message?.content || '').trim();
+        if (!summary) throw new Error('AI 返回的总结为空');
+
+        s.memory = {
+          summary: summary,
+          compressedUntilIdx: endIdx,
+          updatedAt: Date.now()
+        };
+        saveSessions();
+        compressDiv.innerText = `✅ 记忆整理完成 · 压缩了 ${messagesToCompress.length} 条历史 · 大纲 ${summary.length} 字 · 点 🧠 按钮可查看`;
+        updateMemoryBtn();
+        return true;
+      } catch(err) {
+        compressDiv.classList.add('error');
+        compressDiv.innerText = '❌ 记忆压缩失败：' + err.message + (manualTrigger ? '' : '（下次满足条件时会重试）');
+        updateMemoryBtn();
+        if (manualTrigger) alert('压缩失败：' + err.message);
+        return false;
+      } finally {
+        isCompressing = false;
+      }
+    }
+
+    // AI 回复完后被调用，判断是否需要自动压缩
+    function maybeAutoCompress() {
+      if (!memSettings.enabled) return;
+      if (!currentId || !sessions[currentId]) return;
+      if (isSending || isCompressing) return;
+      const total = calcUncompressedChars(sessions[currentId]);
+      if (total >= memSettings.threshold) {
+        // 固化 sessionId 避免 200ms 内用户切换会话导致压缩错对象
+        const sid = currentId;
+        setTimeout(() => compressMemory(sid, false), 200);
+      }
+    }
+
+    // 构造发给 AI 时的"长期记忆"system 消息(把 summary 包成醒目提示)
+    function buildMemorySystemBlock(memory) {
+      if (!memory || !memory.summary) return '';
+      return `# 📖 长期剧情记忆（早期对话的压缩大纲，是后续剧情的事实基础）
+
+${memory.summary}
+
+⚠️ 上面是已经发生过的剧情大纲，请基于这些事实继续后续角色扮演，保持剧情、关系、人物状态的连贯性。不要遗忘大纲里提到的关键事件、承诺和心理状态。`;
+    }
+
+    // ===== 记忆面板 UI =====
+    const memoryModal = document.getElementById('memoryModal');
+    const memText     = document.getElementById('memText');
+    const memMeta     = document.getElementById('memMeta');
+
+    function openMemoryModal() {
+      if (!currentId) { alert('请先开始一个对话～'); return; }
+      const s = sessions[currentId];
+      const mem = s.memory || { summary: '', compressedUntilIdx: 0, updatedAt: 0 };
+      memText.value = mem.summary || '';
+      const totalChars = calcUncompressedChars(s);
+      const compressed = mem.compressedUntilIdx || 0;
+      const updateTime = mem.updatedAt ? new Date(mem.updatedAt).toLocaleString() : '尚未生成';
+      memMeta.innerHTML =
+        `<b>当前对话:</b> ${s.messages.length} 条消息 · 已压缩 <b>${compressed}</b> 条<br>` +
+        `<b>未压缩字符数:</b> ${totalChars} / 触发阈值 ${memSettings.threshold}<br>` +
+        `<b>大纲最后更新:</b> ${updateTime}` +
+        (mem.summary ? ` · <b>大纲长度:</b> ${mem.summary.length} 字` : '');
+      memoryModal.style.display = 'flex';
+    }
+    function closeMemoryModal() { memoryModal.style.display = 'none'; }
+
+    document.getElementById('memoryBtn').addEventListener('click', openMemoryModal);
+    document.getElementById('memCancel').addEventListener('click', closeMemoryModal);
+    memoryModal.addEventListener('click', (e) => { if (e.target === memoryModal) closeMemoryModal(); });
+    document.getElementById('memSave').addEventListener('click', () => {
+      if (!currentId) { closeMemoryModal(); return; }
+      const s = sessions[currentId];
+      const newSummary = memText.value.trim();
+      if (newSummary) {
+        s.memory = s.memory || { compressedUntilIdx: 0 };
+        s.memory.summary = newSummary;
+        s.memory.updatedAt = Date.now();
+      } else if (s.memory) {
+        delete s.memory.summary;
+        s.memory.updatedAt = Date.now();
+      }
+      saveSessions();
+      updateMemoryBtn();
+      closeMemoryModal();
+    });
+    document.getElementById('memClear').addEventListener('click', () => {
+      if (!currentId) return;
+      if (!confirm('确定清空当前对话的剧情大纲吗？\n\n清空后 AI 会失去对早期剧情的记忆\n(但已压缩过的消息不会被恢复)')) return;
+      const s = sessions[currentId];
+      if (s.memory) {
+        delete s.memory.summary;
+        s.memory.updatedAt = Date.now();
+      }
+      memText.value = '';
+      saveSessions();
+      updateMemoryBtn();
+      openMemoryModal();
+    });
+    document.getElementById('memCompressNow').addEventListener('click', async () => {
+      if (!currentId) return;
+      if (isSending) { alert('当前有发送中的请求,等一下再压～'); return; }
+      closeMemoryModal();
+      const ok = await compressMemory(currentId, true);
+      if (ok) setTimeout(openMemoryModal, 300);
+    });
+
+    loadMemSettings();
 
     loadSettings();
     loadSessions();
