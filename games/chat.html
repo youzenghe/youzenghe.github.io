@@ -1057,6 +1057,12 @@
     let API_KEY = '';
     let API_URL = DEFAULT_API_URL;
     let MODEL   = DEFAULT_MODEL;
+    // 长文件生成优先给最大输出预算；如果接口不支持，会自动降级重试。
+    const MAX_OUTPUT_TOKENS = 65536;
+    const OUTPUT_TOKEN_FALLBACKS = [65536, 32768, 16384, 8192, 4096];
+    // 长文件流式输出时避免每个 token 都重建文件卡片，不然内容一长页面会卡住。
+    const STREAM_RENDER_INTERVAL_MS = 120;
+    const STREAM_RENDER_MIN_CHARS = 1200;
 
     // ===== 关系数值范围配置 =====
     // 好感/信任总值范围 [STAT_MIN, STAT_MAX]，单次变化幅度 [-STAT_DELTA_MAX, +STAT_DELTA_MAX]
@@ -1496,6 +1502,48 @@
       div.innerHTML = html;
       aiFileDivIds.set(div, newIds);
     }
+
+    function renderAssistantReply(aiDiv, aiReply, directorOptions) {
+      if (directorOptions && directorOptions.enabled) {
+        // 实时提取 [剧情]...[/剧情] 概要,追加到 director 气泡的括号里
+        const m = aiReply.match(/\[剧情\]([\s\S]*?)\[\/剧情\]/);
+        if (m && directorOptions.bubble) {
+          const newLabel = directorOptions.baseLabel() + '（' + m[1].trim() + '）';
+          directorOptions.bubble.innerText = newLabel;
+          if (directorOptions.setLabel) directorOptions.setLabel(newLabel);
+        }
+        // AI 气泡只显示概要标签之后的角色对话内容
+        const tagEnd = '[/剧情]';
+        const idx = aiReply.indexOf(tagEnd);
+        if (idx >= 0) {
+          applyAIContent(aiDiv, aiReply.substring(idx + tagEnd.length).trim() || '思考中...');
+        } else if (aiReply.includes('[剧情]')) {
+          aiDiv.innerText = '剧情推进中...';
+        } else {
+          applyAIContent(aiDiv, aiReply || '思考中...');
+        }
+      } else {
+        applyAIContent(aiDiv, aiReply || '思考中...');
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function createStreamRenderer(aiDiv, directorOptions) {
+      let lastRenderAt = 0;
+      let lastRenderedLen = 0;
+      return (aiReply, force = false) => {
+        const now = Date.now();
+        if (!force &&
+            now - lastRenderAt < STREAM_RENDER_INTERVAL_MS &&
+            aiReply.length - lastRenderedLen < STREAM_RENDER_MIN_CHARS) {
+          return;
+        }
+        lastRenderAt = now;
+        lastRenderedLen = aiReply.length;
+        renderAssistantReply(aiDiv, aiReply, directorOptions);
+      };
+    }
+
     function downloadAIFile(id) {
       const f = aiFileBlobs.get(id);
       if (!f) return;
@@ -1588,13 +1636,13 @@
 
     // ===== 智能构造请求体：根据模型名添加对应的"关闭思考"字段 =====
     // 不同 AI 厂家关闭思考的字段不同，乱加可能报错（比如 Grok 4 原版收到 reasoning_effort 会 400）
-    function buildRequestBody(messages) {
+    function buildRequestBody(messages, maxTokens = MAX_OUTPUT_TOKENS) {
       const m = (MODEL || '').toLowerCase();
       const body = {
         model: MODEL,
         messages: messages,
         temperature: 0.9,
-        max_tokens: 4096,
+        max_tokens: maxTokens,
         presence_penalty: 0.3,
         frequency_penalty: 0.2,
         stream: true
@@ -1642,6 +1690,30 @@
       }
 
       return body;
+    }
+
+    function looksLikeMaxTokenError(text) {
+      return /max[_\s-]?tokens|max[_\s-]?completion[_\s-]?tokens|maximum.*tokens|tokens.*maximum|too many tokens|context length|exceed|too large|最大|上下文|长度|超出/i.test(text || '');
+    }
+
+    async function fetchChatCompletion(messages) {
+      let lastError = '';
+      for (const maxTokens of OUTPUT_TOKEN_FALLBACKS) {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + API_KEY
+          },
+          body: JSON.stringify(buildRequestBody(messages, maxTokens))
+        });
+        if (response.ok) return response;
+
+        const errText = await response.text();
+        lastError = 'HTTP ' + response.status + ': ' + errText;
+        if (!looksLikeMaxTokenError(errText)) throw new Error(lastError);
+      }
+      throw new Error(lastError || '请求失败：输出 token 预算超出模型/接口上限');
     }
 
     // ===== 发送 =====
@@ -1797,29 +1869,25 @@
       const aiDiv = isMeta ? addMetaEl('ai', '思考中...') : addMsgEl('ai', '思考中...');
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + API_KEY
-          },
-         body: JSON.stringify(buildRequestBody(finalMessages))
-        });
-
-        if (!response.ok) {
-          const errText = await response.text();
-          throw new Error('HTTP ' + response.status + ': ' + errText);
-        }
+        const response = await fetchChatCompletion(finalMessages);
 
         const reader  = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let aiReply   = '';
+        let sseBuffer = '';
+        const renderStream = createStreamRenderer(aiDiv, {
+          enabled: isDirector,
+          bubble: directorBubble,
+          baseLabel: () => directorPayload.label,
+          setLabel: (label) => { msgObj.meta.label = label; }
+        });
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+          sseBuffer += decoder.decode(value, { stream: true });
+          const lines = sseBuffer.split('\n');
+          sseBuffer = lines.pop() || '';
           for (const line of lines) {
             const trimmed = line.trim();
             if (!trimmed.startsWith('data:')) continue;
@@ -1829,32 +1897,23 @@
               const json  = JSON.parse(jsonStr);
               const token = json.choices?.[0]?.delta?.content || '';
               aiReply += token;
-
-              if (isDirector) {
-                // 实时提取 [剧情]...[/剧情] 概要,追加到 director 气泡的括号里
-                const m = aiReply.match(/\[剧情\]([\s\S]*?)\[\/剧情\]/);
-                if (m && directorBubble) {
-                  const newLabel = directorPayload.label + '（' + m[1].trim() + '）';
-                  directorBubble.innerText = newLabel;
-                  msgObj.meta.label = newLabel;
-                }
-                // AI 气泡只显示概要标签之后的角色对话内容
-                const tagEnd = '[/剧情]';
-                const idx = aiReply.indexOf(tagEnd);
-                if (idx >= 0) {
-                  applyAIContent(aiDiv, aiReply.substring(idx + tagEnd.length).trim() || '思考中...');
-                } else if (aiReply.includes('[剧情]')) {
-                  aiDiv.innerText = '剧情推进中...';
-                } else {
-                  applyAIContent(aiDiv, aiReply || '思考中...');
-                }
-              } else {
-                applyAIContent(aiDiv, aiReply || '思考中...');
-              }
-              chatBox.scrollTop = chatBox.scrollHeight;
+              renderStream(aiReply);
             } catch(e) {}
           }
         }
+        if (sseBuffer.trim()) {
+          const trimmed = sseBuffer.trim();
+          if (trimmed.startsWith('data:')) {
+            const jsonStr = trimmed.slice(5).trim();
+            if (jsonStr !== '[DONE]') {
+              try {
+                const json = JSON.parse(jsonStr);
+                aiReply += json.choices?.[0]?.delta?.content || '';
+              } catch(e) {}
+            }
+          }
+        }
+        renderStream(aiReply, true);
 
         // 存档保留 [剧情] 标签,这样后续对话的 AI 上下文里能看到自己的格式示范,避免对话变长后忘记格式
         const replyObj = { role: 'assistant', content: aiReply };
@@ -2227,20 +2286,23 @@
       });
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
-          body: JSON.stringify(buildRequestBody(finalMessages))
-        });
-        if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + await response.text());
+        const response = await fetchChatCompletion(finalMessages);
         const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let aiReply = '';
+        let sseBuffer = '';
+        const renderStream = createStreamRenderer(aiDiv, {
+          enabled: isDir,
+          bubble: directorBubble,
+          baseLabel: () => ((lastMsg.meta && lastMsg.meta.label) || '').split('（')[0],
+          setLabel: (label) => { if (lastMsg.meta) lastMsg.meta.label = label; }
+        });
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+          sseBuffer += decoder.decode(value, { stream: true });
+          const lines = sseBuffer.split('\n');
+          sseBuffer = lines.pop() || '';
           for (const line of lines) {
             const trimmed = line.trim();
             if (!trimmed.startsWith('data:')) continue;
@@ -2250,30 +2312,23 @@
               const json = JSON.parse(jsonStr);
               const token = json.choices?.[0]?.delta?.content || '';
               aiReply += token;
-              if (isDir) {
-                const m = aiReply.match(/\[剧情\]([\s\S]*?)\[\/剧情\]/);
-                if (m && directorBubble && lastMsg.meta) {
-                  const baseLabel = (lastMsg.meta.label || '').split('（')[0];
-                  const newLabel = baseLabel + '（' + m[1].trim() + '）';
-                  directorBubble.innerText = newLabel;
-                  lastMsg.meta.label = newLabel;
-                }
-                const tagEnd = '[/剧情]';
-                const i2 = aiReply.indexOf(tagEnd);
-                if (i2 >= 0) {
-                  applyAIContent(aiDiv, aiReply.substring(i2 + tagEnd.length).trim() || '思考中...');
-                } else if (aiReply.includes('[剧情]')) {
-                  aiDiv.innerText = '剧情推进中...';
-                } else {
-                  applyAIContent(aiDiv, aiReply || '思考中...');
-                }
-              } else {
-                applyAIContent(aiDiv, aiReply || '思考中...');
-              }
-              chatBox.scrollTop = chatBox.scrollHeight;
+              renderStream(aiReply);
             } catch(e) {}
           }
         }
+        if (sseBuffer.trim()) {
+          const trimmed = sseBuffer.trim();
+          if (trimmed.startsWith('data:')) {
+            const jsonStr = trimmed.slice(5).trim();
+            if (jsonStr !== '[DONE]') {
+              try {
+                const json = JSON.parse(jsonStr);
+                aiReply += json.choices?.[0]?.delta?.content || '';
+              } catch(e) {}
+            }
+          }
+        }
+        renderStream(aiReply, true);
         const replyObj = { role: 'assistant', content: aiReply };
         if (isMetaReply) replyObj.meta = { metaReply: true };
         sessions[currentId].messages.push(replyObj);
