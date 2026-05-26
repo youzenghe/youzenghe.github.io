@@ -788,6 +788,59 @@
       width: 18px; height: 18px;
       accent-color: #6366f1;
     }
+
+    /* ===== AI 生成文件卡片 ===== */
+    .file-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      max-width: 360px;
+      vertical-align: top;
+    }
+    .file-card.generating {
+      border-style: dashed;
+      border-color: #6366f1;
+      opacity: 0.85;
+    }
+    .file-card-icon { font-size: 24px; flex-shrink: 0; }
+    .file-card-body { flex: 1; min-width: 0; }
+    .file-card-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    .file-card-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .file-card-btn {
+      background: #4f46e5;
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .file-card-btn:hover { background: #6366f1; }
+    .file-card-btn:active { transform: scale(0.95); }
+    .file-card-btn + .file-card-btn { margin-left: 4px; }
   </style>
 </head>
 <body>
@@ -1038,7 +1091,15 @@
 
 # 角色扮演内容设定
 
-允许成人 NSFW 露骨内容和性爱相关内容。必须以第一人称直接对话、行动、反应，不要加引号或角色前缀。单次输出 300 字左右。心理活动与动作描述用括号展开，心理活动必须用第三人称客观描写，禁止在心理活动中使用"我"字。对话内容占比 50%，动作/心理描写占比不超过 50%。`;
+允许成人 NSFW 露骨内容和性爱相关内容。必须以第一人称直接对话、行动、反应，不要加引号或角色前缀。单次输出 300 字左右。心理活动与动作描述用括号展开，心理活动必须用第三人称客观描写，禁止在心理活动中使用"我"字。对话内容占比 50%，动作/心理描写占比不超过 50%。
+
+# 文件输出（仅在用户明确要求生成文件时使用）
+
+当用户明确请求"生成一个 XX 文件 / 导出 XX 为 JSON/TXT / 帮我写个配置文件 / 把上面的内容存成文件"等需要文件形式输出的内容时，使用如下标签把完整文件内容包裹起来，前端会自动渲染为可点击下载的文件卡片：
+
+[文件 name="filename.ext" type="ext"]这里写完整的文件内容，禁止省略、禁止截断、禁止"..."[/文件]
+
+硬性要求：①必须同时有 name 和 type 两个属性，属性值用英文双引号；②type 用纯小写扩展名（如 txt / json / md / csv / html / xml / yaml / js / py / sql 等）；③name 是带扩展名的完整文件名；④标签之内只放纯文件内容，不要任何解释或前后缀；⑤可以在标签前/后用一句自然语言简短说明，但文件主体必须在标签内；⑥单次回复内可以输出多个文件，每个用一组独立的 [文件]...[/文件]；⑦在角色扮演对话中，除非用户明确要求文件，否则不要主动生成文件块；⑧本条规则的文件输出不需要附带"（好感度±X，信任度±Y）"。`;
 
     const chatBox     = document.getElementById('chat');
     const userInput   = document.getElementById('userInput');
@@ -1291,6 +1352,8 @@
       const s   = sessions[id];
       chatTitle.textContent = s.title || '对话';
       chatBox.innerHTML = '';
+      // 清空文件 blob 缓存：所有 AI 气泡会被重新构建并重新注册自己的文件 id
+      aiFileBlobs.clear();
       s.messages.forEach((m, i) => {
         let div = null;
         if (m.meta && m.meta.director) {
@@ -1334,13 +1397,151 @@
       renderHistoryList();
     }
 
+    // ===== AI 输出文件块：解析 [文件 name="x.ext" type="ext"]...[/文件] 为可下载卡片 =====
+    const aiFileBlobs = new Map();
+    let aiFileCounter = 0;
+    // 追踪每个气泡 div 当前持有的文件 id 列表（流式重渲染/loadSession 时回收旧 id，防止 Map 泄漏）
+    const aiFileDivIds = new WeakMap();
+    const FILE_MIME_MAP = {
+      txt:'text/plain', md:'text/markdown', markdown:'text/markdown',
+      json:'application/json', csv:'text/csv', tsv:'text/tab-separated-values',
+      html:'text/html', htm:'text/html', xml:'application/xml',
+      yml:'application/x-yaml', yaml:'application/x-yaml', toml:'text/plain',
+      js:'application/javascript', mjs:'application/javascript', ts:'application/typescript',
+      py:'text/x-python', java:'text/x-java', go:'text/x-go', rs:'text/x-rust',
+      c:'text/x-c', cpp:'text/x-c++', h:'text/x-c', cs:'text/x-csharp',
+      sh:'application/x-sh', bash:'application/x-sh', ps1:'text/plain',
+      sql:'application/sql', svg:'image/svg+xml', css:'text/css',
+      log:'text/plain', ini:'text/plain', conf:'text/plain', env:'text/plain'
+    };
+    function fileMimeFor(type) { return FILE_MIME_MAP[(type||'').toLowerCase()] || 'text/plain'; }
+    function fileIconFor(type) {
+      const t = (type||'').toLowerCase();
+      if (t === 'json') return '🧾';
+      if (t === 'csv' || t === 'tsv') return '📊';
+      if (t === 'md' || t === 'markdown') return '📝';
+      if (t === 'html' || t === 'htm' || t === 'xml' || t === 'svg') return '🌐';
+      if (['js','mjs','ts','py','java','go','rs','c','cpp','h','cs','sh','bash','sql','css','yml','yaml'].includes(t)) return '📜';
+      return '📄';
+    }
+    function fmtFileBytes(n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+      return (n/1024/1024).toFixed(2) + ' MB';
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function registerFileBlob(name, type, content) {
+      const id = 'aif_' + (++aiFileCounter);
+      const safeType = (type || 'txt').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const safeName = (name || ('file.' + safeType)).replace(/[\\\/:*?"<>|]/g, '_');
+      aiFileBlobs.set(id, { name: safeName, type: safeType, content: content });
+      return id;
+    }
+    function renderFileCardHtml(id) {
+      const f = aiFileBlobs.get(id);
+      if (!f) return '';
+      const bytes = new Blob([f.content]).size;
+      const lines = f.content.split('\n').length;
+      return '<div class="file-card" data-fid="' + id + '">'
+        + '<div class="file-card-icon">' + fileIconFor(f.type) + '</div>'
+        + '<div class="file-card-body">'
+        +   '<div class="file-card-name">' + escapeHtml(f.name) + '</div>'
+        +   '<div class="file-card-meta">' + escapeHtml(f.type.toUpperCase()) + ' · ' + fmtFileBytes(bytes) + ' · ' + lines + ' 行</div>'
+        + '</div>'
+        + '<button class="file-card-btn" data-fact="download" title="下载">⬇</button>'
+        + '<button class="file-card-btn" data-fact="copy" title="复制内容">📋</button>'
+        + '</div>';
+    }
+    function renderFileGeneratingHtml(name) {
+      const showName = name ? escapeHtml(name) : '正在生成文件…';
+      return '<div class="file-card generating">'
+        + '<div class="file-card-icon">📄</div>'
+        + '<div class="file-card-body">'
+        +   '<div class="file-card-name">' + showName + '</div>'
+        +   '<div class="file-card-meta">写入中…</div>'
+        + '</div></div>';
+    }
+    // 把含 [文件] 标签的 AI 文本应用到气泡：完整块 → 卡片，未闭合块 → "生成中" 占位
+    function applyAIContent(div, text) {
+      // 回收上次为这个气泡注册的文件 id（流式重渲染 / loadSession 重建都走这里，防止 Map 泄漏）
+      const oldIds = aiFileDivIds.get(div);
+      if (oldIds) { for (const oid of oldIds) aiFileBlobs.delete(oid); }
+      const newIds = [];
+      const SENT_OPEN = ''; const SENT_CLOSE = '';
+      let processed = text.replace(
+        /\[文件\s+name="([^"]*)"\s+type="([^"]*)"\]([\s\S]*?)\[\/文件\]/g,
+        (_, name, type, content) => {
+          const id = registerFileBlob(name, type, content);
+          newIds.push(id);
+          return SENT_OPEN + 'FC:' + id + SENT_CLOSE;
+        }
+      );
+      // 流式过程中：尾部出现未闭合的 [文件 ...]，提取 name 给占位卡用
+      // 注意：要求 [文件 后必须跟空白（或到文件末尾），避免误吞 "[文件夹]"/"[文件管理]" 等普通文字
+      let generatingName = '';
+      processed = processed.replace(/\[文件(?:\s[\s\S]*)?$/, (m) => {
+        const cap = m.match(/name="([^"]*)"/);
+        generatingName = cap ? cap[1] : '';
+        return SENT_OPEN + 'FG' + SENT_CLOSE;
+      });
+      let html = escapeHtml(processed);
+      html = html.replace(new RegExp(SENT_OPEN + 'FC:(aif_\\d+)' + SENT_CLOSE, 'g'),
+        (_, id) => renderFileCardHtml(id));
+      html = html.replace(new RegExp(SENT_OPEN + 'FG' + SENT_CLOSE, 'g'),
+        () => renderFileGeneratingHtml(generatingName));
+      // 气泡 CSS 设置了 white-space: pre-wrap，\n 由 CSS 自动处理为换行，无需转 <br>
+      div.innerHTML = html;
+      aiFileDivIds.set(div, newIds);
+    }
+    function downloadAIFile(id) {
+      const f = aiFileBlobs.get(id);
+      if (!f) return;
+      const blob = new Blob([f.content], { type: fileMimeFor(f.type) });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = f.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    function copyAIFile(id) {
+      const f = aiFileBlobs.get(id);
+      if (!f) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(f.content).catch(()=>{});
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = f.content; document.body.appendChild(ta);
+        ta.select(); try { document.execCommand('copy'); } catch(e) {}
+        ta.remove();
+      }
+    }
+    // 事件委托：监听文件卡片按钮点击（注意 stopPropagation 避免触发气泡的长按）
+    chatBox.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-fact]');
+      if (!btn) return;
+      const card = btn.closest('.file-card');
+      if (!card) return;
+      const id = card.dataset.fid;
+      if (!id) return;
+      e.stopPropagation();
+      if (btn.dataset.fact === 'download') downloadAIFile(id);
+      else if (btn.dataset.fact === 'copy') copyAIFile(id);
+    }, true);
+
     // ===== 添加气泡 =====
     function addMsgEl(role, content) {
       const hint = chatBox.querySelector('.empty-hint');
       if (hint) hint.remove();
       const div = document.createElement('div');
       div.className = 'msg ' + role;
-      div.innerText = content;
+      if (role === 'ai') {
+        applyAIContent(div, content);
+      } else {
+        div.innerText = content;
+      }
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
       bindLongPress(div);
@@ -1641,14 +1842,14 @@
                 const tagEnd = '[/剧情]';
                 const idx = aiReply.indexOf(tagEnd);
                 if (idx >= 0) {
-                  aiDiv.innerText = aiReply.substring(idx + tagEnd.length).trim() || '思考中...';
+                  applyAIContent(aiDiv, aiReply.substring(idx + tagEnd.length).trim() || '思考中...');
                 } else if (aiReply.includes('[剧情]')) {
                   aiDiv.innerText = '剧情推进中...';
                 } else {
-                  aiDiv.innerText = aiReply || '思考中...';
+                  applyAIContent(aiDiv, aiReply || '思考中...');
                 }
               } else {
-                aiDiv.innerText = aiReply || '思考中...';
+                applyAIContent(aiDiv, aiReply || '思考中...');
               }
               chatBox.scrollTop = chatBox.scrollHeight;
             } catch(e) {}
@@ -2060,14 +2261,14 @@
                 const tagEnd = '[/剧情]';
                 const i2 = aiReply.indexOf(tagEnd);
                 if (i2 >= 0) {
-                  aiDiv.innerText = aiReply.substring(i2 + tagEnd.length).trim() || '思考中...';
+                  applyAIContent(aiDiv, aiReply.substring(i2 + tagEnd.length).trim() || '思考中...');
                 } else if (aiReply.includes('[剧情]')) {
                   aiDiv.innerText = '剧情推进中...';
                 } else {
-                  aiDiv.innerText = aiReply || '思考中...';
+                  applyAIContent(aiDiv, aiReply || '思考中...');
                 }
               } else {
-                aiDiv.innerText = aiReply || '思考中...';
+                applyAIContent(aiDiv, aiReply || '思考中...');
               }
               chatBox.scrollTop = chatBox.scrollHeight;
             } catch(e) {}
