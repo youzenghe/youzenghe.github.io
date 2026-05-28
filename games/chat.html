@@ -2103,6 +2103,27 @@
       padding: 8px;
       margin-bottom: 12px;
     }
+    #profileToggle {
+      width: 100%;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: none;
+      border-radius: 8px;
+      background: #303030;
+      color: #ececec;
+      padding: 0 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    #profileManager.collapsed #profileList {
+      display: none;
+    }
+    #profileManager.collapsed #profileToggle {
+      margin-bottom: 0;
+    }
     #profileList {
       display: grid;
       gap: 6px;
@@ -2141,9 +2162,10 @@
       padding-top: 8px;
       margin-top: 8px;
       border-top: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap;
     }
     .profile-actions button {
-      flex: 1;
+      flex: 1 1 calc(50% - 8px);
     }
     #settingsModal .form-row.inline {
       display: grid;
@@ -2692,9 +2714,12 @@
       <div class="form-section-title">模型预设</div>
       <input type="hidden" id="modelProfileSelect" value="default">
       <div id="profileManager">
+        <button id="profileToggle" type="button">预设列表 <span>收起</span></button>
         <div id="profileList"></div>
         <div class="profile-actions">
-          <button id="saveModelProfile" type="button">保存/更新当前预设</button>
+          <button id="newModelProfile" type="button">新建预设</button>
+          <button id="saveModelProfile" type="button">更新当前</button>
+          <button id="saveAsModelProfile" type="button">另存为新预设</button>
           <button id="deleteModelProfile" type="button">删除预设</button>
         </div>
       </div>
@@ -4378,22 +4403,52 @@
         btn.addEventListener('click', () => {
           applyModelProfile(p, false);
           renderModelProfileSelect();
-          document.getElementById('setProfileName').value = p.name;
-          document.getElementById('setApiUrl').value = p.apiUrl;
-          document.getElementById('setApiKey').value = p.apiKey;
-          document.getElementById('setModel').value = p.model;
+          fillModelProfileForm(p);
         });
         list.appendChild(btn);
       });
     }
 
+    function makeModelProfileId() {
+      return 'profile_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    }
+
+    function fillModelProfileForm(p) {
+      document.getElementById('modelProfileSelect').value = p ? p.id : '';
+      document.getElementById('setProfileName').value = p ? (p.name || '') : '';
+      document.getElementById('setApiUrl').value = p ? (p.apiUrl || DEFAULT_API_URL) : DEFAULT_API_URL;
+      document.getElementById('setApiKey').value = p ? (p.apiKey || '') : '';
+      document.getElementById('setModel').value = p ? (p.model || DEFAULT_MODEL) : DEFAULT_MODEL;
+    }
+
+    function readModelProfileForm(forceNew = false) {
+      const id = forceNew ? makeModelProfileId() : (document.getElementById('modelProfileSelect').value || makeModelProfileId());
+      const model = document.getElementById('setModel').value.trim() || DEFAULT_MODEL;
+      return {
+        id,
+        name: document.getElementById('setProfileName').value.trim() || model,
+        apiUrl: document.getElementById('setApiUrl').value.trim() || DEFAULT_API_URL,
+        apiKey: document.getElementById('setApiKey').value.trim(),
+        model
+      };
+    }
+
+    function saveModelProfileFromForm(forceNew = false) {
+      const profile = readModelProfileForm(forceNew);
+      const idx = modelProfiles.findIndex(p => p.id === profile.id);
+      if (idx >= 0 && !forceNew) modelProfiles[idx] = profile;
+      else modelProfiles.push(profile);
+      applyModelProfile(profile, false);
+      renderModelProfileSelect();
+      renderModelMenu();
+      saveSettings();
+      return profile;
+    }
+
     function openSettingsModal() {
       renderModelProfileSelect();
       const active = modelProfiles.find(p => p.id === MODEL_PROFILE_ID) || modelProfiles[0];
-      document.getElementById('setProfileName').value = active ? active.name : '';
-      document.getElementById('setApiUrl').value = API_URL;
-      document.getElementById('setApiKey').value = API_KEY;
-      document.getElementById('setModel').value  = MODEL;
+      fillModelProfileForm(active || null);
       document.getElementById('setBgOpacity').value = uiSettings.bgOpacity;
       document.getElementById('bgFileStatus').textContent = uiSettings.bgImage
         ? ('已设置：' + (uiSettings.bgName || '背景图'))
@@ -4408,23 +4463,31 @@
     }
     document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
     document.getElementById('setCancel').addEventListener('click', closeSettingsModal);
-    document.getElementById('saveModelProfile').addEventListener('click', () => {
-      const name = document.getElementById('setProfileName').value.trim() || document.getElementById('setModel').value.trim() || '未命名模型';
-      const profile = {
-        id: document.getElementById('modelProfileSelect').value || ('profile_' + Date.now()),
-        name,
-        apiUrl: document.getElementById('setApiUrl').value.trim() || DEFAULT_API_URL,
-        apiKey: document.getElementById('setApiKey').value.trim(),
-        model: document.getElementById('setModel').value.trim() || DEFAULT_MODEL
-      };
-      const idx = modelProfiles.findIndex(p => p.id === profile.id);
-      if (idx >= 0) modelProfiles[idx] = profile;
-      else modelProfiles.push(profile);
-      applyModelProfile(profile, false);
+    document.getElementById('profileToggle').addEventListener('click', () => {
+      const box = document.getElementById('profileManager');
+      box.classList.toggle('collapsed');
+      document.querySelector('#profileToggle span').textContent = box.classList.contains('collapsed') ? '展开' : '收起';
+    });
+    document.getElementById('newModelProfile').addEventListener('click', () => {
+      MODEL_PROFILE_ID = '';
       renderModelProfileSelect();
-      renderModelMenu();
-      saveSettings();
-      alert('模型预设已保存');
+      fillModelProfileForm({
+        id: '',
+        name: '',
+        apiUrl: DEFAULT_API_URL,
+        apiKey: '',
+        model: DEFAULT_MODEL
+      });
+      document.getElementById('setProfileName').focus();
+    });
+    document.getElementById('saveModelProfile').addEventListener('click', () => {
+      const created = !document.getElementById('modelProfileSelect').value;
+      saveModelProfileFromForm(false);
+      alert(created ? '新模型预设已保存' : '当前模型预设已更新');
+    });
+    document.getElementById('saveAsModelProfile').addEventListener('click', () => {
+      saveModelProfileFromForm(true);
+      alert('已另存为新模型预设');
     });
     document.getElementById('deleteModelProfile').addEventListener('click', () => {
       if (modelProfiles.length <= 1) { alert('至少保留一个模型预设'); return; }
@@ -5353,6 +5416,8 @@ ${memory.summary}
     loadSettings();
     sessionsLoadPromise = loadSessions().finally(() => {
       sessionsLoaded = true;
+      renderHistoryList();
+      if (document.body.classList.contains('library-mode')) renderLibrary();
     });
 
     // 修复手机Chrome 100vh被地址栏吃掉的问题
