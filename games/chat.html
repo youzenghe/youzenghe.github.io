@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MoreChat</title>
+  <link rel="icon" href="../assets/雨.ico">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -841,70 +842,1640 @@
     .file-card-btn:hover { background: #6366f1; }
     .file-card-btn:active { transform: scale(0.95); }
     .file-card-btn + .file-card-btn { margin-left: 4px; }
+
+    /* ===== 视觉刷新：更像一个长期使用的桌面/移动聊天工具 ===== */
+    :root {
+      --bg: #10100f;
+      --bg-soft: #151515;
+      --panel: #1b1b1a;
+      --panel-2: #242321;
+      --panel-3: #2f2d2a;
+      --line: rgba(255,255,255,0.09);
+      --line-strong: rgba(255,255,255,0.15);
+      --text: #f4f0e8;
+      --muted: #a7a29a;
+      --muted-2: #736f68;
+      --accent: #3dd6c6;
+      --accent-2: #e2a84c;
+      --accent-3: #7c8cff;
+      --danger: #ff6b6b;
+      --shadow: 0 18px 44px rgba(0,0,0,0.34);
+    }
+
+    body {
+      background:
+        linear-gradient(180deg, #141313 0%, #10100f 42%, #0d0f10 100%);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    }
+
+    ::selection { background: rgba(61,214,198,0.32); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.16);
+      border: 3px solid transparent;
+      border-radius: 999px;
+      background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.26); }
+
+    #main {
+      background: rgba(16,16,15,0.94);
+    }
+
+    #topbar {
+      min-height: 58px;
+      padding: 10px 14px;
+      background: rgba(27,27,26,0.94);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 10px 26px rgba(0,0,0,0.18);
+      backdrop-filter: blur(14px);
+    }
+
+    #chatTitle {
+      color: #d8d1c7;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .top-icon-btn,
+    #memoryBtn,
+    #closeBtn {
+      border-color: var(--line-strong);
+      background: rgba(255,255,255,0.035);
+      color: #ddd7ce;
+      border-radius: 8px;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    }
+    .top-icon-btn:hover,
+    #memoryBtn:hover,
+    #closeBtn:hover {
+      background: rgba(61,214,198,0.12);
+      border-color: rgba(61,214,198,0.45);
+      color: #f9fbf8;
+    }
+    .top-icon-btn:active,
+    #memoryBtn:active,
+    #sendBtn:active,
+    #progressBtn:active,
+    #attachBtn:active,
+    #newChatBtn:active {
+      transform: translateY(1px);
+    }
+
+    #statsBar {
+      justify-content: flex-start;
+      padding: 9px 14px;
+      gap: 10px;
+      background: rgba(20,20,19,0.96);
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+    .stat-item {
+      min-height: 30px;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .stat-label { color: var(--muted); }
+    .stat-value.pos { color: #4fe2a0; }
+    .stat-value.neg { color: #ff7a7a; }
+
+    #chat {
+      padding: 18px 18px 20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 170px),
+        var(--bg);
+    }
+
+    .msg {
+      max-width: min(820px, calc(100% - 54px));
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    .user {
+      margin-left: auto;
+      margin-right: 4px;
+      background: linear-gradient(135deg, #226f75, #3853a3);
+      border-color: rgba(255,255,255,0.16);
+      color: #fff;
+    }
+    .ai {
+      margin-left: 4px;
+      margin-right: auto;
+      background: #20201f;
+      border-color: rgba(255,255,255,0.08);
+      color: #f1ece4;
+    }
+    .msg.director,
+    .msg.memcompress {
+      box-shadow: none;
+      border-radius: 8px;
+    }
+    .msg.meta {
+      background: rgba(226,168,76,0.10);
+      border-color: rgba(226,168,76,0.55);
+      color: #ffe0a3;
+    }
+    .msg.statop {
+      background: rgba(124,140,255,0.11);
+      border-color: rgba(124,140,255,0.55);
+      color: #cfd5ff;
+    }
+
+    .bottom {
+      padding: 12px 14px 14px;
+      background: rgba(27,27,26,0.96);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -12px 28px rgba(0,0,0,0.22);
+    }
+
+    textarea,
+    .form-row input,
+    .form-row textarea,
+    #editText,
+    #memText {
+      background: #20201f;
+      color: var(--text);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+    textarea:focus,
+    .form-row input:focus,
+    .form-row textarea:focus,
+    #editText:focus,
+    #memText:focus {
+      background: #242321;
+      border-color: rgba(61,214,198,0.62);
+      box-shadow: 0 0 0 3px rgba(61,214,198,0.10);
+    }
+
+    #sendBtn,
+    #progressBtn,
+    #newChatBtn,
+    #setSave,
+    #editSave,
+    #memSave,
+    .file-card-btn {
+      background: linear-gradient(135deg, #2bbfac, #5667f2);
+      border-radius: 8px;
+      box-shadow: 0 8px 18px rgba(43,191,172,0.16);
+      transition: transform 0.16s ease, filter 0.16s ease, opacity 0.16s ease;
+    }
+    #sendBtn:hover:not(:disabled),
+    #progressBtn:hover:not(:disabled),
+    #newChatBtn:hover,
+    #setSave:hover,
+    #editSave:hover,
+    #memSave:hover,
+    .file-card-btn:hover {
+      filter: brightness(1.08);
+    }
+    #attachBtn {
+      background: #2c2b29;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+    }
+    #attachBtn:hover:not(:disabled) {
+      background: rgba(226,168,76,0.16);
+      border-color: rgba(226,168,76,0.48);
+    }
+    #progressBtn.auto-on {
+      background: linear-gradient(135deg, #19b785, #2bbfac);
+      box-shadow: 0 0 0 3px rgba(25,183,133,0.16);
+    }
+
+    #sidebar {
+      width: 310px;
+      background: rgba(25,25,24,0.98);
+      border-right: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    #sidebarHeader {
+      min-height: 58px;
+      border-bottom: 1px solid var(--line);
+      color: #efe9df;
+    }
+    #sidebarTools {
+      background: rgba(255,255,255,0.018);
+      border-bottom-color: var(--line) !important;
+    }
+    #sidebarTools button,
+    .sheet-item,
+    .sheet-section,
+    .sheet-auto,
+    .edit-card,
+    .mem-meta,
+    .form-hint,
+    .file-card {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    #sidebarTools button:hover,
+    .sheet-item:hover {
+      background: #302f2c;
+    }
+    .history-item {
+      border-radius: 8px;
+      color: #d9d2c8;
+    }
+    .history-item:hover {
+      background: rgba(255,255,255,0.055);
+    }
+    .history-item.active {
+      background: rgba(61,214,198,0.14);
+      color: #ffffff;
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    #bottomSheet,
+    #msgActionSheet {
+      background: #1b1b1a;
+      border: 1px solid var(--line);
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      box-shadow: var(--shadow);
+    }
+    .sheet-handle { background: rgba(255,255,255,0.25); }
+    .sheet-title,
+    .edit-title {
+      color: #f4f0e8;
+    }
+    .chip {
+      background: #302f2c;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #eee8dd;
+    }
+    .chip:hover,
+    .chip:active {
+      background: rgba(61,214,198,0.16);
+      border-color: rgba(61,214,198,0.42);
+    }
+    .sheet-item.danger,
+    .del-btn:hover {
+      color: var(--danger);
+    }
+
+    #editModal,
+    #settingsModal,
+    #memoryModal,
+    #characterModal,
+    #sheetOverlay,
+    #overlay {
+      backdrop-filter: blur(8px);
+    }
+    .edit-card {
+      max-height: min(88vh, 760px);
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+    }
+
+    #fileChips {
+      background: rgba(27,27,26,0.96);
+      border-top: 1px solid var(--line);
+    }
+    .file-chip {
+      background: rgba(124,140,255,0.12);
+      border-color: rgba(124,140,255,0.48);
+      color: #dbe0ff;
+      border-radius: 999px;
+    }
+    .file-chip.parsing {
+      background: rgba(226,168,76,0.13);
+      border-color: rgba(226,168,76,0.56);
+    }
+    .file-chip.error {
+      background: rgba(255,107,107,0.12);
+      border-color: rgba(255,107,107,0.58);
+    }
+    .file-card {
+      max-width: min(390px, 100%);
+      background: #242321;
+    }
+
+    .empty-hint {
+      color: var(--muted-2);
+      margin-top: 14vh;
+    }
+
+    @media (max-width: 640px) {
+      #sidebar { width: min(86vw, 320px); }
+      #topbar {
+        min-height: 54px;
+        gap: 6px;
+        padding: 8px 10px;
+      }
+      .top-icon-btn {
+        font-size: 16px;
+        padding: 5px 8px;
+      }
+      #chatTitle {
+        max-width: 38%;
+        font-size: 13px;
+      }
+      #statsBar {
+        padding: 7px 10px;
+      }
+      #chat {
+        padding: 12px 10px 14px;
+      }
+      .msg {
+        max-width: calc(100% - 18px);
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      .user { margin-left: auto; margin-right: 0; }
+      .ai { margin-left: 0; margin-right: auto; }
+      .bottom {
+        gap: 6px;
+        padding: 9px 8px 10px;
+      }
+      #sendBtn,
+      #progressBtn,
+      #attachBtn {
+        padding: 11px 12px;
+      }
+      textarea {
+        min-width: 0;
+        font-size: 15px;
+      }
+      .edit-card {
+        width: 100%;
+        max-height: 90vh;
+      }
+    }
+
+    /* ===== ChatGPT 风格收束：干净、居中、少图标 ===== */
+    body {
+      background: #212121;
+      color: #ececec;
+    }
+
+    #main {
+      background: #212121;
+    }
+
+    #topbar {
+      min-height: 52px;
+      background: #212121;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    #chatTitle {
+      color: #ececec;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .top-icon-btn,
+    #memoryBtn {
+      background: transparent;
+      border-color: transparent;
+      color: #b4b4b4;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      box-shadow: none;
+    }
+    .top-icon-btn:hover,
+    #memoryBtn:hover {
+      background: #2f2f2f;
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    #statsBar {
+      justify-content: center;
+      background: #212121;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 12px;
+      gap: 8px;
+    }
+    .stat-item,
+    #memoryBtn {
+      background: #2a2a2a;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #d8d8d8;
+      border-radius: 999px;
+      min-height: 30px;
+    }
+    .stat-item > span:first-child {
+      display: none;
+    }
+    .stat-label {
+      color: #b4b4b4;
+    }
+
+    #chat {
+      background: #212121;
+      padding: 26px 0 24px;
+    }
+
+    .empty-hint {
+      color: #8f8f8f;
+      margin-top: 18vh;
+      font-size: 15px;
+    }
+
+    .msg {
+      position: relative;
+      width: min(calc(100% - 32px), 768px);
+      max-width: 768px;
+      margin: 0 auto 22px;
+      padding: 0 0 0 48px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      color: #ececec;
+      line-height: 1.78;
+      font-size: 15px;
+    }
+
+    .msg.ai {
+      margin-left: auto;
+      margin-right: auto;
+      background: transparent;
+      border: none;
+    }
+    .msg.ai::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #303030 url("../assets/雨.ico") center / cover no-repeat;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.10);
+    }
+
+    .msg.user {
+      width: fit-content;
+      max-width: min(70%, 620px);
+      margin-left: auto;
+      margin-right: max(16px, calc((100% - 768px) / 2));
+      padding: 10px 15px;
+      background: #2f2f2f;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      color: #f5f5f5;
+    }
+
+    .msg.meta.ai,
+    .msg.meta.user,
+    .msg.director,
+    .msg.statop,
+    .msg.memcompress {
+      width: min(calc(100% - 32px), 768px);
+      max-width: 768px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 9px 12px;
+      border-radius: 8px;
+      box-shadow: none;
+    }
+    .msg.meta.ai::before {
+      display: none;
+    }
+
+    .bottom {
+      width: min(calc(100% - 24px), 768px);
+      margin: 0 auto;
+      padding: 10px 0 18px;
+      background: #212121;
+      border-top: none;
+      box-shadow: none;
+      align-items: center;
+    }
+
+    textarea {
+      min-height: 52px;
+      max-height: 180px;
+      background: #2f2f2f;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 26px;
+      padding: 14px 16px;
+      color: #ececec;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.16);
+    }
+    textarea:focus {
+      background: #2f2f2f;
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.18);
+    }
+
+    #sendBtn,
+    #progressBtn,
+    #attachBtn {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 50%;
+      background: #ececec;
+      color: #212121;
+      border: none;
+      box-shadow: none;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    #progressBtn,
+    #attachBtn {
+      background: transparent;
+      color: #b4b4b4;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    #progressBtn:hover:not(:disabled),
+    #attachBtn:hover:not(:disabled) {
+      background: #2f2f2f;
+      border-color: rgba(255,255,255,0.2);
+      color: #ffffff;
+    }
+    #sendBtn:hover:not(:disabled) {
+      filter: none;
+      background: #ffffff;
+    }
+
+    #fileChips {
+      width: min(calc(100% - 24px), 768px);
+      margin: 0 auto;
+      background: #212121;
+      border-top: none;
+      padding: 0 0 4px;
+    }
+
+    #sidebar {
+      width: 292px;
+      background: #171717;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      box-shadow: none;
+    }
+    #sidebarHeader {
+      min-height: 52px;
+      border-bottom: none;
+      color: #ececec;
+    }
+    #newChatBtn,
+    #sidebarTools button {
+      background: #2f2f2f !important;
+      color: #ececec !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: none;
+    }
+    #newChatBtn:hover,
+    #sidebarTools button:hover {
+      background: #3a3a3a !important;
+    }
+    .history-item {
+      color: #d6d6d6;
+      border-radius: 8px;
+    }
+    .history-item:hover,
+    .history-item.active {
+      background: #2f2f2f;
+      box-shadow: none;
+    }
+
+    .edit-card,
+    #bottomSheet,
+    #msgActionSheet {
+      background: #2a2a2a;
+      border-color: rgba(255,255,255,0.10);
+      color: #ececec;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.38);
+    }
+
+    @media (max-width: 640px) {
+      #chatTitle { max-width: 46%; }
+      #chat { padding-top: 18px; }
+      .msg {
+        width: calc(100% - 24px);
+        padding-left: 42px;
+      }
+      .msg.ai::before {
+        width: 30px;
+        height: 30px;
+      }
+      .msg.user {
+        max-width: calc(100% - 54px);
+        margin-right: 12px;
+      }
+      .bottom,
+      #fileChips {
+        width: calc(100% - 16px);
+      }
+      #sendBtn,
+      #progressBtn,
+      #attachBtn {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    /* ===== ChatGPT 参考结构：常驻侧栏、模型菜单、资料库、背景图 ===== */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image: var(--chat-bg-image, none);
+      background-size: cover;
+      background-position: center;
+      opacity: var(--chat-bg-opacity, 0);
+      pointer-events: none;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: rgba(0,0,0,0.72);
+      opacity: var(--chat-bg-mask, 0);
+      pointer-events: none;
+    }
+    body.has-bg #main,
+    body.has-bg #topbar,
+    body.has-bg #chat,
+    body.has-bg .bottom,
+    body.has-bg #statsBar,
+    body.has-bg #fileChips {
+      background: transparent;
+    }
+
+    #sidebar {
+      position: relative;
+      transform: none;
+      width: 305px;
+      height: 100vh;
+      flex-shrink: 0;
+      z-index: 40;
+      transition: width 0.22s ease, opacity 0.18s ease;
+      overflow: hidden;
+    }
+    #sidebar.open { transform: none; }
+    body.sidebar-collapsed #sidebar {
+      width: 0;
+      border-right: 0;
+      opacity: 0;
+    }
+    #overlay,
+    #overlay.show {
+      display: none;
+    }
+    #main {
+      min-width: 0;
+    }
+    #historyBtn {
+      display: none;
+    }
+    body.sidebar-collapsed #historyBtn {
+      display: inline-flex;
+    }
+
+    #sidebarHeader {
+      justify-content: space-between;
+      padding: 14px 18px 10px;
+    }
+    #appLogo {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
+    }
+    #closeBtn {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 16px;
+      color: #b4b4b4;
+    }
+    #sidebarNav {
+      padding: 12px 8px 10px;
+    }
+    .side-nav-item {
+      width: 100%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      margin-bottom: 4px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      color: #ececec;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .side-nav-item:hover,
+    .side-nav-item.active {
+      background: #2f2f2f;
+    }
+    .side-nav-item#newChatBtn {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .side-nav-item#newChatBtn:hover,
+    .side-nav-item#newChatBtn.active {
+      background: #2f2f2f !important;
+    }
+    #recentTitle {
+      padding: 12px 18px 8px;
+      color: #ececec;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    #sidebarTools {
+      padding: 4px 12px 8px !important;
+      display: flex !important;
+      gap: 8px !important;
+      border-bottom: none !important;
+    }
+    #sidebarTools button {
+      flex: 1;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #historyList {
+      padding: 0 8px 14px;
+    }
+    .history-item {
+      min-height: 36px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .del-btn {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .history-item:hover .del-btn {
+      opacity: 1;
+    }
+
+    #topbar {
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 10px 18px;
+    }
+    #modelPicker {
+      position: relative;
+      margin-right: auto;
+    }
+    #modelMenuBtn {
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: #ececec;
+      border-radius: 8px;
+      padding: 0 10px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #modelMenuBtn:hover {
+      background: #2f2f2f;
+    }
+    #currentModelLabel {
+      display: inline-block;
+      max-width: 180px;
+      margin-left: 6px;
+      color: #b4b4b4;
+      font-size: 12px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    #modelMenu {
+      display: none;
+      position: absolute;
+      top: 42px;
+      left: 0;
+      width: 320px;
+      max-width: calc(100vw - 24px);
+      background: #2a2a2a;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.38);
+      padding: 8px;
+      z-index: 320;
+    }
+    #modelMenu.show {
+      display: block;
+    }
+    .model-menu-item {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #ececec;
+      text-align: left;
+      border-radius: 8px;
+      padding: 10px 11px;
+      cursor: pointer;
+    }
+    .model-menu-item:hover,
+    .model-menu-item.active {
+      background: #3a3a3a;
+    }
+    .model-menu-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .model-menu-meta {
+      margin-top: 3px;
+      color: #a8a8a8;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .model-menu-actions {
+      display: flex;
+      gap: 8px;
+      padding: 8px 2px 2px;
+    }
+    .model-menu-actions button {
+      flex: 1;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: #212121;
+      color: #ececec;
+      cursor: pointer;
+    }
+
+    #chatTitle {
+      display: none;
+    }
+    .empty-hint {
+      display: none;
+    }
+    #chat {
+      padding-bottom: 122px;
+    }
+    .bottom {
+      position: fixed;
+      left: calc(305px + max(12px, (100vw - 305px - 768px) / 2));
+      right: max(12px, (100vw - 305px - 768px) / 2);
+      bottom: 18px;
+      z-index: 35;
+      width: auto;
+      max-width: 768px;
+      margin: 0 auto;
+    }
+    body.sidebar-collapsed .bottom {
+      left: max(12px, calc((100vw - 768px) / 2));
+      right: max(12px, calc((100vw - 768px) / 2));
+    }
+    textarea {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    #libraryView {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      background: #212121;
+      padding: 72px 24px 40px;
+    }
+    body.library-mode #chat,
+    body.library-mode #statsBar,
+    body.library-mode .bottom,
+    body.library-mode #fileChips {
+      display: none !important;
+    }
+    body.library-mode #libraryView {
+      display: block;
+    }
+    .library-inner {
+      width: min(940px, 100%);
+      margin: 0 auto;
+    }
+    .library-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 34px;
+    }
+    .library-head h1 {
+      font-size: 30px;
+      font-weight: 700;
+    }
+    .library-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #librarySearch {
+      width: min(290px, 42vw);
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #2a2a2a;
+      color: #ececec;
+      padding: 0 16px;
+      outline: none;
+    }
+    #libraryRefresh {
+      height: 42px;
+      border: none;
+      border-radius: 999px;
+      background: #ececec;
+      color: #171717;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+    .library-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .library-tab {
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #ececec;
+      padding: 10px 18px;
+      cursor: pointer;
+    }
+    .library-tab.active {
+      background: #3a3a3a;
+    }
+    .library-table {
+      color: #ececec;
+    }
+    .library-row {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) 230px 110px;
+      gap: 18px;
+      align-items: center;
+      min-height: 64px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .library-header {
+      min-height: 34px;
+      color: #b4b4b4;
+      font-size: 13px;
+    }
+    .library-file-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .library-file-icon {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      background: #303030;
+      color: #ececec;
+      flex-shrink: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .library-file-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .library-file-sub {
+      color: #8f8f8f;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .library-empty {
+      padding: 46px 0;
+      color: #8f8f8f;
+      text-align: center;
+    }
+
+    #modelProfileSelect,
+    #setBgFile,
+    #setBgOpacity {
+      width: 100%;
+    }
+    #saveModelProfile,
+    #deleteModelProfile,
+    #clearBgBtn {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: #2f2f2f;
+      color: #ececec;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 760px) {
+      #sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        transform: translateX(-100%);
+        width: min(86vw, 305px);
+        opacity: 1;
+      }
+      #sidebar.open {
+        transform: translateX(0);
+      }
+      body.sidebar-collapsed #sidebar {
+        width: min(86vw, 305px);
+        transform: translateX(-100%);
+        opacity: 1;
+      }
+      #overlay.show {
+        display: block;
+      }
+      #historyBtn {
+        display: inline-flex;
+      }
+      .bottom,
+      body.sidebar-collapsed .bottom {
+        left: 8px;
+        right: 8px;
+        bottom: 10px;
+      }
+      .library-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .library-tools,
+      #librarySearch {
+        width: 100%;
+      }
+      .library-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 12px 0;
+      }
+      .library-header {
+        display: none;
+      }
+    }
+
+    /* ===== 本轮修正：顶部/输入框/设置面板质感 ===== */
+    #topbar {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      min-height: 56px;
+    }
+    #historyBtn {
+      margin-right: 8px;
+    }
+    body.sidebar-collapsed #historyBtn {
+      display: inline-flex;
+    }
+    #modelPicker {
+      margin-right: 0;
+      flex: 0 0 auto;
+    }
+    #modelMenuBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 36px;
+      padding: 0 10px;
+      line-height: 1;
+    }
+    #modelMenuBtn .chev {
+      display: inline-flex;
+      align-items: center;
+      height: 1em;
+      color: #b4b4b4;
+      font-size: 14px;
+      transform: translateY(-1px);
+    }
+    #currentModelLabel {
+      display: none;
+    }
+    #topStats {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      max-width: min(48vw, 420px);
+      pointer-events: auto;
+    }
+    #statsBar {
+      display: none;
+    }
+    #topStats .stat-item,
+    #memoryBtn {
+      min-height: 30px;
+      height: 30px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #memoryBtn {
+      font-size: 13px;
+      min-width: auto;
+    }
+
+    .msg {
+      padding-left: 0;
+    }
+    .msg.ai::before {
+      display: none;
+    }
+    .msg.ai {
+      width: min(calc(100% - 32px), 900px);
+      max-width: 900px;
+    }
+    .msg.user {
+      max-width: min(62%, 620px);
+    }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: 40px 40px minmax(0, 1fr) 42px;
+      align-items: center;
+      gap: 6px;
+      min-height: 66px;
+      padding: 8px 10px;
+      background: #2f2f2f;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 32px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.24);
+    }
+    textarea {
+      min-height: 46px;
+      height: 46px;
+      max-height: 150px;
+      padding: 12px 8px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      line-height: 1.45;
+    }
+    textarea:focus {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    #progressBtn,
+    #attachBtn,
+    #sendBtn {
+      width: 40px;
+      height: 40px;
+      align-self: center;
+    }
+    #progressBtn,
+    #attachBtn {
+      border: none;
+      background: transparent;
+      color: #ececec;
+      font-size: 24px;
+    }
+    #progressBtn {
+      font-size: 20px;
+      color: #cfcfcf;
+    }
+    #progressBtn:hover:not(:disabled),
+    #attachBtn:hover:not(:disabled) {
+      background: #3a3a3a;
+      border: none;
+    }
+    #sendBtn {
+      background: #ececec;
+      color: #212121;
+      border: none;
+    }
+    #sendBtn svg {
+      width: 25px;
+      height: 25px;
+      display: block;
+      fill: currentColor;
+    }
+    #sendBtn:disabled {
+      opacity: 0.55;
+    }
+
+    #settingsModal .edit-card {
+      width: min(620px, calc(100vw - 32px));
+      max-height: min(86vh, 760px);
+      padding: 18px 20px;
+    }
+    #profileManager {
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      background: #242424;
+      padding: 8px;
+      margin-bottom: 12px;
+    }
+    #profileList {
+      display: grid;
+      gap: 6px;
+      max-height: 190px;
+      overflow-y: auto;
+    }
+    .profile-card {
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #ececec;
+      text-align: left;
+      padding: 10px 11px;
+      cursor: pointer;
+    }
+    .profile-card:hover,
+    .profile-card.active {
+      background: #343434;
+    }
+    .profile-card-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .profile-card-meta {
+      margin-top: 3px;
+      color: #a8a8a8;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .profile-actions {
+      display: flex;
+      gap: 8px;
+      padding-top: 8px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .profile-actions button {
+      flex: 1;
+    }
+    #settingsModal .form-row.inline {
+      display: grid;
+      grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+    }
+    #settingsModal .form-row.inline label {
+      margin: 0;
+      white-space: normal;
+      line-height: 1.45;
+    }
+    #settingsModal .form-row.inline input[type=range] {
+      width: 100%;
+    }
+    #settingsModal .form-row.inline input[type=number] {
+      width: 120px;
+      justify-self: end;
+    }
+    #settingsModal .form-row.inline input[type=checkbox] {
+      justify-self: end;
+    }
+
+    @media (max-width: 760px) {
+      #topStats {
+        display: flex;
+        position: static;
+        transform: none;
+        margin: 0 auto;
+        max-width: none;
+        overflow: hidden;
+      }
+      #topStats .stat-item,
+      #memoryBtn {
+        padding: 0 9px;
+        font-size: 12px;
+      }
+      #sidebar.open ~ #main #topStats,
+      body:not(.sidebar-collapsed) #topStats {
+        display: none;
+      }
+      .bottom,
+      body.sidebar-collapsed .bottom {
+        grid-template-columns: 38px 38px minmax(0, 1fr) 40px;
+        min-height: 58px;
+        border-radius: 29px;
+        padding: 6px 8px;
+      }
+      #progressBtn,
+      #attachBtn,
+      #sendBtn {
+        width: 38px;
+        height: 38px;
+      }
+      #settingsModal .form-row.inline {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      #settingsModal .form-row.inline input[type=number],
+      #settingsModal .form-row.inline input[type=checkbox] {
+        justify-self: start;
+      }
+    }
+
+    /* ===== 顶栏细节修正 ===== */
+    #topbar {
+      gap: 10px;
+    }
+    #historyBtn {
+      width: 36px;
+      height: 36px;
+      margin-right: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+    }
+    #modelPicker {
+      margin-right: 0;
+    }
+    #modelMenuBtn {
+      height: 36px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 18px;
+      line-height: 36px;
+    }
+    #modelMenuBtn .chev {
+      height: 36px;
+      align-items: center;
+      line-height: 36px;
+      font-size: 13px;
+      transform: none;
+      margin-left: 1px;
+    }
+    #exportCurrentBtn {
+      margin-left: auto;
+    }
+    #topStats .stat-item > span:first-child {
+      display: inline-flex;
+    }
+    #topStats .stat-label {
+      display: inline-flex;
+      color: #b4b4b4;
+    }
+    #topStats .stat-value {
+      min-width: 18px;
+      text-align: center;
+      justify-content: center;
+    }
+    #modelMenu {
+      width: 240px;
+      padding: 8px;
+    }
+    .model-menu-item {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+    }
+    .model-menu-name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .model-menu-meta,
+    .model-menu-actions {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      #exportCurrentBtn {
+        margin-left: 0;
+      }
+    }
+
+    /* ===== 细节修正：模型箭头、侧栏图标、背景图状态 ===== */
+    #modelMenuBtn .chev {
+      position: relative;
+      width: 10px;
+      height: 10px;
+      margin-left: 2px;
+      font-size: 0;
+      line-height: 0;
+      transform: none;
+      flex-shrink: 0;
+    }
+    #modelMenuBtn .chev::before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: 0;
+      width: 6px;
+      height: 6px;
+      border-right: 2px solid #b4b4b4;
+      border-bottom: 2px solid #b4b4b4;
+      transform: rotate(45deg);
+    }
+
+    .side-nav-item {
+      gap: 12px;
+      position: relative;
+    }
+    .side-nav-item::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ececec;
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    #newChatBtn.side-nav-item::before {
+      content: "✎";
+      font-size: 20px;
+      transform: translateY(-1px);
+    }
+    #searchChatBtn.side-nav-item::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ececec;
+      border-radius: 50%;
+      margin-left: 2px;
+      margin-right: 4px;
+      position: relative;
+    }
+    #searchChatBtn.side-nav-item::after {
+      content: "";
+      position: absolute;
+      left: 29px;
+      top: 25px;
+      width: 8px;
+      height: 2px;
+      border-radius: 2px;
+      background: #ececec;
+      transform: rotate(45deg);
+    }
+    #libraryBtn.side-nav-item::before {
+      content: "▥";
+      font-size: 21px;
+    }
+
+    .bg-file-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: #1f1f1f;
+      padding: 6px 8px;
+    }
+    #setBgFile {
+      display: none;
+    }
+    #chooseBgBtn {
+      border: none;
+      border-radius: 7px;
+      background: #ececec;
+      color: #202020;
+      padding: 7px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    #bgFileStatus {
+      color: #b4b4b4;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
 
   <div id="sidebar">
     <div id="sidebarHeader">
-      <span>📋 历史对话</span>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <button id="newChatBtn">＋ 新对话</button>
-        <button id="closeBtn">✕</button>
-      </div>
+      <img id="appLogo" src="../assets/雨.ico" alt="MoreChat">
+      <button id="closeBtn" title="收起侧边栏">⇤</button>
     </div>
-    <div id="sidebarTools" style="padding: 8px 12px; display: flex; gap: 6px; border-bottom: 1px solid #1f2937;">
-      <button id="exportBtn" style="flex:1;background:#374151;color:#e5e7eb;border:none;border-radius:6px;padding:7px 8px;font-size:12px;cursor:pointer;">📤 导出全部</button>
-      <button id="importBtn" style="flex:1;background:#374151;color:#e5e7eb;border:none;border-radius:6px;padding:7px 8px;font-size:12px;cursor:pointer;">📥 导入</button>
+    <div id="sidebarNav">
+      <button class="side-nav-item active" id="newChatBtn">新聊天</button>
+      <button class="side-nav-item" id="searchChatBtn">搜索聊天</button>
+      <button class="side-nav-item" id="libraryBtn">库</button>
+    </div>
+    <div id="sidebarTools">
+      <button id="exportBtn">导出全部</button>
+      <button id="importBtn">导入</button>
     </div>
     <input type="file" id="importFile" accept=".json,application/json" style="display:none;">
+    <div id="recentTitle">最近</div>
     <div id="historyList"></div>
   </div>
   <div id="overlay"></div>
 
   <div id="main">
     <div id="topbar">
-      <button class="top-icon-btn" id="historyBtn" title="历史对话">☰</button>
+      <button class="top-icon-btn" id="historyBtn" title="展开侧边栏">☰</button>
+      <div id="modelPicker">
+        <button id="modelMenuBtn">模型 <span class="chev">⌄</span></button>
+        <div id="modelMenu"></div>
+      </div>
       <div id="chatTitle">新对话</div>
-      <button class="top-icon-btn" id="exportCurrentBtn" title="导出当前对话">📤</button>
-      <button class="top-icon-btn" id="characterBtn" title="角色卡（人设）">👤</button>
-      <button class="top-icon-btn" id="settingsBtn" title="API 设置">⚙️</button>
-    </div>
-    <div id="statsBar">
-      <div class="stat-item">
-        <span>❤️</span>
-        <span class="stat-label">好感</span>
-        <span class="stat-value zero" id="statAf">0</span>
-        <span class="stat-delta" id="statAfDelta"></span>
+      <div id="topStats">
+        <div class="stat-item">
+          <span class="stat-label">好感</span>
+          <span class="stat-value zero" id="statAf">0</span>
+          <span class="stat-delta" id="statAfDelta"></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">信任</span>
+          <span class="stat-value zero" id="statTr">0</span>
+          <span class="stat-delta" id="statTrDelta"></span>
+        </div>
+        <button id="memoryBtn" title="长期记忆 / 剧情压缩">记忆</button>
       </div>
-      <div class="stat-item">
-        <span>🤝</span>
-        <span class="stat-label">信任</span>
-        <span class="stat-value zero" id="statTr">0</span>
-        <span class="stat-delta" id="statTrDelta"></span>
-      </div>
-      <button id="memoryBtn" title="长期记忆 / 剧情压缩">🧠 记忆</button>
+      <button class="top-icon-btn" id="exportCurrentBtn" title="导出当前对话">导出</button>
+      <button class="top-icon-btn" id="characterBtn" title="角色卡（人设）">角色</button>
+      <button class="top-icon-btn" id="settingsBtn" title="API 设置">设置</button>
     </div>
+    <div id="statsBar"></div>
     <div id="chat">
-      <div class="empty-hint">✨ 开始新的对话吧～<br>历史记录会自动保存哦</div>
+      <div class="empty-hint"></div>
+    </div>
+    <div id="libraryView">
+      <div class="library-inner">
+        <div class="library-head">
+          <h1>库</h1>
+          <div class="library-tools">
+            <input id="librarySearch" type="text" placeholder="搜索资料库">
+            <button id="libraryRefresh">刷新</button>
+          </div>
+        </div>
+        <div class="library-tabs">
+          <button class="library-tab active" data-kind="all">全部</button>
+          <button class="library-tab" data-kind="doc">文件</button>
+          <button class="library-tab" data-kind="img">图片</button>
+        </div>
+        <div class="library-table">
+          <div class="library-row library-header">
+            <div>名称</div><div>来源</div><div>大小</div>
+          </div>
+          <div id="libraryList"></div>
+        </div>
+      </div>
     </div>
     <div id="fileChips"></div>
     <div class="bottom">
-      <button id="progressBtn" title="推进剧情">⏩</button>
-      <button id="attachBtn" title="上传文件（txt/md/json/csv/代码/PDF/Word/Excel）">📎</button>
+      <button id="progressBtn" title="推进剧情">⋯</button>
+      <button id="attachBtn" title="上传文件（txt/md/json/csv/代码/PDF/Word/Excel）">＋</button>
       <input type="file" id="fileInput" multiple accept=".txt,.md,.markdown,.json,.csv,.tsv,.html,.htm,.xml,.log,.yml,.yaml,.toml,.ini,.cfg,.conf,.js,.mjs,.cjs,.ts,.tsx,.jsx,.py,.java,.kt,.go,.rs,.rb,.php,.swift,.c,.cpp,.h,.hpp,.cs,.scala,.dart,.lua,.pl,.r,.sql,.sh,.bash,.zsh,.ps1,.bat,.cmd,.env,.vue,.svelte,.astro,.tex,.rst,.adoc,.pdf,.docx,.xlsx,.xls,.xlsm,.ods,text/*" style="display:none;">
-      <textarea id="userInput" rows="2" placeholder="输入消息  ·  ! 数值操作  ·  / 出戏问AI  ·  📎 附件"></textarea>
-      <button id="sendBtn">发送</button>
+      <textarea id="userInput" rows="2" placeholder="输入消息，支持 ! 数值操作、/ 出戏指令、附件"></textarea>
+      <button id="sendBtn" title="发送">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5l6 6-1.4 1.4L13 8.8V19h-2V8.8l-3.6 3.6L6 11z"></path></svg>
+      </button>
     </div>
   </div>
 
   <div id="sheetOverlay"></div>
   <div id="bottomSheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">⏩ 推进剧情</div>
+    <div class="sheet-title">推进剧情</div>
 
     <div class="sheet-section">
-      <div class="sheet-label">⏰ 时间快进</div>
+      <div class="sheet-label">时间快进</div>
       <div class="sheet-chips">
         <button class="chip" data-time="几小时">几小时后</button>
         <button class="chip" data-time="一天">一天后</button>
@@ -915,21 +2486,21 @@
       </div>
     </div>
 
-    <div class="sheet-item" data-act="event">🎲 触发突发事件</div>
+    <div class="sheet-item" data-act="event">触发突发事件</div>
   </div>
 
   <div id="msgActionSheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">消息操作</div>
-    <div class="sheet-item" data-msgact="copy">📋 复制内容</div>
-    <div class="sheet-item" data-msgact="edit" id="actEdit">✏️ 编辑此条</div>
-    <div class="sheet-item" data-msgact="regen" id="actRegen">🔄 重新生成（让 AI 重答）</div>
-    <div class="sheet-item danger" data-msgact="delete">🗑 撤回此组（关系数值同步回退）</div>
+    <div class="sheet-item" data-msgact="copy">复制内容</div>
+    <div class="sheet-item" data-msgact="edit" id="actEdit">编辑此条</div>
+    <div class="sheet-item" data-msgact="regen" id="actRegen">重新生成</div>
+    <div class="sheet-item danger" data-msgact="delete">撤回此组（关系数值同步回退）</div>
   </div>
 
   <div id="editModal">
     <div class="edit-card">
-      <div class="edit-title">✏️ 编辑消息内容</div>
+      <div class="edit-title">编辑消息内容</div>
       <textarea id="editText" rows="10"></textarea>
       <div class="edit-actions">
         <button id="editCancel">取消</button>
@@ -940,7 +2511,20 @@
 
   <div id="settingsModal">
     <div class="edit-card">
-      <div class="edit-title">⚙️ API 设置</div>
+      <div class="edit-title">API 设置</div>
+      <div class="form-section-title">模型预设</div>
+      <input type="hidden" id="modelProfileSelect" value="default">
+      <div id="profileManager">
+        <div id="profileList"></div>
+        <div class="profile-actions">
+          <button id="saveModelProfile" type="button">保存/更新当前预设</button>
+          <button id="deleteModelProfile" type="button">删除预设</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>预设名称</label>
+        <input type="text" id="setProfileName" placeholder="例如：DeepSeek / Kimi / 本地代理" autocomplete="off">
+      </div>
       <div class="form-row">
         <label>API URL</label>
         <input type="text" id="setApiUrl" placeholder="https://api.deepseek.com/v1/chat/completions" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -954,12 +2538,32 @@
         <input type="text" id="setModel" placeholder="deepseek-v4-flash" autocomplete="off" autocapitalize="off" spellcheck="false">
       </div>
       <div class="form-hint">
-        💡 支持任何兼容 OpenAI 格式的 API：DeepSeek、Grok、Claude 代理、OpenAI、Kimi、智谱、通义……都行。<br>
-        🔒 你的 API Key 仅保存在<b>你自己的浏览器本地</b>，不会上传到任何服务器。<br>
-        📝 留空恢复默认：DeepSeek 官方接口 / deepseek-v4-flash 模型。
+        支持任何兼容 OpenAI 格式的 API：DeepSeek、Grok、Claude 代理、OpenAI、Kimi、智谱、通义等。<br>
+        你的 API Key 仅保存在<b>你自己的浏览器本地</b>，不会上传到任何服务器。<br>
+        可以保存多个预设，然后从顶部“模型”菜单快速切换。
       </div>
 
-      <div class="form-section-title">🧠 长期记忆 / 剧情压缩</div>
+      <div class="form-section-title">背景</div>
+      <div class="form-row">
+        <label>背景图</label>
+        <div class="bg-file-row">
+          <button id="chooseBgBtn" type="button">选择背景图</button>
+          <span id="bgFileStatus">未设置背景图</span>
+          <input type="file" id="setBgFile" accept="image/*">
+        </div>
+      </div>
+      <div class="form-row inline">
+        <label for="setBgOpacity">背景透明度</label>
+        <input type="range" id="setBgOpacity" min="0" max="0.55" step="0.05">
+      </div>
+      <div class="form-hint">
+        不设置背景图时保持默认黑色风格；设置后会叠一层暗色遮罩，整体仍偏黑。
+      </div>
+      <div class="edit-actions" style="justify-content: flex-start; flex-wrap: wrap; gap: 8px;">
+        <button id="clearBgBtn" type="button">清除背景图</button>
+      </div>
+
+      <div class="form-section-title">长期记忆 / 剧情压缩</div>
       <div class="form-row inline">
         <label for="setMemAuto">自动压缩（AI 回复后超阈值自动触发）</label>
         <input type="checkbox" id="setMemAuto">
@@ -973,9 +2577,9 @@
         <input type="number" id="setMemKeepRecent" min="2" max="50" step="2">
       </div>
       <div class="form-hint">
-        💡 阈值越大压缩越晚（默认 12000 ≈ 6k token，约 30-50 条消息）<br>
-        💡 保留最近 N 条让 AI 看到原话不脱口吻（默认 8 条 ≈ 4 轮对话）<br>
-        💡 点 statsBar 上的 🧠 记忆 按钮可查看/编辑/手动触发压缩
+        阈值越大压缩越晚（默认 60000，适合较长上下文模型）<br>
+        保留最近 N 条让 AI 看到原话不脱口吻（默认 8 条 ≈ 4 轮对话）<br>
+        点状态栏上的“记忆”按钮可查看、编辑或手动触发压缩。
       </div>
 
       <div class="edit-actions">
@@ -987,7 +2591,7 @@
 
   <div id="characterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center;padding:16px;">
     <div class="edit-card">
-      <div class="edit-title">👤 角色卡（本对话专属人设）</div>
+      <div class="edit-title">角色卡（本对话专属人设）</div>
       <div class="form-row">
         <label>角色名</label>
         <input type="text" id="charName" placeholder="例如：小红、林深、艾米莉…" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -997,17 +2601,17 @@
         <textarea id="charDescription" rows="12" placeholder="例如：&#10;22岁大学生，傲娇但内心温柔&#10;长发，喜欢穿连衣裙，怕黑&#10;和你是青梅竹马，最近开始意识到对你的特殊感情&#10;说话习惯：句尾带"哼"或"才不是…"&#10;..."></textarea>
       </div>
       <div class="form-hint">
-        💡 角色卡会自动注入到 system prompt 顶部，每轮 AI 都记得这些设定<br>
-        📝 仅对【当前对话】生效；可以保存为模板，新对话快速加载<br>
-        🗑️ 两个字段都为空时相当于关闭角色卡<br>
-        🤝 想和小伙伴分享？用下方「导出/导入角色卡」生成 JSON 文件互通
+        角色卡会自动注入到 system prompt 顶部，每轮 AI 都记得这些设定。<br>
+        仅对【当前对话】生效；可以保存为模板，新对话快速加载。<br>
+        两个字段都为空时相当于关闭角色卡。<br>
+        想和小伙伴分享？用下方「导出/导入角色卡」生成 JSON 文件互通。
       </div>
       <!-- 第一行：模板操作 + 取消/保存 -->
       <div class="edit-actions" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; gap: 8px;">
-          <button id="charLoadTpl" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📂 从模板加载</button>
-          <button id="charSaveTpl" style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">💾 保存为模板</button>
-          <button id="charDelTpl" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">🗑 删除模板</button>
+          <button id="charLoadTpl" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">从模板加载</button>
+          <button id="charSaveTpl" style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">保存为模板</button>
+          <button id="charDelTpl" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">删除模板</button>
         </div>
         <div style="display: flex; gap: 8px;">
           <button id="charCancel">取消</button>
@@ -1016,8 +2620,8 @@
       </div>
       <!-- 第二行：角色卡文件导入/导出（社群分享用） -->
       <div class="edit-actions" style="justify-content: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-        <button id="charExportFile" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📤 导出角色卡文件</button>
-        <button id="charImportFile" style="background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">📥 导入角色卡文件</button>
+        <button id="charExportFile" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">导出角色卡文件</button>
+        <button id="charImportFile" style="background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">导入角色卡文件</button>
         <input type="file" id="charImportInput" accept=".json,application/json" style="display:none;">
       </div>
     </div>
@@ -1025,22 +2629,22 @@
 
   <div id="memoryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center;padding:16px;">
     <div class="edit-card">
-      <div class="edit-title">🧠 长期记忆 / 剧情压缩</div>
+      <div class="edit-title">长期记忆 / 剧情压缩</div>
       <div class="mem-meta" id="memMeta">尚未生成剧情大纲</div>
       <div class="form-row">
         <label>剧情大纲（AI 自动生成，可手动编辑修正）</label>
         <textarea id="memText" placeholder="还没生成剧情大纲～&#10;条件触发后会自动压缩，也可以点下方「立即压缩」手动触发"></textarea>
       </div>
       <div class="form-hint">
-        💡 这段大纲会作为「长期记忆」注入到每次 AI 的 system prompt，让 AI 记住早期剧情<br>
-        🔄 多次压缩会基于已有大纲整合新对话，<b>不会丢失旧剧情</b><br>
-        ✏️ 可手动编辑大纲补充/修正关键信息（保存后立即生效）<br>
-        ⚠️ 清空大纲后 AI 会失去早期剧情记忆，谨慎操作
+        这段大纲会作为「长期记忆」注入到每次 AI 的 system prompt，让 AI 记住早期剧情。<br>
+        多次压缩会基于已有大纲整合新对话，<b>不会丢失旧剧情</b>。<br>
+        可手动编辑大纲补充或修正关键信息，保存后立即生效。<br>
+        清空大纲后 AI 会失去早期剧情记忆，谨慎操作。
       </div>
       <div class="edit-actions" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; gap: 8px;">
-          <button id="memCompressNow" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">⚡ 立即压缩</button>
-          <button id="memClear" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">🗑 清空大纲</button>
+          <button id="memCompressNow" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">立即压缩</button>
+          <button id="memClear" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;">清空大纲</button>
         </div>
         <div style="display: flex; gap: 8px;">
           <button id="memCancel" style="background:#374151;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;">取消</button>
@@ -1057,6 +2661,10 @@
     let API_KEY = '';
     let API_URL = DEFAULT_API_URL;
     let MODEL   = DEFAULT_MODEL;
+    let MODEL_PROFILE_ID = 'default';
+    let modelProfiles = [];
+    let uiSettings = { bgImage: '', bgName: '', bgOpacity: 0.25 };
+    let libraryFilter = 'all';
     // 长文件生成优先给最大输出预算；如果接口不支持，会自动降级重试。
     const MAX_OUTPUT_TOKENS = 65536;
     const OUTPUT_TOKEN_FALLBACKS = [65536, 32768, 16384, 8192, 4096];
@@ -1121,6 +2729,125 @@
     let sessions  = {};
     let currentId = null;
     let isSending = false;
+    let sessionsLoaded = false;
+    let sessionsLoadPromise = null;
+
+    // ===== IndexedDB（大存档主存储，纯前端，无需后端） =====
+    // localStorage 对大附件/长小说很容易爆容量；IndexedDB 更适合存完整会话。
+    const APP_DB_NAME = 'morechat_db';
+    const APP_DB_VERSION = 1;
+    const APP_KV_STORE = 'kv';
+    const LOCAL_SESSIONS_SOFT_LIMIT = 1800000; // 约 1.8MB，超过就只存 IndexedDB，避免 localStorage 配额弹窗
+    let appDbPromise = null;
+
+    function openAppDb() {
+      if (appDbPromise) return appDbPromise;
+      appDbPromise = new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error('当前浏览器不支持 IndexedDB'));
+          return;
+        }
+        const req = indexedDB.open(APP_DB_NAME, APP_DB_VERSION);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(APP_KV_STORE)) {
+            db.createObjectStore(APP_KV_STORE);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error || new Error('IndexedDB 打开失败'));
+      });
+      return appDbPromise;
+    }
+
+    async function idbGet(key) {
+      const db = await openAppDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(APP_KV_STORE, 'readonly');
+        const req = tx.objectStore(APP_KV_STORE).get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error || new Error('IndexedDB 读取失败'));
+      });
+    }
+
+    async function idbSet(key, value) {
+      const db = await openAppDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(APP_KV_STORE, 'readwrite');
+        tx.objectStore(APP_KV_STORE).put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error || new Error('IndexedDB 写入失败'));
+      });
+    }
+
+    function defaultModelProfiles() {
+      return [{
+        id: 'default',
+        name: 'DeepSeek',
+        apiUrl: DEFAULT_API_URL,
+        apiKey: '',
+        model: DEFAULT_MODEL
+      }];
+    }
+
+    function normalizeModelProfiles(profiles) {
+      const arr = Array.isArray(profiles) && profiles.length ? profiles : defaultModelProfiles();
+      return arr.map((p, i) => ({
+        id: p.id || ('profile_' + Date.now() + '_' + i),
+        name: p.name || p.model || ('模型 ' + (i + 1)),
+        apiUrl: p.apiUrl || DEFAULT_API_URL,
+        apiKey: p.apiKey || '',
+        model: p.model || DEFAULT_MODEL
+      }));
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem('ds_api_settings', JSON.stringify({
+          apiUrl: API_URL,
+          apiKey: API_KEY,
+          model: MODEL,
+          activeProfileId: MODEL_PROFILE_ID,
+          modelProfiles,
+          ui: uiSettings
+        }));
+      } catch(e) {
+        alert('设置保存失败：可能是背景图太大，浏览器本地存储空间不够。');
+      }
+    }
+
+    function updateCurrentModelLabel() {
+      const btn = document.getElementById('modelMenuBtn');
+      if (!btn) return;
+      btn.title = MODEL + '\n' + API_URL;
+    }
+
+    function applyModelProfile(profile, persist = true) {
+      if (!profile) return;
+      MODEL_PROFILE_ID = profile.id;
+      API_URL = profile.apiUrl || DEFAULT_API_URL;
+      API_KEY = profile.apiKey || '';
+      MODEL = profile.model || DEFAULT_MODEL;
+      updateCurrentModelLabel();
+      renderModelMenu();
+      if (persist) saveSettings();
+    }
+
+    function applyUiSettings() {
+      const bg = uiSettings && uiSettings.bgImage;
+      const op = uiSettings && typeof uiSettings.bgOpacity === 'number' ? uiSettings.bgOpacity : 0.25;
+      if (bg) {
+        document.body.classList.add('has-bg');
+        document.body.style.setProperty('--chat-bg-image', `url("${bg}")`);
+        document.body.style.setProperty('--chat-bg-opacity', String(op));
+        document.body.style.setProperty('--chat-bg-mask', '1');
+      } else {
+        document.body.classList.remove('has-bg');
+        document.body.style.removeProperty('--chat-bg-image');
+        document.body.style.setProperty('--chat-bg-opacity', '0');
+        document.body.style.setProperty('--chat-bg-mask', '0');
+      }
+    }
 
     // ===== 导演指令文案（仅作为新增的 user message 注入，不修改原 prompt） =====
     const SUMMARY_RULE = '\n\n【输出格式硬性要求·必须严格遵守】每一次回复都必须在最开头用 [剧情] 与 [/剧情] 标签包裹一段不超过40字的"旁白式剧情概要"，告诉我刚刚剧情如何被推进。要求：①必须使用客观的第三人称旁白叙述（描述时间流逝、场景、角色处境或动作），严禁使用第一人称"我"来自述；②标签必须完整闭合；③示例：[剧情]一周后的傍晚，咖啡馆窗外下起了大雨，她抱着湿透的外套推门进来。[/剧情]。标签结束后再换行，以角色身份继续后续的对话与动作描述。即使我们之前的对话很长，这个格式也必须每次都严格遵守，不可省略。';
@@ -1129,8 +2856,8 @@
       event:    '（导演指令：请你主动设计并触发一个符合当前情境的突发事件或剧情转折。事件发生过程中，角色必须主动开口对我说话、明确表达态度或发起互动，让我清楚知道对方说了什么、做了什么，方便我接续回应。不要只用旁白叙述，不要等待我的提示。）' + SUMMARY_RULE
     };
     const DIRECTOR_LABELS = {
-      time:   (t) => `⏰ 时间快进 · ${t}后`,
-      event:    '🎲 突发事件'
+      time:   (t) => `时间快进 · ${t}后`,
+      event:    '突发事件'
     };
 
     // ===== 元指令（出戏对话）：用户输入以 / 开头时触发，让底层 AI 跳出角色扮演 =====
@@ -1140,8 +2867,22 @@
     // ===== localStorage =====
     let _quotaAlerted = false; // 配额提示去抖，避免连续弹窗轰炸
     function saveSessions() {
+      // 主存储：IndexedDB。它是浏览器本地数据库，适合保存完整附件上下文。
+      idbSet('sessions', sessions).catch(e => {
+        if (!_quotaAlerted) {
+          _quotaAlerted = true;
+          alert('⚠️ IndexedDB 保存失败，刚才的内容可能没有完整保存：\n' + e.message);
+        }
+      });
+
+      // 兼容兜底：小存档同步写 localStorage；大存档不再强塞，避免 5MB 配额爆炸。
       try {
-        localStorage.setItem('ds_sessions', JSON.stringify(sessions));
+        const raw = JSON.stringify(sessions);
+        if (raw.length <= LOCAL_SESSIONS_SOFT_LIMIT) {
+          localStorage.setItem('ds_sessions', raw);
+        } else {
+          localStorage.removeItem('ds_sessions');
+        }
         _quotaAlerted = false;
       } catch(e) {
         const isQuota = e.name === 'QuotaExceededError' ||
@@ -1149,14 +2890,29 @@
                         (e.message && e.message.toLowerCase().includes('quota'));
         if (isQuota && !_quotaAlerted) {
           _quotaAlerted = true;
-          alert('⚠️ 浏览器本地存储空间已满，刚才的内容未能保存！\n\n常见原因：\n  • 上传的附件文件太大\n  • 历史对话累积过多\n\n建议：\n  • 用 ☰ 侧栏的 📤 导出按钮备份后，再删除旧对话\n  • 减小上传文件大小或拆分多次上传');
+          alert('⚠️ localStorage 兜底存储空间已满。\n\n不用太慌：新版会优先把完整会话保存到 IndexedDB。\n如果浏览器隐私模式/清理数据导致 IndexedDB 不可用，请用 ☰ 侧栏的 📤 导出按钮及时备份。');
         }
       }
     }
-    function loadSessions() {
+    async function loadSessions() {
+      let loadedFromIdb = false;
+      try {
+        const data = await idbGet('sessions');
+        if (data && typeof data === 'object') {
+          sessions = data;
+          loadedFromIdb = true;
+        }
+      } catch(e) {
+        // IndexedDB 不可用时走旧 localStorage 兼容路径
+      }
+      if (loadedFromIdb) return;
       try {
         const raw = localStorage.getItem('ds_sessions');
-        if (raw) sessions = JSON.parse(raw);
+        if (raw) {
+          sessions = JSON.parse(raw);
+          // 从旧版本迁移到 IndexedDB；失败也不影响继续使用。
+          idbSet('sessions', sessions).catch(()=>{});
+        }
       } catch(e) { sessions = {}; }
     }
 
@@ -1309,26 +3065,73 @@
     // ===== 侧边栏 =====
     document.getElementById('historyBtn').addEventListener('click', openSidebar);
     document.getElementById('closeBtn').addEventListener('click', closeSidebar);
+    document.getElementById('libraryBtn').addEventListener('click', showLibrary);
+    document.getElementById('searchChatBtn').addEventListener('click', searchChats);
     overlay.addEventListener('click', closeSidebar);
-    function openSidebar()  { renderHistoryList(); sidebar.classList.add('open'); overlay.classList.add('show'); }
-    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+    function openSidebar()  {
+      if (!sessionsLoaded && sessionsLoadPromise) {
+        historyList.innerHTML = '<div style="color:#4b5563;text-align:center;padding:24px;font-size:13px;">正在读取本地存档...</div>';
+        sessionsLoadPromise.finally(renderHistoryList);
+      } else {
+        renderHistoryList();
+      }
+      document.body.classList.remove('sidebar-collapsed');
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+    }
+    function closeSidebar() {
+      document.body.classList.add('sidebar-collapsed');
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+
+    function setSidebarActive(which) {
+      document.querySelectorAll('.side-nav-item').forEach(btn => btn.classList.remove('active'));
+      const btn = document.getElementById(which);
+      if (btn) btn.classList.add('active');
+    }
+
+    function showChatView() {
+      document.body.classList.remove('library-mode');
+      setSidebarActive('newChatBtn');
+    }
+
+    function showLibrary() {
+      document.body.classList.add('library-mode');
+      setSidebarActive('libraryBtn');
+      renderLibrary();
+      if (window.innerWidth <= 760) closeSidebar();
+    }
+
+    function searchChats() {
+      const q = prompt('搜索聊天标题：');
+      if (q === null) return;
+      renderHistoryList(q.trim());
+      setSidebarActive('searchChatBtn');
+      document.body.classList.remove('sidebar-collapsed');
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+    }
 
     // ===== 新对话 =====
-    document.getElementById('newChatBtn').addEventListener('click', () => { closeSidebar(); newChat(); });
+    document.getElementById('newChatBtn').addEventListener('click', () => { showChatView(); if (window.innerWidth <= 760) closeSidebar(); newChat(); });
     function newChat() {
       currentId = null;
-      chatBox.innerHTML = '<div class="empty-hint">✨ 开始新的对话吧～<br>历史记录会自动保存哦</div>';
+      chatBox.innerHTML = '<div class="empty-hint"></div>';
       chatTitle.textContent = '新对话';
       renderStats(null);
       updateMemoryBtn();
     }
 
     // ===== 渲染历史列表 =====
-    function renderHistoryList() {
+    function renderHistoryList(filterText = '') {
       historyList.innerHTML = '';
-      const ids = Object.keys(sessions).sort((a, b) => Number(b) - Number(a));
+      const q = (filterText || '').toLowerCase();
+      const ids = Object.keys(sessions)
+        .filter(id => !q || ((sessions[id].title || '无标题').toLowerCase().includes(q)))
+        .sort((a, b) => Number(b) - Number(a));
       if (!ids.length) {
-        historyList.innerHTML = '<div style="color:#4b5563;text-align:center;padding:24px;font-size:13px;">还没有历史对话哦～</div>';
+          historyList.innerHTML = '<div style="color:#8f8f8f;text-align:center;padding:24px;font-size:13px;">' + (q ? '没有匹配的聊天' : '还没有历史对话') + '</div>';
         return;
       }
       ids.forEach(id => {
@@ -1347,13 +3150,14 @@
 
         item.appendChild(titleEl);
         item.appendChild(delBtn);
-        item.addEventListener('click', () => { loadSession(id); closeSidebar(); });
+        item.addEventListener('click', () => { showChatView(); loadSession(id); if (window.innerWidth <= 760) closeSidebar(); });
         historyList.appendChild(item);
       });
     }
 
     // ===== 加载历史 =====
     function loadSession(id) {
+      showChatView();
       currentId = id;
       const s   = sessions[id];
       chatTitle.textContent = s.title || '对话';
@@ -1363,7 +3167,7 @@
       s.messages.forEach((m, i) => {
         let div = null;
         if (m.meta && m.meta.director) {
-          div = addDirectorEl(m.meta.label || '⏩ 推进剧情');
+        div = addDirectorEl(m.meta.label || '推进剧情');
         } else if (m.meta && m.meta.statOp) {
           // 数值快捷操作：显示操作摘要
           div = addStatOpEl(m.meta.summary || m.content);
@@ -1718,6 +3522,7 @@
 
     // ===== 发送 =====
     async function sendMessage(directorPayload) {
+      if (!sessionsLoaded && sessionsLoadPromise) await sessionsLoadPromise;
       if (isSending) return;
       if (!API_KEY) { alert('请先点击右上角 ⚙️ 填写你的 API Key～'); openSettingsModal(); return; }
 
@@ -1789,7 +3594,7 @@
       isSending = true;
       sendBtn.disabled = true;
       progressBtn.disabled = true;
-      sendBtn.innerText = '发送中';
+      sendBtn.innerHTML = '…';
 
       // 普通消息和元指令时附加已上传的文件内容（导演/数值操作不带附件）
       const attach = (!isDirector && !isStatOp) ? buildAttachContext() : { text: '', names: [] };
@@ -1938,7 +3743,7 @@
         isSending = false;
         sendBtn.disabled = false;
         progressBtn.disabled = false;
-        sendBtn.innerText = '发送';
+        sendBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5l6 6-1.4 1.4L13 8.8V19h-2V8.8l-3.6 3.6L6 11z"></path></svg>';
         // AI 回复完成后,检查是否需要自动压缩历史
         maybeAutoCompress();
       }
@@ -2235,7 +4040,7 @@
       isSending = true;
       sendBtn.disabled = true;
       progressBtn.disabled = true;
-      sendBtn.innerText = '发送中';
+      sendBtn.innerHTML = '…';
 
       const lastMsg = msgs[lastUserIdx];
       const isDir = !!(lastMsg.meta && lastMsg.meta.director);
@@ -2349,7 +4154,7 @@
         isSending = false;
         sendBtn.disabled = false;
         progressBtn.disabled = false;
-        sendBtn.innerText = '发送';
+        sendBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5l6 6-1.4 1.4L13 8.8V19h-2V8.8l-3.6 3.6L6 11z"></path></svg>';
       }
     }
 
@@ -2359,16 +4164,60 @@
         const raw = localStorage.getItem('ds_api_settings');
         if (raw) {
           const s = JSON.parse(raw);
-          API_KEY = s.apiKey || '';
-          API_URL = s.apiUrl || DEFAULT_API_URL;
-          MODEL   = s.model  || DEFAULT_MODEL;
+          modelProfiles = normalizeModelProfiles(s.modelProfiles || [{
+            id: 'default',
+            name: s.model || 'DeepSeek',
+            apiUrl: s.apiUrl || DEFAULT_API_URL,
+            apiKey: s.apiKey || '',
+            model: s.model || DEFAULT_MODEL
+          }]);
+          uiSettings = Object.assign({ bgImage: '', bgName: '', bgOpacity: 0.25 }, s.ui || {});
+          const active = modelProfiles.find(p => p.id === s.activeProfileId) || modelProfiles[0];
+          applyModelProfile(active, false);
+          applyUiSettings();
+          return;
         }
       } catch(e) {}
+      modelProfiles = defaultModelProfiles();
+      applyModelProfile(modelProfiles[0], false);
+      applyUiSettings();
     }
+
+    function renderModelProfileSelect() {
+      const hidden = document.getElementById('modelProfileSelect');
+      if (hidden) hidden.value = MODEL_PROFILE_ID;
+      const list = document.getElementById('profileList');
+      if (!list) return;
+      list.innerHTML = '';
+      modelProfiles.forEach(p => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'profile-card' + (p.id === MODEL_PROFILE_ID ? ' active' : '');
+        btn.innerHTML = '<div class="profile-card-name">' + escapeHtml(p.name) + '</div>' +
+          '<div class="profile-card-meta">' + escapeHtml(p.model) + ' · ' + escapeHtml(p.apiUrl) + '</div>';
+        btn.addEventListener('click', () => {
+          applyModelProfile(p, false);
+          renderModelProfileSelect();
+          document.getElementById('setProfileName').value = p.name;
+          document.getElementById('setApiUrl').value = p.apiUrl;
+          document.getElementById('setApiKey').value = p.apiKey;
+          document.getElementById('setModel').value = p.model;
+        });
+        list.appendChild(btn);
+      });
+    }
+
     function openSettingsModal() {
+      renderModelProfileSelect();
+      const active = modelProfiles.find(p => p.id === MODEL_PROFILE_ID) || modelProfiles[0];
+      document.getElementById('setProfileName').value = active ? active.name : '';
       document.getElementById('setApiUrl').value = API_URL;
       document.getElementById('setApiKey').value = API_KEY;
       document.getElementById('setModel').value  = MODEL;
+      document.getElementById('setBgOpacity').value = uiSettings.bgOpacity;
+      document.getElementById('bgFileStatus').textContent = uiSettings.bgImage
+        ? ('已设置：' + (uiSettings.bgName || '背景图'))
+        : '未设置背景图';
       document.getElementById('setMemAuto').checked       = !!memSettings.enabled;
       document.getElementById('setMemThreshold').value    = memSettings.threshold;
       document.getElementById('setMemKeepRecent').value   = memSettings.keepRecent;
@@ -2379,15 +4228,82 @@
     }
     document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
     document.getElementById('setCancel').addEventListener('click', closeSettingsModal);
+    document.getElementById('saveModelProfile').addEventListener('click', () => {
+      const name = document.getElementById('setProfileName').value.trim() || document.getElementById('setModel').value.trim() || '未命名模型';
+      const profile = {
+        id: document.getElementById('modelProfileSelect').value || ('profile_' + Date.now()),
+        name,
+        apiUrl: document.getElementById('setApiUrl').value.trim() || DEFAULT_API_URL,
+        apiKey: document.getElementById('setApiKey').value.trim(),
+        model: document.getElementById('setModel').value.trim() || DEFAULT_MODEL
+      };
+      const idx = modelProfiles.findIndex(p => p.id === profile.id);
+      if (idx >= 0) modelProfiles[idx] = profile;
+      else modelProfiles.push(profile);
+      applyModelProfile(profile, false);
+      renderModelProfileSelect();
+      renderModelMenu();
+      saveSettings();
+      alert('模型预设已保存');
+    });
+    document.getElementById('deleteModelProfile').addEventListener('click', () => {
+      if (modelProfiles.length <= 1) { alert('至少保留一个模型预设'); return; }
+      const id = document.getElementById('modelProfileSelect').value;
+      const p = modelProfiles.find(x => x.id === id);
+      if (!p || !confirm('确定删除预设 "' + p.name + '" 吗？')) return;
+      modelProfiles = modelProfiles.filter(x => x.id !== id);
+      applyModelProfile(modelProfiles[0], false);
+      renderModelProfileSelect();
+      renderModelMenu();
+      saveSettings();
+    });
+    document.getElementById('setBgOpacity').addEventListener('input', (e) => {
+      uiSettings.bgOpacity = parseFloat(e.target.value) || 0;
+      applyUiSettings();
+    });
+    document.getElementById('chooseBgBtn').addEventListener('click', () => {
+      document.getElementById('setBgFile').click();
+    });
+    document.getElementById('setBgFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        uiSettings.bgImage = ev.target.result;
+        uiSettings.bgName = file.name;
+        document.getElementById('bgFileStatus').textContent = '已设置：' + file.name;
+        applyUiSettings();
+        saveSettings();
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('clearBgBtn').addEventListener('click', () => {
+      uiSettings.bgImage = '';
+      uiSettings.bgName = '';
+      document.getElementById('bgFileStatus').textContent = '未设置背景图';
+      applyUiSettings();
+      saveSettings();
+    });
     document.getElementById('setSave').addEventListener('click', () => {
       API_URL = document.getElementById('setApiUrl').value.trim() || DEFAULT_API_URL;
       API_KEY = document.getElementById('setApiKey').value.trim();
       MODEL   = document.getElementById('setModel').value.trim() || DEFAULT_MODEL;
-      try {
-        localStorage.setItem('ds_api_settings', JSON.stringify({
-          apiUrl: API_URL, apiKey: API_KEY, model: MODEL
-        }));
-      } catch(e) {}
+      const activeName = document.getElementById('setProfileName').value.trim() || MODEL;
+      let active = modelProfiles.find(p => p.id === MODEL_PROFILE_ID);
+      if (!active) {
+        active = { id: 'profile_' + Date.now(), name: activeName, apiUrl: API_URL, apiKey: API_KEY, model: MODEL };
+        modelProfiles.push(active);
+      } else {
+        active.name = activeName;
+        active.apiUrl = API_URL;
+        active.apiKey = API_KEY;
+        active.model = MODEL;
+      }
+      uiSettings.bgOpacity = parseFloat(document.getElementById('setBgOpacity').value) || 0;
+      applyModelProfile(active, false);
+      applyUiSettings();
+      saveSettings();
       // 记忆压缩设置
       const thRaw = parseInt(document.getElementById('setMemThreshold').value, 10);
       const krRaw = parseInt(document.getElementById('setMemKeepRecent').value, 10);
@@ -2396,6 +4312,32 @@
       memSettings.keepRecent = (!isNaN(krRaw) && krRaw >= 2    && krRaw <= 50)     ? krRaw : MEM_DEFAULTS.keepRecent;
       saveMemSettings();
       closeSettingsModal();
+    });
+
+    function renderModelMenu() {
+      const menu = document.getElementById('modelMenu');
+      if (!menu) return;
+      menu.innerHTML = '';
+      modelProfiles.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'model-menu-item' + (p.id === MODEL_PROFILE_ID ? ' active' : '');
+        btn.innerHTML = '<div class="model-menu-name">' + escapeHtml(p.name) + '</div>';
+        btn.addEventListener('click', () => {
+          applyModelProfile(p);
+          menu.classList.remove('show');
+        });
+        menu.appendChild(btn);
+      });
+    }
+
+    document.getElementById('modelMenuBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderModelMenu();
+      document.getElementById('modelMenu').classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+      const picker = document.getElementById('modelPicker');
+      if (picker && !picker.contains(e.target)) document.getElementById('modelMenu').classList.remove('show');
     });
 
     // ===== 角色卡（人设预设） =====
@@ -2643,8 +4585,82 @@
       e.target.value = ''; // 允许重复选择同一文件
     });
 
+    // ===== 库：汇总所有历史会话里上传过的附件 =====
+    function collectLibraryItems() {
+      const items = [];
+      Object.keys(sessions).forEach(sessionId => {
+        const s = sessions[sessionId];
+        (s.messages || []).forEach((m, msgIdx) => {
+          const names = Array.isArray(m.attachNames) ? m.attachNames : [];
+          names.forEach((n, fileIdx) => {
+            const name = n.name || '未命名文件';
+            const ext = getFileExt(name);
+            const isImg = ['png','jpg','jpeg','webp','gif','bmp','svg','ico'].includes(ext);
+            items.push({
+              id: sessionId + '_' + msgIdx + '_' + fileIdx,
+              sessionId,
+              msgIdx,
+              name,
+              ext,
+              kind: isImg ? 'img' : 'doc',
+              size: n.size || 0,
+              truncated: !!n.truncated,
+              title: s.title || '无标题',
+              time: Number(sessionId) || 0
+            });
+          });
+        });
+      });
+      return items.sort((a, b) => b.time - a.time);
+    }
+
+    function renderLibrary() {
+      const list = document.getElementById('libraryList');
+      if (!list) return;
+      const q = (document.getElementById('librarySearch').value || '').trim().toLowerCase();
+      const items = collectLibraryItems().filter(item => {
+        if (libraryFilter !== 'all' && item.kind !== libraryFilter) return false;
+        if (!q) return true;
+        return item.name.toLowerCase().includes(q) || item.title.toLowerCase().includes(q);
+      });
+      list.innerHTML = '';
+      if (!items.length) {
+        list.innerHTML = '<div class="library-empty">还没有上传过的文件。发送带附件的消息后，这里会自动出现。</div>';
+        return;
+      }
+      items.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'library-row';
+        row.innerHTML =
+          '<div class="library-file-name">' +
+            '<span class="library-file-icon">' + escapeHtml(item.ext || 'file') + '</span>' +
+            '<div style="min-width:0;">' +
+              '<div class="library-file-title">' + escapeHtml(item.name) + '</div>' +
+              '<div class="library-file-sub">' + (item.truncated ? '已截断 · ' : '') + new Date(item.time || Date.now()).toLocaleDateString() + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div>' + escapeHtml(item.title) + '</div>' +
+          '<div>' + (item.size ? formatFileSize(item.size) : '-') + '</div>';
+        row.addEventListener('click', () => loadSession(item.sessionId));
+        list.appendChild(row);
+      });
+    }
+
+    document.getElementById('libraryRefresh').addEventListener('click', renderLibrary);
+    document.getElementById('librarySearch').addEventListener('input', renderLibrary);
+    document.querySelectorAll('.library-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.library-tab').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        libraryFilter = btn.dataset.kind || 'all';
+        renderLibrary();
+      });
+    });
+
     // ===== 文件附件（上传文本/PDF/Word/Excel，解析后随消息一起发给 AI） =====
-    const MAX_FILE_CHARS = 100000;   // 单文件上限 10w 字符,超长截断（防止爆 token）
+    // 单文件全文注入上限：这里是“字符”不是 token。
+    // 30 万字符足够覆盖约 2 万字小说/Java 文档；再大就很容易撞到模型上下文上限。
+    const MAX_FILE_CHARS = 300000;
     const ATTACH_START = '【📎附件区开始】';
     const ATTACH_END   = '【📎附件区结束】';
 
@@ -2872,7 +4888,7 @@
     // ===== 长期记忆 / 剧情压缩 =====
     const MEM_DEFAULTS = {
       enabled: true,
-      threshold: 12000,   // 字符阈值（≈ 6k tokens，约 30-50 条消息）
+      threshold: 60000,   // 字符阈值（约 15k tokens 量级，适合较长上下文模型）
       keepRecent: 8       // 保留最近 N 条原文不压缩
     };
     let memSettings = { ...MEM_DEFAULTS };
@@ -2974,15 +4990,15 @@ ${convo}
       btn.classList.remove('compressing', 'has-memory');
       if (state === 'compressing') {
         btn.classList.add('compressing');
-        btn.textContent = '🧠 整理中…';
+        btn.textContent = '整理中';
         return;
       }
       const s = currentId && sessions[currentId];
       if (s && s.memory && s.memory.summary) {
         btn.classList.add('has-memory');
-        btn.textContent = '🧠 记忆 ✓';
+        btn.textContent = '记忆 ✓';
       } else {
-        btn.textContent = '🧠 记忆';
+        btn.textContent = '记忆';
       }
     }
 
@@ -3155,7 +5171,9 @@ ${memory.summary}
     loadMemSettings();
 
     loadSettings();
-    loadSessions();
+    sessionsLoadPromise = loadSessions().finally(() => {
+      sessionsLoaded = true;
+    });
 
     // 修复手机Chrome 100vh被地址栏吃掉的问题
     function fixHeight() {
