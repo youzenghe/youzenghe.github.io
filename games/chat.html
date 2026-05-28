@@ -2442,6 +2442,29 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
+    /* 附件标签固定在输入框上方，避免被底部输入栏遮挡 */
+    #fileChips.show {
+      display: flex;
+      position: fixed;
+      left: calc(305px + max(12px, (100vw - 305px - 768px) / 2));
+      right: max(12px, (100vw - 305px - 768px) / 2);
+      bottom: 92px;
+      width: auto;
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 0 6px;
+      background: transparent;
+      border-top: none;
+      z-index: 36;
+    }
+    body.sidebar-collapsed #fileChips.show {
+      left: max(12px, calc((100vw - 768px) / 2));
+      right: max(12px, calc((100vw - 768px) / 2));
+    }
+    #chat {
+      padding-bottom: 148px;
+    }
     .msg.statop,
     .msg.meta {
       padding-top: 30px !important;
@@ -2571,8 +2594,12 @@
         position: fixed;
         left: 10px;
         right: 10px;
-        bottom: 72px;
+        bottom: 74px;
         width: auto;
+        max-width: none;
+        padding: 0 4px;
+        background: transparent;
+        border-top: none;
         z-index: 35;
       }
       #settingsModal {
