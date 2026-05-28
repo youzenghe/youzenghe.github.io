@@ -2382,6 +2382,146 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
+    /* ===== 手机端收束：顶栏分两行，抽屉打开时隐藏状态栏 ===== */
+    @media (max-width: 760px) {
+      #topbar {
+        min-height: 92px;
+        padding: 8px 10px;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-content: center;
+      }
+      body:not(.sidebar-collapsed) #topbar {
+        min-height: 54px;
+      }
+      #historyBtn {
+        order: 1;
+        width: 34px;
+        height: 34px;
+        margin-right: 2px;
+      }
+      #modelPicker {
+        order: 2;
+      }
+      #modelMenuBtn {
+        height: 34px;
+        padding: 0 7px;
+        font-size: 17px;
+      }
+      #exportCurrentBtn,
+      #characterBtn,
+      #settingsBtn {
+        order: 3;
+        height: 34px;
+        min-width: auto;
+        padding: 0 8px;
+        font-size: 13px;
+      }
+      #exportCurrentBtn {
+        margin-left: auto;
+      }
+      #topStats {
+        order: 4;
+        flex: 0 0 100%;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 2px;
+      }
+      body:not(.sidebar-collapsed) #topStats {
+        display: none;
+      }
+      #topStats .stat-item,
+      #memoryBtn {
+        height: 28px;
+        min-height: 28px;
+        padding: 0 9px;
+        gap: 5px;
+        font-size: 12px;
+      }
+      #chat {
+        padding-top: 14px;
+        padding-bottom: 96px;
+      }
+      .msg {
+        width: calc(100% - 22px);
+        max-width: calc(100% - 22px);
+        font-size: 14px;
+      }
+      .msg.user {
+        max-width: calc(100% - 54px);
+      }
+      .bottom,
+      body.sidebar-collapsed .bottom {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        grid-template-columns: 36px 36px minmax(0, 1fr) 38px;
+        min-height: 58px;
+        padding: 6px 8px;
+        border-radius: 29px;
+      }
+      #progressBtn,
+      #attachBtn,
+      #sendBtn {
+        width: 36px;
+        height: 36px;
+      }
+      #attachBtn {
+        font-size: 22px;
+      }
+      #progressBtn {
+        font-size: 18px;
+      }
+      #sendBtn svg {
+        width: 23px;
+        height: 23px;
+      }
+      textarea {
+        height: 42px;
+        min-height: 42px;
+        padding: 10px 4px;
+        font-size: 14px;
+      }
+      #fileChips {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: 72px;
+        width: auto;
+        z-index: 35;
+      }
+      #settingsModal {
+        padding: 10px;
+      }
+      #settingsModal .edit-card {
+        width: 100%;
+        max-height: 88vh;
+        padding: 14px;
+      }
+      .profile-actions,
+      #settingsModal .edit-actions {
+        flex-direction: column;
+      }
+      .profile-actions button,
+      #settingsModal .edit-actions button {
+        width: 100%;
+      }
+      .bg-file-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      #chooseBgBtn {
+        width: 100%;
+      }
+      #bgFileStatus {
+        white-space: normal;
+      }
+      #modelMenu {
+        left: 0;
+        width: min(240px, calc(100vw - 20px));
+      }
+    }
   </style>
 </head>
 <body>
