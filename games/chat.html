@@ -2096,6 +2096,44 @@
       max-height: min(86vh, 760px);
       padding: 18px 20px;
     }
+    .settings-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 4px;
+      margin: 12px 0 14px;
+      background: #202020;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+    }
+    .settings-tab {
+      height: 38px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #a8a8a8;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .settings-tab:hover {
+      background: #2f2f2f;
+      color: #ececec;
+    }
+    .settings-tab.active {
+      background: #3a3a3a;
+      color: #ffffff;
+    }
+    .settings-panel {
+      display: none;
+    }
+    .settings-panel.active {
+      display: block;
+    }
+    .settings-panel .form-section-title:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
     #profileManager {
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 10px;
@@ -2711,7 +2749,14 @@
   <div id="settingsModal">
     <div class="edit-card">
       <div class="edit-title">API 设置</div>
-      <div class="form-section-title">模型预设</div>
+      <div class="settings-tabs">
+        <button class="settings-tab active" data-tab="model" type="button">模型</button>
+        <button class="settings-tab" data-tab="appearance" type="button">外观</button>
+        <button class="settings-tab" data-tab="memory" type="button">记忆</button>
+      </div>
+
+      <div class="settings-panel active" data-panel="model">
+        <div class="form-section-title">模型预设</div>
       <input type="hidden" id="modelProfileSelect" value="default">
       <div id="profileManager">
         <button id="profileToggle" type="button">预设列表 <span>收起</span></button>
@@ -2744,8 +2789,10 @@
         你的 API Key 仅保存在<b>你自己的浏览器本地</b>，不会上传到任何服务器。<br>
         可以保存多个预设，然后从顶部“模型”菜单快速切换。
       </div>
+      </div>
 
-      <div class="form-section-title">背景</div>
+      <div class="settings-panel" data-panel="appearance">
+        <div class="form-section-title">背景</div>
       <div class="form-row">
         <label>背景图</label>
         <div class="bg-file-row">
@@ -2764,8 +2811,10 @@
       <div class="edit-actions" style="justify-content: flex-start; flex-wrap: wrap; gap: 8px;">
         <button id="clearBgBtn" type="button">清除背景图</button>
       </div>
+      </div>
 
-      <div class="form-section-title">长期记忆 / 剧情压缩</div>
+      <div class="settings-panel" data-panel="memory">
+        <div class="form-section-title">长期记忆 / 剧情压缩</div>
       <div class="form-row inline">
         <label for="setMemAuto">自动压缩（AI 回复后超阈值自动触发）</label>
         <input type="checkbox" id="setMemAuto">
@@ -2782,6 +2831,7 @@
         阈值越大压缩越晚（默认 60000，适合较长上下文模型）<br>
         保留最近 N 条让 AI 看到原话不脱口吻（默认 8 条 ≈ 4 轮对话）<br>
         点状态栏上的“记忆”按钮可查看、编辑或手动触发压缩。
+      </div>
       </div>
 
       <div class="edit-actions">
@@ -4456,13 +4506,25 @@
       document.getElementById('setMemAuto').checked       = !!memSettings.enabled;
       document.getElementById('setMemThreshold').value    = memSettings.threshold;
       document.getElementById('setMemKeepRecent').value   = memSettings.keepRecent;
+      setSettingsTab('model');
       document.getElementById('settingsModal').classList.add('show');
     }
     function closeSettingsModal() {
       document.getElementById('settingsModal').classList.remove('show');
     }
+    function setSettingsTab(name) {
+      document.querySelectorAll('.settings-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === name);
+      });
+      document.querySelectorAll('.settings-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.panel === name);
+      });
+    }
     document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
     document.getElementById('setCancel').addEventListener('click', closeSettingsModal);
+    document.querySelectorAll('.settings-tab').forEach(btn => {
+      btn.addEventListener('click', () => setSettingsTab(btn.dataset.tab));
+    });
     document.getElementById('profileToggle').addEventListener('click', () => {
       const box = document.getElementById('profileManager');
       box.classList.toggle('collapsed');
