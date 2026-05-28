@@ -2182,7 +2182,7 @@
         font-size: 12px;
       }
       #sidebar.open ~ #main #topStats,
-      body:not(.sidebar-collapsed) #topStats {
+      body.sidebar-open #topStats {
         display: none;
       }
       .bottom,
@@ -2382,6 +2382,30 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .msg.statop,
+    .msg.meta {
+      padding-top: 30px !important;
+    }
+    .msg.statop::before,
+    .msg.meta::before {
+      top: 6px;
+      left: 12px;
+      right: 12px;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 760px) {
+      .msg.statop,
+      .msg.meta {
+        padding-top: 34px !important;
+      }
+      .msg.statop::before,
+      .msg.meta::before {
+        font-size: 12px;
+      }
+    }
 
     /* ===== 手机端收束：顶栏分两行，抽屉打开时隐藏状态栏 ===== */
     @media (max-width: 760px) {
@@ -2392,7 +2416,7 @@
         flex-wrap: wrap;
         align-content: center;
       }
-      body:not(.sidebar-collapsed) #topbar {
+      body.sidebar-open #topbar {
         min-height: 54px;
       }
       #historyBtn {
@@ -2428,7 +2452,7 @@
         gap: 6px;
         margin-top: 2px;
       }
-      body:not(.sidebar-collapsed) #topStats {
+      body.sidebar-open #topStats {
         display: none;
       }
       #topStats .stat-item,
@@ -2520,6 +2544,19 @@
       #modelMenu {
         left: 0;
         width: min(240px, calc(100vw - 20px));
+      }
+      #overlay,
+      #overlay.show {
+        z-index: 80;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(0,0,0,0.42);
+      }
+      #sidebar {
+        z-index: 120;
+        filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
       }
     }
   </style>
@@ -3216,11 +3253,13 @@
         renderHistoryList();
       }
       document.body.classList.remove('sidebar-collapsed');
+      document.body.classList.add('sidebar-open');
       sidebar.classList.add('open');
       overlay.classList.add('show');
     }
     function closeSidebar() {
       document.body.classList.add('sidebar-collapsed');
+      document.body.classList.remove('sidebar-open');
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
     }
@@ -3249,6 +3288,7 @@
       renderHistoryList(q.trim());
       setSidebarActive('searchChatBtn');
       document.body.classList.remove('sidebar-collapsed');
+      document.body.classList.add('sidebar-open');
       sidebar.classList.add('open');
       overlay.classList.add('show');
     }
