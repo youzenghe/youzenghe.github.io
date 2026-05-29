@@ -1,0 +1,17 @@
+{
+  "games": [
+  {
+    "id": 1,
+    "title": "和这样的我恋爱吧",
+    "category": "AVG",
+    "description": "一个我幻想室友变成美少女和我恋爱的故事",
+    "previewEmoji": "🌸",
+    "image": "../assets/game1.webp",
+    "type": "galgame",
+    "platform": "PC/安卓",
+    "releaseDate": "2026-03-28",
+    "status": "已上架好游快爆",
+    "downloadLink": "https://pan.baidu.com/s/1X_q_1Y1g5zo2IXcbc9LNjQ?pwd=sbkk"
+  }
+  ]
+}

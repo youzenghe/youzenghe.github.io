@@ -1,0 +1,100 @@
+backend:
+  name: github
+  repo: youzenghe/youzenghe.github.io
+  branch: main
+  base_url: https://yzh-decap-auth.yzh1019.workers.dev
+  auth_endpoint: /auth
+
+site_url: https://yzh1019.top
+display_url: https://yzh1019.top
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+locale: "zh_Hans"
+
+collections:
+  - name: "posts"
+    label: "文章"
+    folder: "content/posts"
+    create: true
+    slug: "{{id}}-{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "ID", name: "id", widget: "number" }
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "分类", name: "cat", widget: "string" }
+      - { label: "分类颜色", name: "catColor", widget: "string" }
+      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "阅读时间", name: "readTime", widget: "number" }
+      - { label: "表情", name: "emoji", widget: "string" }
+      - { label: "封面", name: "cover", widget: "image" }
+      - { label: "摘要", name: "excerpt", widget: "text" }
+      - label: "标签"
+        name: "tags"
+        widget: "list"
+        field: { label: "标签项", name: "tag", widget: "string" }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  - name: "projects"
+    label: "项目"
+    files:
+      - name: "projects"
+        label: "项目列表"
+        file: "content/projects.json"
+        fields:
+          - label: "项目"
+            name: "projects"
+            widget: "list"
+            fields:
+              - { label: "ID", name: "id", widget: "number" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "描述", name: "desc", widget: "text" }
+              - { label: "分类", name: "cat", widget: "string" }
+              - label: "技术栈"
+                name: "tech"
+                widget: "list"
+                field: { label: "技术项", name: "techItem", widget: "string" }
+              - { label: "日期", name: "date", widget: "string" }
+              - { label: "奖项键", name: "award", widget: "select", options: ["gold", "silver", "bronze", "none"] }
+              - { label: "奖项文本", name: "awardText", widget: "string" }
+              - { label: "表情", name: "emoji", widget: "string" }
+              - { label: "图片", name: "img", widget: "image" }
+
+  - name: "games"
+    label: "游戏"
+    files:
+      - name: "games"
+        label: "游戏列表"
+        file: "content/games.json"
+        fields:
+          - label: "游戏"
+            name: "games"
+            widget: "list"
+            fields:
+              - { label: "ID", name: "id", widget: "number" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "分类", name: "category", widget: "string" }
+              - { label: "描述", name: "description", widget: "text" }
+              - { label: "预览表情", name: "previewEmoji", widget: "string" }
+              - { label: "图片", name: "image", widget: "image" }
+              - { label: "类型", name: "type", widget: "string" }
+              - { label: "平台", name: "platform", widget: "string" }
+              - { label: "发布日期", name: "releaseDate", widget: "string" }
+              - { label: "状态", name: "status", widget: "string" }
+              - { label: "下载链接", name: "downloadLink", widget: "string" }
+
+  - name: "friend-links"
+    label: "友链"
+    files:
+      - name: "friend-links"
+        label: "友链列表"
+        file: "content/friend-links.json"
+        fields:
+          - label: "友链"
+            name: "friendLinks"
+            widget: "list"
+            fields:
+              - { label: "名称", name: "name", widget: "string" }
+              - { label: "链接", name: "url", widget: "string" }
+              - { label: "展示链接", name: "displayUrl", widget: "string" }
+              - { label: "徽章", name: "badge", widget: "string" }

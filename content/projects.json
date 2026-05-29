@@ -1,0 +1,100 @@
+{
+  "projects": [
+  {
+    "id": 1,
+    "title": "智审云枢",
+    "desc": "法律场景的 AI 辅助系统，主要做知识库检索、文本理解和案例分析。我负责把模型能力和业务流程接起来，并处理答辩时最容易被问到的准确性问题。",
+    "cat": "AI / 法律科技",
+    "tech": ["Vue", "Python", "NLP", "法律知识库"],
+    "date": "2025.06",
+    "award": "gold",
+    "awardText": "🥇 省级一等奖",
+    "emoji": "⚖️",
+    "img": "../assets/projects/legalmind.webp"
+  },
+  {
+    "id": 2,
+    "title": "此刻汴相豫",
+    "desc": "中原文化展示类 Web 项目，重点在内容结构、页面交互和视觉设计。这个项目更多考验信息组织，而不是单纯堆页面效果。",
+    "cat": "文化传播 / Web 展示",
+    "tech": ["Vue", "前端可视化", "交互设计", "内容策划"],
+    "date": "2025.07",
+    "award": "silver",
+    "awardText": "🥈 河南省二等奖",
+    "emoji": "🏛️",
+    "img": "../assets/projects/moment-henan.webp"
+  },
+  {
+    "id": 3,
+    "title": "扶光云课堂",
+    "desc": "和扶光志愿者团队合作的公益项目，用来整理和展示白血病儿童治疗相关知识。我主要负责把内容管理和前端展示流程做顺。",
+    "cat": "公益平台",
+    "tech": ["Vue", "Node.js", "内容管理", "公益传播"],
+    "date": "2025.09",
+    "award": "none",
+    "awardText": "合作项目",
+    "emoji": "☁️",
+    "img": "../assets/projects/fuguang-cloud-classroom.webp"
+  },
+  {
+    "id": 4,
+    "title": "律图合同助手",
+    "desc": "合同审阅方向的小工具，核心是条款解析、风险提示和结果解释。难点在于让输出足够具体，不能只给一段泛泛的 AI 回复。",
+    "cat": "法律科技 / 智能辅助",
+    "tech": ["JavaScript", "Python", "NLP", "合同分析"],
+    "date": "2025.11",
+    "award": "bronze",
+    "awardText": "🥉 赛区三等奖",
+    "emoji": "📑",
+    "img": "../assets/projects/law-contract-assistant.webp"
+  },
+  {
+    "id": 5,
+    "title": "绿信评",
+    "desc": "企业环保方向的小程序项目，接手后主要处理信息管理、评价流程和上线细节，目前已经部署到微信小程序。",
+    "cat": "微信小程序 / 企业环保",
+    "tech": ["微信小程序", "云开发", "数据管理", "企业环保服务"],
+    "date": "2025.12",
+    "award": "none",
+    "awardText": "已上线",
+    "emoji": "🌿",
+    "img": "../assets/projects/green-credit.webp"
+  },
+  {
+    "id": 6,
+    "title": "拳意中原",
+    "desc": "和体育学部合作的拳法宣传项目，主要做内容展示、图片资料整理和品牌页面，目前在走软著申请流程。",
+    "cat": "文化传播 / 体育宣传",
+    "tech": ["Vue", "前端展示", "内容运营", "品牌宣传"],
+    "date": "2026.01",
+    "award": "silver",
+    "awardText": "📝 软著申请中",
+    "emoji": "🥋",
+    "img": "../assets/projects/quanyi-zhongyuan.webp"
+  },
+  {
+    "id": 7,
+    "title": "文智融典",
+    "desc": "个人全栈开发的名著知识图谱项目，后端负责数据建模和图谱查询，前端负责人物关系、事件脉络的可视化。",
+    "cat": "AI / 知识图谱",
+    "tech": ["Java", "Spring Boot", "Neo4j", "Vue"],
+    "date": "2026.02",
+    "award": "gold",
+    "awardText": "🥇 全国一等奖",
+    "emoji": "📚",
+    "img": "../assets/projects/literary-knowledge-map.webp"
+  },
+  {
+    "id": 8,
+    "title": "一首诗词",
+    "desc": "Java 全栈诗词项目，功能集中在诗词展示、检索和内容管理，已经完成软著登记。",
+    "cat": "Java 全栈 / 传统文化",
+    "tech": ["Java", "Spring Boot", "MySQL", "Vue"],
+    "date": "2026.03",
+    "award": "silver",
+    "awardText": "🛡️ 已获软著",
+    "emoji": "🪶",
+    "img": "../assets/projects/poem-project.webp"
+  }
+  ]
+}
