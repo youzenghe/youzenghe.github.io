@@ -35,6 +35,9 @@ jobs:
       - name: Install image tools
         run: python -m pip install Pillow
 
+      - name: Optimize uploaded images
+        run: python scripts/optimize_upload_images.py
+
       - name: Generate thumbnails
         run: python scripts/generate_thumbnails.py
 
