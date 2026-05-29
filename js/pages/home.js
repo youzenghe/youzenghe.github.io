@@ -1,7 +1,7 @@
 window.SiteApp.registerPage('home', () => {
   const stopTypewriter = typewriter(
     document.getElementById('typewriter'),
-    ['吃谷爱好者', 'AI 爱好者', '编程爱好者', 'ACG 爱好者'],
+    ['前端开发者', 'AI 应用实践者', '项目复盘记录者', 'ACG 玩家'],
     120
   );
 
@@ -69,13 +69,13 @@ window.SiteApp.registerPage('home', () => {
           <div class="about-strip">
             <div class="about-avatar"></div>
             <div class="about-info">
-              <h2>你好，我是这个次元空间的主人 ✦</h2>
-              <p>一个沉迷于二次元世界的普通人。在这里分享我喜欢的动画、漫画与游戏，也记录平凡却珍贵的生活瞬间。</p>
+              <h2>你好，我是超级小识 ✦</h2>
+              <p>这里用来整理项目经历、技术选择和实际踩坑。ACG 内容会保留，但它更像个人标签，不会抢走技术记录的位置。</p>
               <div class="about-tags">
-                <span class="tag">ACG 爱好者</span>
-                <span class="tag">编程爱好者</span>
-                <span class="tag">AI 爱好者</span>
-                <span class="tag">吃谷爱好者</span>
+                <span class="tag">前端</span>
+                <span class="tag">AI 应用</span>
+                <span class="tag">项目复盘</span>
+                <span class="tag">ACG</span>
               </div>
             </div>
           </div>
@@ -85,9 +85,9 @@ window.SiteApp.registerPage('home', () => {
         <div class="section-header">
           <div class="section-header-row">
             <div>
-              <div class="section-label">Latest Posts</div>
+              <div class="section-label">Notes</div>
               <div class="divider"></div>
-              <h2 class="section-title">最新文章</h2>
+              <h2 class="section-title">最近记录</h2>
             </div>
             <a href="pages/posts.html" class="btn btn-ghost" style="align-self: flex-end;">查看全部 →</a>
           </div>
@@ -98,9 +98,9 @@ window.SiteApp.registerPage('home', () => {
         <div class="section-header">
           <div class="section-header-row">
             <div>
-              <div class="section-label">Projects</div>
+              <div class="section-label">Builds</div>
               <div class="divider"></div>
-              <h2 class="section-title">最近的项目</h2>
+              <h2 class="section-title">项目复盘</h2>
             </div>
             <a href="pages/projects.html" class="btn btn-ghost" style="align-self: flex-end;">项目列表 →</a>
           </div>

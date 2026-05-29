@@ -2,9 +2,6 @@
    次元日记 · Global Styles
    ============================================================ */
 
-/* ----- Google Fonts ----- */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;900&family=ZCOOL+XiaoWei&family=Raleway:ital,wght@0,300;0,700;0,900;1,300&display=swap');
-
 /* ----- CSS Variables: Dark (default) ----- */
 :root {
   --sakura:        #f9a8c9;
@@ -24,6 +21,9 @@
   --shadow:        rgba(0,0,0,0.45);
   --card-bg:       rgba(28,17,40,0.7);
   --nav-bg:        rgba(18,11,24,0.65);
+  --font-body:      "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+  --font-display:   "Microsoft YaHei", "PingFang SC", serif;
+  --font-ui:        "Segoe UI", Arial, sans-serif;
   --radius:        1.2rem;
   --radius-sm:     0.6rem;
   --transition:    0.25s ease;
@@ -48,7 +48,7 @@ body.light {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
-  font-family: 'Noto Serif SC', serif;
+  font-family: var(--font-body);
   background: var(--ink);
   color: var(--text);
   min-height: 100vh;
@@ -159,7 +159,7 @@ nav {
   transition: background var(--transition);
 }
 .nav-logo {
-  font-family: 'ZCOOL XiaoWei', serif;
+  font-family: var(--font-display);
   font-size: 1.35rem;
   background: linear-gradient(90deg, var(--sakura), var(--accent));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
@@ -185,6 +185,9 @@ nav {
 }
 .nav-icon-btn:hover { background: var(--glass-mid); transform: scale(1.08); }
 .nav-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 /* Mobile Nav */
 .mobile-menu {
@@ -231,7 +234,7 @@ nav {
 .search-input-row span { font-size: 1.2rem; color: var(--accent); }
 #search-input {
   flex: 1; background: none; border: none; outline: none;
-  font-family: 'Noto Serif SC', serif; font-size: 1.1rem;
+  font-family: var(--font-body); font-size: 1.1rem;
   color: var(--text);
 }
 #search-input::placeholder { color: var(--text-muted); }
@@ -242,7 +245,7 @@ nav {
   margin-bottom: 0.4rem; transition: background var(--transition);
 }
 .search-result-item:hover { background: var(--glass); }
-.sri-cat { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 0.2rem; font-family: 'Raleway', sans-serif; font-weight: 700; }
+.sri-cat { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 0.2rem; font-family: var(--font-ui); font-weight: 700; }
 .sri-title { font-size: 0.95rem; margin-bottom: 0.15rem; }
 .sri-excerpt { font-size: 0.78rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .search-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem; }
@@ -321,7 +324,7 @@ nav {
   animation: loader-slide 1.15s ease-in-out infinite;
 }
 .loader-text {
-  font-family: 'Raleway', sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.72rem;
   color: rgba(237,228,245,0.74);
   letter-spacing: 0.18em;
@@ -336,10 +339,10 @@ nav {
 .section-label {
   font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 0.5rem;
-  font-family: 'Raleway', sans-serif; font-weight: 700;
+  font-family: var(--font-ui); font-weight: 700;
 }
 .section-title {
-  font-family: 'ZCOOL XiaoWei', serif;
+  font-family: var(--font-display);
   font-size: clamp(1.7rem, 4.5vw, 2.6rem);
   line-height: 1.2; margin-bottom: 0.8rem;
 }
@@ -365,7 +368,7 @@ nav {
 .btn {
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.65rem 1.7rem; border-radius: 2rem;
-  font-family: 'Noto Serif SC', serif; font-size: 0.88rem;
+  font-family: var(--font-body); font-size: 0.88rem;
   cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
   border: none;
 }
@@ -405,7 +408,7 @@ nav {
   padding: 8rem 0 4rem;
   text-align: center;
 }
-.page-hero h1 { font-family: 'ZCOOL XiaoWei', serif; font-size: clamp(2rem, 6vw, 3.5rem); margin-bottom: 0.8rem; }
+.page-hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 6vw, 3.5rem); margin-bottom: 0.8rem; }
 .page-hero p { color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.8; }
 
 /* ----- FOOTER ----- */
@@ -457,7 +460,7 @@ footer a { color: var(--sakura); }
   animation: pulse 2s infinite;
 }
 .hero-title {
-  font-family: 'ZCOOL XiaoWei', serif;
+  font-family: var(--font-display);
   font-size: clamp(2.8rem, 9vw, 6rem);
   font-weight: 400;
   line-height: 1.08;
@@ -549,7 +552,7 @@ footer a { color: var(--sakura); }
 }
 .stat-item { text-align: center; }
 .stat-num {
-  font-family: 'Raleway', sans-serif;
+  font-family: var(--font-ui);
   font-size: 1.6rem;
   font-weight: 900;
   color: var(--sakura);
@@ -616,7 +619,7 @@ footer a { color: var(--sakura); }
   font-size: 0.7rem;
   color: var(--text-muted);
   margin-bottom: 0.5rem;
-  font-family: 'Raleway', sans-serif;
+  font-family: var(--font-ui);
 }
 .post-cat {
   padding: 0.15rem 0.6rem;
@@ -625,7 +628,7 @@ footer a { color: var(--sakura); }
   background: var(--glass);
 }
 .post-card-title {
-  font-family: 'ZCOOL XiaoWei', serif;
+  font-family: var(--font-display);
   font-size: 1.08rem;
   line-height: 1.4;
   margin-bottom: 0.5rem;
@@ -678,7 +681,7 @@ footer a { color: var(--sakura); }
   filter: blur(10px);
 }
 .about-info h2 {
-  font-family: 'ZCOOL XiaoWei', serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   margin-bottom: 0.4rem;
 }
@@ -817,21 +820,18 @@ footer a { color: var(--sakura); }
   .about-tags { justify-content: center; }
   .posts-grid { grid-template-columns: 1fr; }
 }
-/* 在原有的 .game-card-img 规则基础上，增加以下内容 */
 .game-card-img img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 这个属性非常重要，它会让图片覆盖整个容器，且保持比例 */
+  object-fit: cover;
 }
-/* 只针对live2d，不影响你其他canvas */
 #live2dcanvas {
   background: transparent !important;
   border: none !important;
 }
 
-/* 有些版本用这个id */
 #live2d-widget {
   background: transparent !important;
 }

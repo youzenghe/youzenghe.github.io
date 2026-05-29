@@ -14,7 +14,8 @@ window.SiteApp.registerPage('post-detail', () => {
 
   function toAbsoluteAssetUrl(path) {
     if (!path) return `${absoluteBase}/assets/avatar.png`;
-    return `${absoluteBase}/${path.replace(/^\.\.\//, '')}`;
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${absoluteBase}/${path.replace(/^\.\.\//, '').replace(/^\//, '')}`;
   }
 
   function stripHtml(html) {
@@ -124,5 +125,35 @@ window.SiteApp.registerPage('post-detail', () => {
     `;
   }
 
+  const backToTop = document.getElementById('back-to-top');
+  const syncBackToTop = () => {
+    backToTop?.classList.toggle('visible', window.scrollY > 520);
+  };
+  const scrollToTop = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const scroller = document.scrollingElement || document.documentElement;
+    try {
+      scroller?.scrollTo?.({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      window.scrollTo(0, 0);
+    }
+    window.setTimeout(() => {
+      if (window.scrollY < 4) return;
+      if (scroller) scroller.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 220);
+  };
+  backToTop?.addEventListener('click', scrollToTop);
+  window.addEventListener('scroll', syncBackToTop, { passive: true });
+  syncBackToTop();
+
   initReveal();
+
+  return () => {
+    backToTop?.removeEventListener('click', scrollToTop);
+    window.removeEventListener('scroll', syncBackToTop);
+  };
 });

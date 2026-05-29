@@ -10,7 +10,7 @@ window.SiteApp.registerPage('posts', () => {
       '@type': 'CollectionPage',
       url: `${absoluteBase}/pages/posts.html`,
       name: '文章 · 次元日记',
-      description: '浏览次元日记的全部文章内容，按分类、标签与推荐内容快速查找。',
+      description: '浏览技术笔记、项目复盘、竞赛记录和 ACG 相关随笔。',
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: POSTS.map((post, index) => ({

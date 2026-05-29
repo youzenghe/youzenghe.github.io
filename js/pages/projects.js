@@ -11,6 +11,12 @@ window.SiteApp.registerPage('projects', () => {
   let projectLightboxIndex = 0;
   let previousActiveElement = null;
 
+  function toAbsoluteAssetUrl(path) {
+    if (!path) return undefined;
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${absoluteBase}/${path.replace(/^\.\.\//, '').replace(/^\//, '')}`;
+  }
+
   function updateStructuredData() {
     const script = document.getElementById('projects-structured-data');
     if (!script) return;
@@ -20,7 +26,7 @@ window.SiteApp.registerPage('projects', () => {
       '@type': 'CollectionPage',
       url: `${absoluteBase}/pages/projects.html`,
       name: '项目列表 · 次元日记',
-      description: '查看次元日记的项目作品、参赛经历、技术栈与成果展示。',
+      description: '查看个人项目、参赛经历、技术栈和复盘记录。',
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: PROJECTS.map((project, index) => ({
@@ -30,7 +36,7 @@ window.SiteApp.registerPage('projects', () => {
             '@type': 'CreativeWork',
             name: project.title,
             description: project.desc,
-            image: project.img ? `${absoluteBase}/${project.img.replace(/^\.\.\//, '')}` : undefined,
+            image: toAbsoluteAssetUrl(project.img),
           },
         })),
       },

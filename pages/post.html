@@ -60,7 +60,7 @@
       margin-bottom: 1rem;
     }
     .post-header h1 {
-      font-family: 'ZCOOL XiaoWei', serif;
+      font-family: var(--font-display);
       font-size: clamp(1.8rem, 5vw, 2.8rem);
       line-height: 1.2;
       margin-bottom: 1rem;
@@ -71,7 +71,7 @@
       gap: 1rem;
       color: var(--text-muted);
       font-size: 0.8rem;
-      font-family: 'Raleway', sans-serif;
+      font-family: var(--font-ui);
     }
     .post-cover {
       width: 100%;
@@ -112,7 +112,7 @@
       color: var(--text);
     }
     .post-body h2 {
-      font-family: 'ZCOOL XiaoWei', serif;
+      font-family: var(--font-display);
       font-size: 1.5rem;
       margin: 2.2rem 0 0.8rem;
       padding-left: 0.8rem;
@@ -153,6 +153,33 @@
       font-size: 0.9rem;
       line-height: 1.8;
     }
+    .back-to-top {
+      position: fixed;
+      right: 280px;
+      bottom: 1.4rem;
+      z-index: 10000;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease, transform 0.2s ease, background var(--transition);
+      backdrop-filter: blur(12px);
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .back-to-top:hover { background: var(--glass-mid); }
 
     .post-sidebar {
       position: sticky;
@@ -182,7 +209,7 @@
       border-radius: var(--radius);
     }
     .sw-title {
-      font-family: 'ZCOOL XiaoWei', serif;
+      font-family: var(--font-display);
       font-size: 1rem;
       margin-bottom: 1rem;
     }
@@ -225,7 +252,7 @@
       font-size: 0.68rem;
       color: var(--text-muted);
       letter-spacing: 0.1em;
-      font-family: 'Raleway', sans-serif;
+      font-family: var(--font-ui);
       margin-bottom: 0.3rem;
     }
     .pn-title {
@@ -240,6 +267,9 @@
     @media (max-width: 860px) {
       .post-layout { grid-template-columns: 1fr; }
       .post-sidebar { position: static; }
+    }
+    @media (max-width: 768px) {
+      .back-to-top { right: 1rem; bottom: 1rem; }
     }
     @media (max-width: 480px) {
       .post-cover {
@@ -287,6 +317,7 @@
       </aside>
     </div>
   </main>
+  <a class="back-to-top" id="back-to-top" href="#main-content" aria-label="返回顶部">↑</a>
 
   <div id="site-shell-bottom"></div>
 

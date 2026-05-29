@@ -61,7 +61,7 @@
       </div>
 
       <nav aria-label="主导航">
-        <a id="site-logo" class="nav-logo" href="${pageHref(config.rootPrefix, 'index.html')}">✦ 次元日记</a>
+        <a id="site-logo" class="nav-logo" href="${pageHref(config.rootPrefix, 'index.html')}">✦ 技术日志</a>
         <div class="nav-center">${navLinks}</div>
         <div class="nav-right">
           <button class="nav-icon-btn search-trigger" type="button" title="搜索" aria-label="打开站内搜索">🔍</button>
@@ -79,7 +79,7 @@
     return `
       <footer>
         <div class="footer-inner">
-          <span>© 次元日记</span>
+          <span>© 超级小识 · 技术日志</span>
           <span id="footer-extra">${footerExtra}</span>
         </div>
       </footer>

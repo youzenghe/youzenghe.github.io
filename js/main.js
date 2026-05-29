@@ -5,17 +5,16 @@
 const PAGE_SCRIPT_RE = /\/js\/pages\/[^/]+\.js(?:\?.*)?$/i;
 const PAGE_STYLE_ATTR = 'data-page-style';
 const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
-const MUSIC_STORAGE_KEY = 'acg-blog:music-state';
-const MUSIC_SAVE_INTERVAL = 800;
 const SAKANA_WIDGET_STYLE_ID = 'sakana-widget-style';
 const SAKANA_WIDGET_SCRIPT_ID = 'sakana-widget-script';
 const SAKANA_WIDGET_CSS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.css';
 const SAKANA_WIDGET_JS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.js';
+const LOCAL_BG_DESKTOP = 'assets/bg-pc.webp';
+const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-const LOW_DATA_CONNECTIONS = new Set(['slow-2g', '2g']);
 
 let currentPageCleanup = null;
 let currentNavigationId = 0;
@@ -26,23 +25,12 @@ let sakanaWidgetLoadPromise = null;
 let sakanaWidgetInstance = null;
 let sakanaWidgetCharacter = 'takina';
 let pendingPageRunRaf = 0;
-const bgReadyQueue = [];
-const bgPendingUrls = new Set();
-let bgPoolFillPromise = null;
+let randomBgReady = null;
+let randomBgPromise = null;
 let navigationPendingCount = 0;
 
 function prefersReducedMotion() {
   return window.matchMedia?.(REDUCED_MOTION_QUERY).matches || false;
-}
-
-function prefersDataSaver() {
-  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  return Boolean(connection?.saveData || LOW_DATA_CONNECTIONS.has(connection?.effectiveType));
-}
-
-function getBgPrefetchPoolSize() {
-  if (prefersReducedMotion() || prefersDataSaver()) return 1;
-  return 2;
 }
 
 function requestIdleWork(callback, timeout = 1200) {
@@ -68,7 +56,7 @@ function preloadBg(url, priority = 'auto') {
           await img.decode();
         }
       } catch (error) {
-        // decode failure should not block a successfully loaded image
+        // 图片已加载即可继续，解码失败不阻塞背景显示。
       }
       resolve({
         url,
@@ -78,69 +66,6 @@ function preloadBg(url, priority = 'auto') {
     img.onerror = reject;
     img.src = url;
   });
-}
-
-function getNextBgCandidateUrl() {
-  let nextUrl = '';
-
-  while (!nextUrl || bgPendingUrls.has(nextUrl) || bgReadyQueue.some((item) => item.url === nextUrl)) {
-    nextUrl = createBgUrl();
-  }
-
-  return nextUrl;
-}
-
-function fillBgQueue() {
-  const poolSize = getBgPrefetchPoolSize();
-  if (bgReadyQueue.length >= poolSize) {
-    return Promise.resolve(bgReadyQueue[0] || null);
-  }
-
-  if (bgPoolFillPromise) return bgPoolFillPromise;
-
-  const missingCount = poolSize - bgReadyQueue.length;
-  const tasks = Array.from({ length: missingCount }, () => {
-    const url = getNextBgCandidateUrl();
-    bgPendingUrls.add(url);
-
-    return preloadBg(url, 'low')
-      .then((readyBg) => {
-        if (!bgReadyQueue.some((item) => item.url === readyBg.url)) {
-          bgReadyQueue.push(readyBg);
-        }
-        return readyBg;
-      })
-      .catch(() => null)
-      .finally(() => {
-        bgPendingUrls.delete(url);
-      });
-  });
-
-  bgPoolFillPromise = Promise.all(tasks)
-    .then(() => bgReadyQueue[0] || null)
-    .finally(() => {
-      bgPoolFillPromise = null;
-      if (bgReadyQueue.length < getBgPrefetchPoolSize() && !bgPendingUrls.size) {
-        window.setTimeout(() => {
-          fillBgQueue().catch(() => {});
-        }, 0);
-      }
-    });
-
-  return bgPoolFillPromise;
-}
-
-async function takeNextBgUrl() {
-  if (bgReadyQueue.length) {
-    const nextUrl = bgReadyQueue.shift() || null;
-    fillBgQueue().catch(() => {});
-    return nextUrl;
-  }
-
-  await fillBgQueue().catch(() => null);
-  const nextUrl = bgReadyQueue.shift() || null;
-  fillBgQueue().catch(() => {});
-  return nextUrl;
 }
 
 function getSiteConfig() {
@@ -153,6 +78,12 @@ function getSiteConfig() {
     footerHtml: dataset.footerHtml || '',
     loaderText: dataset.loaderText || '加载中...',
   };
+}
+
+function getLocalBgUrl() {
+  const isMobile = window.matchMedia?.('(max-width: 768px)').matches || window.innerWidth <= 768;
+  const file = isMobile ? LOCAL_BG_MOBILE : LOCAL_BG_DESKTOP;
+  return `${getSiteConfig().rootPrefix}${file}`;
 }
 
 function showNavigationLoader() {
@@ -261,41 +192,62 @@ function swapBgPane(bgLayer, readyBg) {
   return url;
 }
 
-function loadBg(bgLayer, btn) {
-  if (!bgLayer) return;
-  if (btn) btn.classList.add('spinning');
+function loadInitialBg(bgLayer) {
+  if (!bgLayer) return Promise.resolve('');
+  const url = getLocalBgUrl();
+  if (bgLayer.dataset.bgUrl === url) return Promise.resolve(url);
 
-  const finishButton = () => {
-    if (btn) {
-      window.setTimeout(() => btn.classList.remove('spinning'), 400);
-    }
-  };
-
-  const applyAndRefill = (url) => {
-    if (url?.url) {
-      swapBgPane(bgLayer, url);
-    }
-    fillBgQueue().catch(() => {});
-    finishButton();
-    return url?.url || '';
-  };
-
-  const existingUrl = bgLayer.dataset.bgUrl || '';
-  return takeNextBgUrl()
+  return preloadBg(url, 'high')
     .then((readyBg) => {
-      if (readyBg?.url) {
-        return applyAndRefill(readyBg);
-      }
-
-      const fallbackUrl = getNextBgCandidateUrl();
-      return preloadBg(fallbackUrl)
-        .then((fallbackBg) => applyAndRefill(fallbackBg))
-        .catch(() => applyAndRefill(existingUrl));
+      swapBgPane(bgLayer, readyBg);
+      return readyBg.url;
     })
-    .catch(() => {
-      finishButton();
-      return existingUrl;
+    .catch(() => '');
+}
+
+function prefetchRandomBg() {
+  if (randomBgReady) return Promise.resolve(randomBgReady);
+  if (randomBgPromise) return randomBgPromise;
+
+  randomBgPromise = preloadBg(createBgUrl(), 'low')
+    .then((readyBg) => {
+      randomBgReady = readyBg;
+      return readyBg;
+    })
+    .catch(() => null)
+    .finally(() => {
+      randomBgPromise = null;
     });
+
+  return randomBgPromise;
+}
+
+async function loadNavigationBg(bgLayer) {
+  if (!bgLayer) return '';
+
+  let readyBg = randomBgReady;
+  randomBgReady = null;
+
+  if (!readyBg) {
+    readyBg = await prefetchRandomBg();
+    randomBgReady = null;
+  }
+
+  if (readyBg?.url) {
+    swapBgPane(bgLayer, readyBg);
+    prefetchRandomBg();
+    return readyBg.url;
+  }
+
+  const fallbackUrl = getLocalBgUrl();
+  const fallbackBg = await preloadBg(fallbackUrl, 'low').catch(() => null);
+  if (fallbackBg?.url) {
+    swapBgPane(bgLayer, fallbackBg);
+    prefetchRandomBg();
+    return fallbackBg.url;
+  }
+
+  return bgLayer.dataset.bgUrl || '';
 }
 
 function initParticles(canvasId) {
@@ -771,7 +723,7 @@ function createSakanaWidgetShell(root) {
   githubCover.href = 'https://github.com/youzenghe';
   githubCover.target = '_blank';
   githubCover.rel = 'noreferrer noopener';
-  githubCover.setAttribute('aria-label', '?? youzenghe ? GitHub ??');
+  githubCover.setAttribute('aria-label', '打开 GitHub 主页');
 
   mountPoint.addEventListener('click', (event) => {
     const widgetRect = mountPoint.getBoundingClientRect();
@@ -799,7 +751,7 @@ function ensureSakanaWidgetRoot() {
   root = document.createElement('div');
   root.id = 'sakana-widget-root';
   root.className = 'sakana-widget-root';
-  root.setAttribute('aria-label', '????????');
+  root.setAttribute('aria-label', '右下角摇摇乐挂件');
 
   const footer = document.querySelector('body > footer');
   if (footer?.nextSibling) {
@@ -843,191 +795,6 @@ function initSakanaWidget() {
       sakanaWidgetInstance.mount(mountPoint);
     })
     .catch(() => {});
-}
-function readMusicState() {
-  try {
-    const raw = localStorage.getItem(MUSIC_STORAGE_KEY);
-    if (!raw) {
-      return {
-        playing: false,
-        currentTime: 0,
-      };
-    }
-
-    const parsed = JSON.parse(raw);
-    return {
-      playing: Boolean(parsed.playing),
-      currentTime: Number.isFinite(parsed.currentTime) ? parsed.currentTime : 0,
-    };
-  } catch (error) {
-    return {
-      playing: false,
-      currentTime: 0,
-    };
-  }
-}
-
-function writeMusicState(patch) {
-  const nextState = {
-    ...readMusicState(),
-    ...patch,
-  };
-
-  localStorage.setItem(MUSIC_STORAGE_KEY, JSON.stringify(nextState));
-}
-
-function formatTime(seconds) {
-  if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
-  const total = Math.floor(seconds);
-  const minutes = String(Math.floor(total / 60)).padStart(2, '0');
-  const remainSeconds = String(total % 60).padStart(2, '0');
-  return `${minutes}:${remainSeconds}`;
-}
-
-function initMusicPlayer() {
-  const player = document.getElementById('music-player');
-  const audio = document.getElementById('global-audio');
-  const toggle = document.getElementById('music-toggle');
-  const status = document.getElementById('music-status');
-
-  if (!player || !audio || !toggle || !status || player.dataset.inited === 'true') return;
-  player.dataset.inited = 'true';
-
-  let lastSavedAt = 0;
-  let unlockHandlersBound = false;
-
-  function setStatus(text) {
-    status.textContent = text;
-  }
-
-  function syncButton() {
-    const playing = !audio.paused && !audio.ended;
-    player.classList.toggle('is-playing', playing);
-    toggle.setAttribute('aria-label', playing ? '暂停背景音乐' : '播放背景音乐');
-  }
-
-  function syncProgress() {
-    const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
-    const currentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
-    const percent = duration ? Math.min((currentTime / duration) * 100, 100) : 0;
-    player.style.setProperty('--music-progress', `${percent}%`);
-    setStatus(`${formatTime(currentTime)} / ${duration ? formatTime(duration) : '--:--'}`);
-  }
-
-  function persistCurrentTime(force = false) {
-    const now = Date.now();
-    if (!force && now - lastSavedAt < MUSIC_SAVE_INTERVAL) return;
-    lastSavedAt = now;
-    writeMusicState({
-      currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
-      playing: !audio.paused && !audio.ended,
-    });
-  }
-
-  function detachUnlockHandlers() {
-    if (!unlockHandlersBound) return;
-    ['pointermove', 'wheel', 'scroll', 'keydown', 'touchstart'].forEach((eventName) => {
-      window.removeEventListener(eventName, handleUnlockGesture, true);
-    });
-    unlockHandlersBound = false;
-  }
-
-  async function tryPlay() {
-    try {
-      await audio.play();
-      writeMusicState({ playing: true });
-      detachUnlockHandlers();
-      syncButton();
-      syncProgress();
-    } catch (error) {
-      setStatus('滑动、滚动或移动鼠标后继续播放');
-      if (!unlockHandlersBound) {
-        ['pointermove', 'wheel', 'scroll', 'keydown', 'touchstart'].forEach((eventName) => {
-          window.addEventListener(eventName, handleUnlockGesture, { passive: true, capture: true });
-        });
-        unlockHandlersBound = true;
-      }
-    }
-  }
-
-  function handleUnlockGesture() {
-    if (!readMusicState().playing) {
-      detachUnlockHandlers();
-      return;
-    }
-    tryPlay();
-  }
-
-  function restoreCurrentTime() {
-    const savedState = readMusicState();
-    const nextTime = savedState.currentTime;
-    if (!Number.isFinite(nextTime) || nextTime <= 0) {
-      syncProgress();
-      return;
-    }
-
-    const applyTime = () => {
-      const duration = Number.isFinite(audio.duration) ? audio.duration : nextTime;
-      audio.currentTime = Math.min(nextTime, Math.max(duration - 0.25, 0));
-      syncProgress();
-    };
-
-    if (audio.readyState >= 1) {
-      applyTime();
-    } else {
-      audio.addEventListener('loadedmetadata', applyTime, { once: true });
-    }
-  }
-
-  toggle.addEventListener('click', async () => {
-    if (!audio.paused && !audio.ended) {
-      audio.pause();
-      writeMusicState({ playing: false, currentTime: audio.currentTime });
-      detachUnlockHandlers();
-      syncButton();
-      syncProgress();
-      return;
-    }
-
-    writeMusicState({ playing: true, currentTime: audio.currentTime });
-    await tryPlay();
-  });
-
-  audio.addEventListener('play', () => {
-    writeMusicState({ playing: true });
-    syncButton();
-    syncProgress();
-  });
-
-  audio.addEventListener('pause', () => {
-    syncButton();
-    syncProgress();
-    persistCurrentTime(true);
-  });
-
-  audio.addEventListener('loadedmetadata', syncProgress);
-  audio.addEventListener('timeupdate', () => {
-    syncProgress();
-    persistCurrentTime();
-  });
-  audio.addEventListener('ended', () => {
-    audio.currentTime = 0;
-    writeMusicState({ playing: false, currentTime: 0 });
-    syncButton();
-    syncProgress();
-  });
-
-  window.addEventListener('pagehide', () => {
-    writeMusicState({
-      playing: !audio.paused && !audio.ended,
-      currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
-    });
-  });
-
-  restoreCurrentTime();
-  syncButton();
-  syncProgress();
-
 }
 
 function registerCurrentScripts() {
@@ -1084,7 +851,6 @@ function ensureAppContentRoot() {
       child.id === 'particles' ||
       child.id === 'search-overlay' ||
       child.id === 'mobile-menu' ||
-      child.id === 'music-player' ||
       child.id === 'sakana-widget-root'
     ) {
       return;
@@ -1252,8 +1018,10 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   syncLive2DVisibility();
   scrollToNavigationTarget(hash);
 
-  // Keep route transitions responsive: update background asynchronously.
-  Promise.resolve(loadBg(document.getElementById('bg-layer'))).catch(() => {});
+  const bgLayer = document.getElementById('bg-layer');
+  const pageKey = getPageKey(targetUrl);
+  const bgTask = pageKey === 'home' ? loadInitialBg(bgLayer) : loadNavigationBg(bgLayer);
+  Promise.resolve(bgTask).catch(() => {});
 
   pendingPageRunRaf = window.requestAnimationFrame(() => {
     pendingPageRunRaf = 0;
@@ -1401,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const bgLayer = document.getElementById('bg-layer');
   let initialBgPromise = Promise.resolve('');
   if (bgLayer) {
-    initialBgPromise = Promise.resolve(loadBg(bgLayer));
+    initialBgPromise = Promise.resolve(loadInitialBg(bgLayer));
   }
 
   ensureAppContentRoot();
@@ -1415,16 +1183,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initSakanaWidget();
   applyShellConfig();
   initRouter();
-  fillBgQueue().catch(() => {});
 
   window.addEventListener('load', () => {
-    Promise.all([
-      initialBgPromise.catch(() => ''),
-      new Promise((resolve) => window.setTimeout(resolve, 700)),
-    ]).finally(() => {
+    initialBgPromise.catch(() => '').finally(() => {
       document.getElementById('loader')?.classList.add('hidden');
       syncLive2DVisibility();
-      fillBgQueue().catch(() => {});
+      requestIdleWork(() => {
+        prefetchRandomBg();
+      }, 1000);
     });
   });
 
