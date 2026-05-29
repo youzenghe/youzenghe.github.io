@@ -9,7 +9,7 @@ status: published
 featured: true
 readTime: 3
 emoji: 📜
-cover: ../assets/posts/流萤1.gif
+cover: ../assets/uploads/流萤1.gif
 excerpt: 两本软著对应两个完整项目。这里记录一下项目边界、技术栈和申请材料准备时踩过的坑。
 tags:
   - 软著
