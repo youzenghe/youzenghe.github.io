@@ -56,21 +56,21 @@ collections:
       - { label: "置顶文章", name: "pinned", widget: "boolean", default: false, required: false }
       - { label: "阅读时间", name: "readTime", widget: "number", default: 4 }
       - { label: "表情", name: "emoji", widget: "string", default: "📝" }
-      - { label: "封面", name: "cover", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。封面建议只放一张，正文里可以继续插入多张图片。" }
+      - { label: "封面路径", name: "cover", widget: "string", hint: "先到“媒体”页上传图片/GIF，再填 /assets/uploads/文件名；也可以填外部图片 URL。封面建议只放一张。" }
       - label: "文章图片集"
         name: "images"
         widget: "list"
         required: false
         summary: "{{fields.caption}}"
         fields:
-          - { label: "图片", name: "image", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。" }
+          - { label: "图片路径", name: "image", widget: "string", hint: "先到“媒体”页上传图片/GIF，再填 /assets/uploads/文件名；也可以填外部图片 URL。" }
           - { label: "替代文本", name: "alt", widget: "string", required: false }
           - { label: "图片说明", name: "caption", widget: "string", required: false }
           - { label: "作为正文封面候选", name: "isCover", widget: "boolean", default: false, required: false }
       - { label: "摘要", name: "excerpt", widget: "text" }
       - { label: "SEO 标题", name: "metaTitle", widget: "string", required: false }
       - { label: "SEO 描述", name: "metaDescription", widget: "text", required: false }
-      - { label: "社交分享图", name: "ogImage", widget: "image", required: false, hint: "支持 JPG / PNG / WebP / GIF。" }
+      - { label: "社交分享图路径", name: "ogImage", widget: "string", required: false, hint: "先到“媒体”页上传图片/GIF，再填 /assets/uploads/文件名；也可以填外部图片 URL。" }
       - { label: "Canonical URL", name: "canonical", widget: "string", required: false }
       - label: "标签"
         name: "tags"
