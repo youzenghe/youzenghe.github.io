@@ -6,6 +6,9 @@
   <title>管理后台 · 超级小识</title>
 </head>
 <body>
+  <script>
+    window.CMS_MANUAL_INIT = true;
+  </script>
   <script src="https://unpkg.com/decap-cms@^3.4.0/dist/decap-cms.js"></script>
   <script>
     CMS.registerEditorComponent({
@@ -54,6 +57,8 @@
         return `<figure><img src="${src}" alt="${alt}" style="max-width:100%;height:auto;" />${title}</figure>`;
       }
     });
+
+    CMS.init();
   </script>
 </body>
 </html>
