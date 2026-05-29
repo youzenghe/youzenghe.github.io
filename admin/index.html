@@ -89,11 +89,19 @@
       }
     }
 
+    function isLikelyGithubToken(value) {
+      if (typeof value !== 'string') return false;
+      const token = value.trim();
+      if (!/^[\x21-\x7e]+$/.test(token)) return false;
+      return /^(gh[opusr]_|github_pat_)/i.test(token) || /^[a-f0-9]{40}$/i.test(token);
+    }
+
     function findTokenInValue(value, depth = 0) {
       if (!value || depth > 6) return '';
       if (typeof value === 'string') {
-        if (/^(gho_|ghp_|github_pat_|[a-f0-9]{40})/i.test(value) || value.length > 80) {
-          return value;
+        const token = value.trim();
+        if (isLikelyGithubToken(token)) {
+          return token;
         }
         const parsed = readJsonSafe(value);
         return parsed ? findTokenInValue(parsed, depth + 1) : '';
@@ -107,8 +115,9 @@
       }
       if (typeof value === 'object') {
         for (const key of ['token', 'access_token', 'accessToken', 'oauth_token']) {
-          if (typeof value[key] === 'string') {
-            return value[key];
+          const token = typeof value[key] === 'string' ? value[key].trim() : '';
+          if (isLikelyGithubToken(token)) {
+            return token;
           }
         }
         for (const item of Object.values(value)) {

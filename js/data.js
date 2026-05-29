@@ -177,7 +177,7 @@ const POSTS = [
       "image": "",
       "canonical": ""
     },
-    "content": "<p>申请软件著作权这件事，流程其实比想象中繁琐——文档、代码截图、说明书，缺一不可。</p>\n      <h2>第一本：文智融典</h2>\n      <p>这是我个人全栈独立开发的中国名著知识图谱系统，后端用 Java + Spring Boot，图数据库用 Neo4j，前端是 Vue。核心功能是人物关系查询、事件脉络展示和图谱可视化。</p>\n      <h2>第二本：一首诗词</h2>\n      <p>第二个项目是一首诗词，全栈用 Java 开发，从后端到前端都是一个人搭的。这个项目后来也获得了软著。</p>\n      <blockquote>软著不难，麻烦的是把项目说明、代码材料和功能边界整理清楚。</blockquote>\n      <p>两本软著并排放在这里，是对自己过去那些熬夜的交代。</p>"
+    "content": "<p>申请软件著作权这件事，流程其实比想象中繁琐——文档、代码截图、说明书，缺一不可。</p>\n      <h2>第一本：文智融典</h2>\n      <figure class=\"md-image\"><img src=\"/assets/uploads/微信图片_20260530044302_1135_19.jpg\" alt=\"\" loading=\"lazy\" decoding=\"async\"></figure>\n      <p>文智融典为四大名著迭代作品，这是我个人全栈独立开发的中国名著知识图谱系统，后端用 Java + Spring Boot，图数据库用 Neo4j，前端是 Vue。核心功能是人物关系查询、事件脉络展示和图谱可视化。</p>\n      <h2>第二本：一首诗词</h2>\n      <figure class=\"md-image\"><img src=\"/assets/uploads/微信图片_20260530044321_1136_19.jpg\" alt=\"\" loading=\"lazy\" decoding=\"async\"></figure>\n      <p>第二个项目是一首诗词，全栈用 Java 开发，从后端到前端都是一个人搭的。这个项目后来也获得了软著。</p>\n      <blockquote>软著不难，麻烦的是把项目说明、代码材料和功能边界整理清楚。</blockquote>\n      <p>两本软著并排放在这里，是对自己过去那些熬夜的交代。</p>"
   },
   {
     "id": 1,
