@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:content": "python scripts/build_content.py",
+    "prebuild:dist": "python scripts/build_content.py",
     "build:dist": "node scripts/build_dist.mjs"
   },
   "devDependencies": {
