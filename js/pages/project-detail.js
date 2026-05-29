@@ -12,6 +12,16 @@ window.SiteApp.registerPage('project-detail', () => {
     return typeof image === 'string' ? fallback : image?.alt || fallback;
   }
 
+  function escapeHtml(text) {
+    return String(text || '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[char]);
+  }
+
   document.title = `${project.title} · 项目复盘`;
 
   const head = document.getElementById('project-detail-head');
@@ -39,8 +49,8 @@ window.SiteApp.registerPage('project-detail', () => {
     const gallery = Array.isArray(project.images) && project.images.length
       ? `<div class="project-gallery">${project.images.map((image) => {
           const src = imageSrc(image);
-          const caption = typeof image === 'object' && image?.caption ? `<figcaption>${image.caption}</figcaption>` : '';
-          return `<figure><img src="${resolveThumbnailUrl(src)}" data-full-src="${resolveAssetUrl(src)}" alt="${imageAlt(image, `${project.title} 截图`)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">${caption}</figure>`;
+          const caption = typeof image === 'object' && image?.caption ? `<figcaption>${escapeHtml(image.caption)}</figcaption>` : '';
+          return `<figure><img src="${escapeHtml(resolveThumbnailUrl(src))}" data-full-src="${escapeHtml(resolveAssetUrl(src))}" alt="${escapeHtml(imageAlt(image, `${project.title} 截图`))}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">${caption}</figure>`;
         }).join('')}</div>`
       : '';
     const role = project.role ? `<h2>我的职责</h2><p>${project.role}</p>` : '';
@@ -64,7 +74,7 @@ window.SiteApp.registerPage('project-detail', () => {
   const side = document.getElementById('project-detail-side');
   if (side) {
     const links = Array.isArray(project.links) && project.links.length
-      ? `<div class="project-links">${project.links.map((link) => `<a href="${link.url}" target="_blank" rel="noreferrer noopener">${link.label || link.type || '项目链接'}</a>`).join('')}</div>`
+      ? `<div class="project-links">${project.links.map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer noopener">${escapeHtml(link.label || link.type || '项目链接')}</a>`).join('')}</div>`
       : '';
     side.innerHTML = `
       <p><span class="tag">${project.awardText}</span></p>

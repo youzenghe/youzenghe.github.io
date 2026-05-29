@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT_DIR = ROOT / "content"
 POSTS_DIR = CONTENT_DIR / "posts"
 DATA_JS = ROOT / "js" / "data.js"
-IMAGE_MARKDOWN_RE = re.compile(r'^!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)$')
+IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
 
 
 def parse_scalar(value: str):
@@ -77,15 +77,17 @@ def flush_paragraph(lines: list[str], out: list[str]) -> None:
         return
     text = " ".join(line.strip() for line in lines if line.strip())
     if text:
-        out.append(f"<p>{escape(text)}</p>")
+        out.append(f"<p>{render_inline_markdown(text)}</p>")
     lines.clear()
 
 
-def render_markdown_image(match: re.Match[str]) -> str:
+def render_markdown_image(match: re.Match[str], block: bool = True) -> str:
     alt = escape(match.group("alt") or "")
     src = escape(match.group("src") or "")
     title = escape(match.group("title") or "")
     caption = title or alt
+    if not block:
+        return f'<img class="md-inline-image" src="{src}" alt="{alt}" loading="lazy" decoding="async">'
     caption_html = f"<figcaption>{caption}</figcaption>" if caption else ""
     return (
         '<figure class="md-image">'
@@ -93,6 +95,17 @@ def render_markdown_image(match: re.Match[str]) -> str:
         f"{caption_html}"
         "</figure>"
     )
+
+
+def render_inline_markdown(text: str) -> str:
+    out: list[str] = []
+    last = 0
+    for match in IMAGE_MARKDOWN_RE.finditer(text):
+        out.append(escape(text[last:match.start()]))
+        out.append(render_markdown_image(match, block=False))
+        last = match.end()
+    out.append(escape(text[last:]))
+    return "".join(out)
 
 
 def markdown_to_html(markdown: str) -> str:
@@ -139,7 +152,7 @@ def markdown_to_html(markdown: str) -> str:
         if not stripped:
             flush_paragraph(paragraph, out)
             continue
-        image_match = IMAGE_MARKDOWN_RE.match(stripped)
+        image_match = IMAGE_MARKDOWN_RE.fullmatch(stripped)
         if image_match:
             flush_paragraph(paragraph, out)
             out.append(render_markdown_image(image_match))

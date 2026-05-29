@@ -96,19 +96,34 @@ collections:
           写结果、取舍，以及下次可以改进的地方。
 
   - name: "projects"
-    label: "项目"
+    label: "项目 / 查看复盘"
     files:
       - name: "projects"
-        label: "项目列表"
+        label: "项目列表与复盘内容"
         file: "content/projects.json"
         fields:
-          - label: "项目"
+          - label: "项目与复盘"
             name: "projects"
             widget: "list"
+            summary: "{{fields.title}} · {{fields.cat}}"
             fields:
               - { label: "ID", name: "id", widget: "number" }
               - { label: "标题", name: "title", widget: "string" }
               - { label: "描述", name: "desc", widget: "text" }
+              - label: "查看复盘正文（项目详情页）"
+                name: "detail"
+                widget: "markdown"
+                required: false
+                hint: "这里就是前台点击“查看复盘”后打开的正文。可以直接插入图片或 GIF，生成的 ![说明](图片地址) 会在项目详情页正常显示。"
+                default: |
+                  ## 项目背景
+                  这里说明项目目标、使用场景和核心需求。
+
+                  ## 技术实现
+                  记录主要技术栈、模块分工和关键实现。
+
+                  ## 复盘结论
+                  写清楚最终结果、遇到的问题和后续优化方向。
               - { label: "分类", name: "cat", widget: "string" }
               - { label: "项目状态", name: "status", widget: "select", options: ["规划中", "开发中", "已完成", "已上线", "维护中", "归档"], default: "已完成" }
               - { label: "我的职责", name: "role", widget: "text", required: false }
@@ -149,20 +164,26 @@ collections:
                   - { label: "图片", name: "image", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。" }
                   - { label: "替代文本", name: "alt", widget: "string", required: false }
                   - { label: "图片说明", name: "caption", widget: "string", required: false }
-              - label: "详情正文"
-                name: "detail"
-                widget: "markdown"
-                required: false
-                hint: "详情正文里可以直接插入图片或 GIF，生成的 ![说明](图片地址) 会在项目详情页正常显示。"
-                default: |
-                  ## 项目背景
-                  这里说明项目目标、使用场景和核心需求。
 
-                  ## 技术实现
-                  记录主要技术栈、模块分工和关键实现。
-
-                  ## 复盘结论
-                  写清楚最终结果、遇到的问题和后续优化方向。
+  - name: "changelog"
+    label: "更新日志（页面）"
+    files:
+      - name: "changelog"
+        label: "更新日志页面内容"
+        file: "content/changelog.json"
+        fields:
+          - label: "更新记录"
+            name: "changelog"
+            widget: "list"
+            summary: "{{fields.date}} · {{fields.title}}"
+            fields:
+              - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "类型", name: "type", widget: "select", options: ["功能", "性能", "体验", "修复", "内容"] }
+              - label: "条目"
+                name: "items"
+                widget: "list"
+                field: { label: "条目内容", name: "item", widget: "string" }
 
   - name: "games"
     label: "游戏"
@@ -202,22 +223,3 @@ collections:
               - { label: "链接", name: "url", widget: "string" }
               - { label: "展示链接", name: "displayUrl", widget: "string" }
               - { label: "徽章", name: "badge", widget: "string" }
-
-  - name: "changelog"
-    label: "更新日志"
-    files:
-      - name: "changelog"
-        label: "更新记录"
-        file: "content/changelog.json"
-        fields:
-          - label: "更新记录"
-            name: "changelog"
-            widget: "list"
-            fields:
-              - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
-              - { label: "标题", name: "title", widget: "string" }
-              - { label: "类型", name: "type", widget: "select", options: ["功能", "性能", "体验", "修复", "内容"] }
-              - label: "条目"
-                name: "items"
-                widget: "list"
-                field: { label: "条目内容", name: "item", widget: "string" }
