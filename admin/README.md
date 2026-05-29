@@ -23,7 +23,7 @@ python scripts/build_content.py
 
 然后把 `content/` 里的 Markdown / JSON 生成到 `js/data.js`，再部署到 GitHub Pages。
 
-文章正文使用 Markdown 源码模式，后台仍然支持直接插入图片或 GIF：点击编辑器工具栏里的 `+`，选择 `插入图片/GIF`，再上传或选择图片即可。后台会自动插入类似下面的 Markdown 内容：
+文章正文默认使用富文本编辑模式。插入图片或 GIF 时点击编辑器工具栏里的 `+`，选择 `插入图片/GIF`，再上传或选择图片即可。后台会自动插入类似下面的 Markdown 内容：
 
 ```md
 ![说明](/assets/uploads/cmd-bg.jpg)
