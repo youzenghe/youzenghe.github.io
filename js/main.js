@@ -10,7 +10,7 @@ const SAKANA_WIDGET_SCRIPT_ID = 'sakana-widget-script';
 const SAKANA_WIDGET_CSS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.css';
 const SAKANA_WIDGET_JS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.js';
 const LOCAL_BG_DESKTOP = 'assets/bg-pc.webp';
-const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
+const LOCAL_BG_MOBILE = 'assets/bg-phone.jpg';
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
@@ -1059,6 +1059,12 @@ function prefetchPage(url) {
   fetchPageDocument(cacheKey).catch(() => {});
 }
 
+function prefetchNavigationBgFor(url) {
+  const pageKey = getPageKey(url);
+  if (!pageKey || pageKey === 'home') return;
+  prefetchRandomBg();
+}
+
 function isSameDocumentHashNavigation(url) {
   return (
     url.pathname === location.pathname &&
@@ -1132,18 +1138,21 @@ function initRouter() {
     const link = event.target.closest('a[href]');
     if (!link) return;
     prefetchPage(link.href);
+    prefetchNavigationBgFor(link.href);
   });
 
   document.addEventListener('touchstart', (event) => {
     const link = event.target.closest('a[href]');
     if (!link) return;
     prefetchPage(link.href);
+    prefetchNavigationBgFor(link.href);
   }, { passive: true });
 
   document.addEventListener('focusin', (event) => {
     const link = event.target.closest?.('a[href]');
     if (!link) return;
     prefetchPage(link.href);
+    prefetchNavigationBgFor(link.href);
   });
 
   window.addEventListener('popstate', () => {
@@ -1188,9 +1197,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initialBgPromise.catch(() => '').finally(() => {
       document.getElementById('loader')?.classList.add('hidden');
       syncLive2DVisibility();
-      requestIdleWork(() => {
-        prefetchRandomBg();
-      }, 1000);
     });
   });
 
