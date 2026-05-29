@@ -7,5 +7,53 @@
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@^3.4.0/dist/decap-cms.js"></script>
+  <script>
+    CMS.registerEditorComponent({
+      id: 'cms-image',
+      label: '插入图片/GIF',
+      fields: [
+        {
+          name: 'src',
+          label: '图片/GIF 文件',
+          widget: 'file',
+          media_library: {
+            allow_multiple: false
+          }
+        },
+        {
+          name: 'alt',
+          label: '图片说明',
+          widget: 'string',
+          required: false
+        },
+        {
+          name: 'title',
+          label: '悬停标题',
+          widget: 'string',
+          required: false
+        }
+      ],
+      pattern: /^!\[(.*?)\]\((\S+?)(?:\s+"(.*?)")?\)$/m,
+      fromBlock(match) {
+        return {
+          alt: match[1] || '',
+          src: match[2] || '',
+          title: match[3] || ''
+        };
+      },
+      toBlock(data) {
+        const alt = data.alt || '';
+        const src = data.src || '';
+        const title = data.title ? ` "${data.title}"` : '';
+        return `![${alt}](${src}${title})`;
+      },
+      toPreview(data) {
+        const alt = data.alt || '';
+        const src = data.src || '';
+        const title = data.title ? `<figcaption>${data.title}</figcaption>` : '';
+        return `<figure><img src="${src}" alt="${alt}" style="max-width:100%;height:auto;" />${title}</figure>`;
+      }
+    });
+  </script>
 </body>
 </html>
