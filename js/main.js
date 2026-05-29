@@ -115,6 +115,7 @@ function resolveThumbnailUrl(path) {
   if (!path || /^https?:\/\//i.test(path)) return path;
   const normalized = normalizeLocalAssetPath(path);
   if (!normalized.startsWith('assets/')) return resolveAssetUrl(path);
+  if (/\.(gif|svg)$/i.test(normalized)) return resolveAssetUrl(path);
   const withoutAssets = normalized.slice('assets/'.length);
   return `${getSiteConfig().rootPrefix}assets/thumbs/${withoutAssets.replace(/\.[^.]+$/, '.webp')}`;
 }

@@ -109,6 +109,7 @@ window.SiteApp.registerPage('projects', () => {
           <p class="proj-desc">${project.desc}</p>
           <div class="proj-meta-row">
             <span class="proj-cat">${project.cat}</span>
+            ${project.status ? `<span class="proj-tech-tag">${project.status}</span>` : ''}
             ${project.tech.map((tech) => `<span class="proj-tech-tag">${tech}</span>`).join('')}
           </div>
         </div>

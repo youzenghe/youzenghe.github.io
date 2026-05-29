@@ -14,11 +14,35 @@ locale: "zh_Hans"
 collections:
   - name: "posts"
     label: "文章"
+    label_singular: "文章"
     folder: "content/posts"
     create: true
     slug: "{{id}}-{{slug}}"
     extension: "md"
     format: "frontmatter"
+    identifier_field: "title"
+    summary: "{{title}} · {{cat}} · {{date}}"
+    sortable_fields: ["id", "title", "date", "updatedAt", "cat", "series", "status", "featured", "pinned"]
+    view_groups:
+      - label: "分类"
+        field: "cat"
+      - label: "专题"
+        field: "series"
+      - label: "状态"
+        field: "status"
+    view_filters:
+      - label: "已发布"
+        field: "status"
+        pattern: "published"
+      - label: "草稿"
+        field: "status"
+        pattern: "draft"
+      - label: "精选"
+        field: "featured"
+        pattern: "true"
+      - label: "置顶"
+        field: "pinned"
+        pattern: "true"
     fields:
       - { label: "ID", name: "id", widget: "number" }
       - { label: "标题", name: "title", widget: "string" }
@@ -26,22 +50,41 @@ collections:
       - { label: "专题", name: "series", widget: "string", default: "技术复盘" }
       - { label: "分类颜色", name: "catColor", widget: "string", default: "#67e8f9" }
       - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "更新日期", name: "updatedAt", widget: "datetime", format: "YYYY-MM-DD", required: false }
+      - { label: "发布状态", name: "status", widget: "select", options: [{ label: "已发布", value: "published" }, { label: "草稿", value: "draft" }], default: "published" }
+      - { label: "精选文章", name: "featured", widget: "boolean", default: false, required: false }
+      - { label: "置顶文章", name: "pinned", widget: "boolean", default: false, required: false }
       - { label: "阅读时间", name: "readTime", widget: "number", default: 4 }
       - { label: "表情", name: "emoji", widget: "string", default: "📝" }
-      - { label: "封面", name: "cover", widget: "image" }
+      - { label: "封面", name: "cover", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。封面建议只放一张，正文里可以继续插入多张图片。" }
       - label: "文章图片集"
         name: "images"
         widget: "list"
         required: false
-        field: { label: "图片", name: "image", widget: "image" }
+        summary: "{{fields.caption}}"
+        fields:
+          - { label: "图片", name: "image", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。" }
+          - { label: "替代文本", name: "alt", widget: "string", required: false }
+          - { label: "图片说明", name: "caption", widget: "string", required: false }
+          - { label: "作为正文封面候选", name: "isCover", widget: "boolean", default: false, required: false }
       - { label: "摘要", name: "excerpt", widget: "text" }
+      - { label: "SEO 标题", name: "metaTitle", widget: "string", required: false }
+      - { label: "SEO 描述", name: "metaDescription", widget: "text", required: false }
+      - { label: "社交分享图", name: "ogImage", widget: "image", required: false, hint: "支持 JPG / PNG / WebP / GIF。" }
+      - { label: "Canonical URL", name: "canonical", widget: "string", required: false }
       - label: "标签"
         name: "tags"
         widget: "list"
         field: { label: "标签项", name: "tag", widget: "string" }
+      - label: "手动推荐文章 ID"
+        name: "relatedPosts"
+        widget: "list"
+        required: false
+        field: { label: "文章 ID", name: "postId", widget: "number" }
       - label: "正文"
         name: "body"
         widget: "markdown"
+        hint: "正文编辑器里可以直接插入图片或 GIF，生成的 ![说明](图片地址) 会在文章页正常显示。"
         default: |
           ## 背景
           这里写清楚为什么要做这件事，问题来自哪里。
@@ -67,6 +110,8 @@ collections:
               - { label: "标题", name: "title", widget: "string" }
               - { label: "描述", name: "desc", widget: "text" }
               - { label: "分类", name: "cat", widget: "string" }
+              - { label: "项目状态", name: "status", widget: "select", options: ["规划中", "开发中", "已完成", "已上线", "维护中", "归档"], default: "已完成" }
+              - { label: "我的职责", name: "role", widget: "text", required: false }
               - label: "技术栈"
                 name: "tech"
                 widget: "list"
@@ -75,16 +120,40 @@ collections:
               - { label: "奖项键", name: "award", widget: "select", options: ["gold", "silver", "bronze", "none"] }
               - { label: "奖项文本", name: "awardText", widget: "string" }
               - { label: "表情", name: "emoji", widget: "string" }
-              - { label: "图片", name: "img", widget: "image" }
+              - { label: "图片", name: "img", widget: "image", hint: "项目主图建议只放一张；详情正文里可以继续插入多张图片或 GIF。" }
+              - label: "项目链接"
+                name: "links"
+                widget: "list"
+                required: false
+                fields:
+                  - { label: "名称", name: "label", widget: "string" }
+                  - { label: "链接", name: "url", widget: "string" }
+                  - { label: "类型", name: "type", widget: "select", options: ["演示", "源码", "文档", "报道", "其他"], default: "演示" }
+              - label: "技术亮点"
+                name: "highlights"
+                widget: "list"
+                required: false
+                field: { label: "亮点", name: "highlight", widget: "string" }
+              - label: "踩坑/难点"
+                name: "challenges"
+                widget: "list"
+                required: false
+                field: { label: "难点", name: "challenge", widget: "string" }
+              - { label: "结果/复盘结论", name: "result", widget: "text", required: false }
               - label: "项目图片集"
                 name: "images"
                 widget: "list"
                 required: false
-                field: { label: "图片", name: "image", widget: "image" }
+                summary: "{{fields.caption}}"
+                fields:
+                  - { label: "图片", name: "image", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。" }
+                  - { label: "替代文本", name: "alt", widget: "string", required: false }
+                  - { label: "图片说明", name: "caption", widget: "string", required: false }
               - label: "详情正文"
                 name: "detail"
                 widget: "markdown"
                 required: false
+                hint: "详情正文里可以直接插入图片或 GIF，生成的 ![说明](图片地址) 会在项目详情页正常显示。"
                 default: |
                   ## 项目背景
                   这里说明项目目标、使用场景和核心需求。

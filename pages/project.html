@@ -22,10 +22,19 @@
     .project-detail-body { padding: 1.4rem; border-radius: var(--radius); background: var(--card-bg); border: 1px solid var(--glass-border); line-height: 1.9; color: var(--text-muted); }
     .project-detail-body h2 { color: var(--text); font-family: var(--font-display); margin: 1.4rem 0 0.6rem; }
     .project-detail-body p { margin-bottom: 1rem; }
+    .project-detail-body ul { margin: 0 0 1rem 1.2rem; color: var(--text-muted); }
+    .project-detail-body li { margin-bottom: 0.35rem; }
+    .project-detail-body .md-image { margin: 1.4rem 0; }
+    .project-detail-body .md-image img { width: 100%; max-height: 620px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.16); display: block; }
+    .project-detail-body .md-image figcaption { margin-top: 0.45rem; color: var(--text-muted); font-size: 0.78rem; line-height: 1.6; text-align: center; }
     .project-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }
+    .project-gallery figure { margin: 0; }
     .project-gallery img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); }
+    .project-gallery figcaption { margin-top: 0.35rem; color: var(--text-muted); font-size: 0.76rem; line-height: 1.6; }
     .project-side { position: sticky; top: 90px; padding: 1.2rem; border-radius: var(--radius); background: var(--card-bg); border: 1px solid var(--glass-border); }
     .project-side-title { font-family: var(--font-display); margin-bottom: 0.8rem; }
+    .project-links { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1rem; }
+    .project-links a { color: var(--sakura); font-size: 0.84rem; }
     @media (max-width: 860px) { .project-detail-grid { grid-template-columns: 1fr; } .project-side { position: static; } }
   </style>
 </head>

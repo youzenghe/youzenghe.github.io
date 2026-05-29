@@ -4,6 +4,8 @@ import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from build_content import parse_front_matter
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT_DIR = ROOT / "content"
@@ -42,11 +44,10 @@ def main() -> None:
     posts = sorted(read_json("posts.json")["posts"] if (CONTENT_DIR / "posts.json").exists() else [], key=lambda item: item["id"])
     if not posts:
         for post_file in sorted((CONTENT_DIR / "posts").glob("*.md")):
-            text = post_file.read_text(encoding="utf-8")
-            for line in text.splitlines():
-                if line.startswith("id:"):
-                    posts.append({"id": int(line.split(":", 1)[1].strip())})
-                    break
+            meta, _ = parse_front_matter(post_file.read_text(encoding="utf-8"))
+            if str(meta.get("status", "published")) == "draft":
+                continue
+            posts.append({"id": int(meta["id"])})
 
     for post in posts:
         add_url(urlset, f"{SITE_URL}/pages/post.html?id={post['id']}")

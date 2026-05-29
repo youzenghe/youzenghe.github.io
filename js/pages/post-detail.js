@@ -18,6 +18,14 @@ window.SiteApp.registerPage('post-detail', () => {
     return `${absoluteBase}/${path.replace(/^\.\.\//, '').replace(/^\//, '')}`;
   }
 
+  function imageSrc(image) {
+    return typeof image === 'string' ? image : image?.src || image?.image || '';
+  }
+
+  function imageAlt(image, fallback) {
+    return typeof image === 'string' ? fallback : image?.alt || fallback;
+  }
+
   function stripHtml(html) {
     const temp = document.createElement('div');
     temp.innerHTML = html;
@@ -43,20 +51,26 @@ window.SiteApp.registerPage('post-detail', () => {
     code.innerHTML = highlighted;
   }
 
-  document.title = `${post.title} · 次元日记`;
-  setMeta('meta[name="description"]', 'content', post.excerpt);
-  setMeta('meta[property="og:url"]', 'content', `https://yzh1019.top/pages/post.html?id=${post.id}`);
-  setMeta('meta[property="og:title"]', 'content', `${post.title} · 次元日记`);
-  setMeta('meta[property="og:description"]', 'content', post.excerpt);
-  setMeta('meta[property="og:image"]', 'content', toAbsoluteAssetUrl(post.cover));
+  const seo = post.seo || {};
+  const seoTitle = seo.title || `${post.title} · 次元日记`;
+  const seoDescription = seo.description || post.excerpt;
+  const seoImage = seo.image || post.cover;
+  const canonicalUrl = seo.canonical || `https://yzh1019.top/pages/post.html?id=${post.id}`;
+
+  document.title = seoTitle;
+  setMeta('meta[name="description"]', 'content', seoDescription);
+  setMeta('meta[property="og:url"]', 'content', canonicalUrl);
+  setMeta('meta[property="og:title"]', 'content', seoTitle);
+  setMeta('meta[property="og:description"]', 'content', seoDescription);
+  setMeta('meta[property="og:image"]', 'content', toAbsoluteAssetUrl(seoImage));
   setMeta('meta[property="og:image:alt"]', 'content', `${post.title} 的文章封面`);
-  setMeta('meta[name="twitter:title"]', 'content', `${post.title} · 次元日记`);
-  setMeta('meta[name="twitter:description"]', 'content', post.excerpt);
-  setMeta('meta[name="twitter:image"]', 'content', toAbsoluteAssetUrl(post.cover));
+  setMeta('meta[name="twitter:title"]', 'content', seoTitle);
+  setMeta('meta[name="twitter:description"]', 'content', seoDescription);
+  setMeta('meta[name="twitter:image"]', 'content', toAbsoluteAssetUrl(seoImage));
   setMeta('meta[name="twitter:image:alt"]', 'content', `${post.title} 的文章封面`);
   const canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) {
-    canonical.href = `https://yzh1019.top/pages/post.html?id=${post.id}`;
+    canonical.href = canonicalUrl;
   }
   const structuredData = document.getElementById('post-structured-data');
   if (structuredData) {
@@ -67,10 +81,10 @@ window.SiteApp.registerPage('post-detail', () => {
       articleSection: post.cat,
       keywords: post.tags.join(', '),
       datePublished: post.date,
-      dateModified: post.date,
+      dateModified: post.updatedAt || post.date,
       timeRequired: `PT${post.readTime}M`,
-      description: post.excerpt,
-      image: toAbsoluteAssetUrl(post.cover),
+      description: seoDescription,
+      image: toAbsoluteAssetUrl(seoImage),
       url: `https://yzh1019.top/pages/post.html?id=${post.id}`,
       author: {
         '@type': 'Person',
@@ -131,18 +145,26 @@ window.SiteApp.registerPage('post-detail', () => {
   const gallery = document.getElementById('post-gallery');
   if (gallery) {
     const images = Array.isArray(post.images) ? post.images : [];
-    gallery.replaceChildren(...images.map((src) => {
+    gallery.replaceChildren(...images.map((image) => {
+      const src = imageSrc(image);
+      const figure = document.createElement('figure');
       const img = document.createElement('img');
       img.src = resolveThumbnailUrl(src);
       img.dataset.fullSrc = resolveAssetUrl(src);
-      img.alt = `${post.title} 图片`;
+      img.alt = imageAlt(image, `${post.title} 图片`);
       img.loading = 'lazy';
       img.decoding = 'async';
       img.onerror = () => {
         img.onerror = null;
         img.src = img.dataset.fullSrc;
       };
-      return img;
+      figure.appendChild(img);
+      if (typeof image === 'object' && image?.caption) {
+        const caption = document.createElement('figcaption');
+        caption.textContent = image.caption;
+        figure.appendChild(caption);
+      }
+      return figure;
     }));
   }
 
@@ -174,7 +196,15 @@ window.SiteApp.registerPage('post-detail', () => {
     tocToggle.setAttribute('aria-expanded', String(opened));
   });
 
-  const related = POSTS.filter((item) => item.id !== id && item.cat === post.cat).slice(0, 3);
+  const manualRelated = (post.relatedPosts || [])
+    .map((relatedId) => POSTS.find((item) => item.id === relatedId && item.id !== id))
+    .filter(Boolean);
+  const fallbackRelated = POSTS.filter((item) => (
+    item.id !== id &&
+    item.cat === post.cat &&
+    !manualRelated.some((relatedPost) => relatedPost.id === item.id)
+  ));
+  const related = [...manualRelated, ...fallbackRelated].slice(0, 3);
   const relatedEl = document.getElementById('related');
   if (relatedEl) {
     relatedEl.innerHTML = '';

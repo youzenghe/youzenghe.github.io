@@ -32,6 +32,10 @@ window.SiteApp.registerPage('posts', () => {
       : post.emoji;
     const tags = simple ? '' : `<div class="plc-tags">${post.tags.map((tag) => `<span class="plc-tag">#${tag}</span>`).join('')}</div>`;
     const readMeta = simple ? '' : `<span>· ${post.readTime} min</span>`;
+    const flags = [
+      post.pinned ? '<span class="plc-flag">置顶</span>' : '',
+      post.featured ? '<span class="plc-flag">精选</span>' : '',
+    ].join('');
 
     return `
       <div class="plc-thumb">${thumbContent}</div>
@@ -40,6 +44,7 @@ window.SiteApp.registerPage('posts', () => {
           <span class="plc-cat" style="${simple ? '' : `color:${post.catColor}`}">${post.cat}</span>
           <span>${post.date}</span>
           ${readMeta}
+          ${flags}
         </div>
         <div class="plc-title">${post.title}</div>
         <div class="plc-excerpt">${post.excerpt}</div>

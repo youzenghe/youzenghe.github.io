@@ -140,7 +140,7 @@
       flex-shrink: 0;
     }
 
-    /* 让左侧 菜单 按钮和右侧 3 个按钮分到两边 */
+    /* 让左侧 ☰ 按钮和右侧 3 个按钮分到两边 */
     #historyBtn { margin-right: auto; }
 
     .top-icon-btn {
@@ -2382,7 +2382,7 @@
       flex-shrink: 0;
     }
     #newChatBtn.side-nav-item::before {
-      content: "编辑";
+      content: "✎";
       font-size: 20px;
       transform: translateY(-1px);
     }
@@ -2672,7 +2672,7 @@
 
   <div id="main">
     <div id="topbar">
-      <button class="top-icon-btn" id="historyBtn" title="展开侧边栏">菜单</button>
+      <button class="top-icon-btn" id="historyBtn" title="展开侧边栏">☰</button>
       <div id="modelPicker">
         <button id="modelMenuBtn">模型 <span class="chev">⌄</span></button>
         <div id="modelMenu"></div>
@@ -5135,7 +5135,7 @@
         const delBtn = document.createElement('button');
         delBtn.className = 'fc-del';
         delBtn.title = '移除';
-        delBtn.textContent = '?';
+        delBtn.textContent = '×';
         delBtn.addEventListener('click', () => {
           pendingFiles = pendingFiles.filter(x => x.id !== f.id);
           renderFileChips();

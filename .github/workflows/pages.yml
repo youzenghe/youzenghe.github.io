@@ -38,6 +38,9 @@ jobs:
       - name: Generate thumbnails
         run: python scripts/generate_thumbnails.py
 
+      - name: Validate content
+        run: python scripts/validate_content.py
+
       - name: Build content bundle
         run: python scripts/build_content.py
 

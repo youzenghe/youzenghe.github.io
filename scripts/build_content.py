@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT_DIR = ROOT / "content"
 POSTS_DIR = CONTENT_DIR / "posts"
 DATA_JS = ROOT / "js" / "data.js"
+IMAGE_MARKDOWN_RE = re.compile(r'^!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)$')
 
 
 def parse_scalar(value: str):
@@ -34,13 +35,27 @@ def parse_front_matter(text: str) -> tuple[dict, str]:
     _, raw_meta, body = text.split("---", 2)
     meta: dict[str, object] = {}
     current_key = ""
+    current_item: dict[str, object] | None = None
 
     for raw_line in raw_meta.splitlines():
         line = raw_line.rstrip()
         if not line.strip():
             continue
         if line.startswith("  - ") and current_key:
-            meta.setdefault(current_key, []).append(parse_scalar(line[4:]))
+            value = line[4:]
+            if ":" in value:
+                item_key, item_value = value.split(":", 1)
+                current_item = {item_key.strip(): parse_scalar(item_value.strip())}
+                meta.setdefault(current_key, []).append(current_item)
+            else:
+                current_item = None
+                meta.setdefault(current_key, []).append(parse_scalar(value))
+            continue
+        if line.startswith("    ") and current_item is not None:
+            nested = line.strip()
+            if ":" in nested:
+                item_key, item_value = nested.split(":", 1)
+                current_item[item_key.strip()] = parse_scalar(item_value.strip())
             continue
         if ":" not in line:
             continue
@@ -52,6 +67,7 @@ def parse_front_matter(text: str) -> tuple[dict, str]:
             meta[key] = parse_scalar(value)
         else:
             meta[key] = []
+        current_item = None
 
     return meta, body.strip()
 
@@ -63,6 +79,20 @@ def flush_paragraph(lines: list[str], out: list[str]) -> None:
     if text:
         out.append(f"<p>{escape(text)}</p>")
     lines.clear()
+
+
+def render_markdown_image(match: re.Match[str]) -> str:
+    alt = escape(match.group("alt") or "")
+    src = escape(match.group("src") or "")
+    title = escape(match.group("title") or "")
+    caption = title or alt
+    caption_html = f"<figcaption>{caption}</figcaption>" if caption else ""
+    return (
+        '<figure class="md-image">'
+        f'<img src="{src}" alt="{alt}" loading="lazy" decoding="async">'
+        f"{caption_html}"
+        "</figure>"
+    )
 
 
 def markdown_to_html(markdown: str) -> str:
@@ -109,6 +139,11 @@ def markdown_to_html(markdown: str) -> str:
         if not stripped:
             flush_paragraph(paragraph, out)
             continue
+        image_match = IMAGE_MARKDOWN_RE.match(stripped)
+        if image_match:
+            flush_paragraph(paragraph, out)
+            out.append(render_markdown_image(image_match))
+            continue
         if stripped.startswith("## "):
             flush_paragraph(paragraph, out)
             out.append(f"<h2>{escape(stripped[3:].strip())}</h2>")
@@ -130,27 +165,73 @@ def markdown_to_html(markdown: str) -> str:
     return "\n      ".join(out)
 
 
+def normalize_bool(value, default: bool = False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    return str(value).strip().lower() in {"true", "yes", "1", "on"}
+
+
+def normalize_image_item(item) -> dict:
+    if isinstance(item, dict):
+        src = str(item.get("image") or item.get("src") or item.get("url") or "")
+        return {
+            "src": src,
+            "alt": str(item.get("alt") or ""),
+            "caption": str(item.get("caption") or ""),
+            "isCover": normalize_bool(item.get("isCover"), False),
+        }
+    return {
+        "src": str(item),
+        "alt": "",
+        "caption": "",
+        "isCover": False,
+    }
+
+
+def normalize_images(items) -> list[dict]:
+    if not isinstance(items, list):
+        return []
+    return [image for image in (normalize_image_item(item) for item in items) if image["src"]]
+
+
 def load_posts() -> list[dict]:
     posts = []
     for path in sorted(POSTS_DIR.glob("*.md")):
         meta, body = parse_front_matter(path.read_text(encoding="utf-8"))
+        status = str(meta.get("status", "published"))
+        if status == "draft":
+            continue
+        images = normalize_images(meta.get("images", []))
         post = {
             "id": int(meta["id"]),
             "title": str(meta["title"]),
             "cat": str(meta["cat"]),
             "catColor": str(meta.get("catColor", "#f9a8c9")),
             "date": str(meta["date"]),
+            "updatedAt": str(meta.get("updatedAt", meta["date"])),
+            "status": status,
+            "featured": normalize_bool(meta.get("featured"), False),
+            "pinned": normalize_bool(meta.get("pinned"), False),
             "readTime": int(meta.get("readTime", 3)),
             "emoji": str(meta.get("emoji", "📝")),
             "cover": str(meta.get("cover", "")),
-            "images": list(meta.get("images", [])),
+            "images": images,
             "series": str(meta.get("series", meta.get("cat", ""))),
             "excerpt": str(meta.get("excerpt", "")),
             "tags": list(meta.get("tags", [])),
+            "relatedPosts": [int(item) for item in meta.get("relatedPosts", []) if str(item).strip()],
+            "seo": {
+                "title": str(meta.get("metaTitle", "")),
+                "description": str(meta.get("metaDescription", "")),
+                "image": str(meta.get("ogImage", "")),
+                "canonical": str(meta.get("canonical", "")),
+            },
             "content": markdown_to_html(body),
         }
         posts.append(post)
-    return sorted(posts, key=lambda item: item["id"])
+    return sorted(posts, key=lambda item: (not item["pinned"], -item["id"]))
 
 
 def read_json(name: str):
@@ -162,10 +243,16 @@ def load_projects() -> list[dict]:
     projects = []
     for project in read_json("projects.json")["projects"]:
         item = dict(project)
-        item.setdefault("images", [])
+        item["status"] = str(item.get("status", "已完成"))
+        item["role"] = str(item.get("role", ""))
+        item["links"] = item.get("links", [])
+        item["highlights"] = item.get("highlights", [])
+        item["challenges"] = item.get("challenges", [])
+        item["result"] = str(item.get("result", ""))
+        item["images"] = normalize_images(item.get("images", []))
         item.setdefault("detail", "")
         if not item["images"] and item.get("img"):
-            item["images"] = [item["img"]]
+            item["images"] = [normalize_image_item(item["img"])]
         if item["detail"]:
             item["detail"] = markdown_to_html(str(item["detail"]))
         projects.append(item)
