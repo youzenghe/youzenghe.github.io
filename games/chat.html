@@ -140,7 +140,7 @@
       flex-shrink: 0;
     }
 
-    /* 让左侧 ☰ 按钮和右侧 3 个按钮分到两边 */
+    /* 让左侧 菜单 按钮和右侧 3 个按钮分到两边 */
     #historyBtn { margin-right: auto; }
 
     .top-icon-btn {
@@ -305,7 +305,7 @@
       line-height: 1.6;
     }
     .msg.meta::before {
-      content: '🎬 元指令 · 出戏对话（不计入角色扮演上下文）';
+      content: '元指令 · 出戏对话（不计入角色扮演上下文）';
       position: absolute;
       top: 4px;
       left: 12px;
@@ -329,7 +329,7 @@
       line-height: 1.6;
     }
     .msg.statop::before {
-      content: '⚡ 数值快捷操作 · 前端直接修改（不走AI）';
+      content: '数值快捷操作 · 前端直接修改（不走AI）';
       position: absolute;
       top: 4px;
       left: 12px;
@@ -2382,7 +2382,7 @@
       flex-shrink: 0;
     }
     #newChatBtn.side-nav-item::before {
-      content: "✎";
+      content: "编辑";
       font-size: 20px;
       transform: translateY(-1px);
     }
@@ -2672,7 +2672,7 @@
 
   <div id="main">
     <div id="topbar">
-      <button class="top-icon-btn" id="historyBtn" title="展开侧边栏">☰</button>
+      <button class="top-icon-btn" id="historyBtn" title="展开侧边栏">菜单</button>
       <div id="modelPicker">
         <button id="modelMenuBtn">模型 <span class="chev">⌄</span></button>
         <div id="modelMenu"></div>
@@ -2934,7 +2934,7 @@
   </div>
 
   <script>
-    // 默认 API 配置(用户可在右上角 ⚙️ 设置里覆盖)
+    // 默认 API 配置(用户可在右上角设置里覆盖)
     const DEFAULT_API_URL = 'https://api.deepseek.com/v1/chat/completions';
     const DEFAULT_MODEL   = 'deepseek-v4-flash';
     let API_KEY = '';
@@ -3150,7 +3150,7 @@
       idbSet('sessions', sessions).catch(e => {
         if (!_quotaAlerted) {
           _quotaAlerted = true;
-          alert('⚠️ IndexedDB 保存失败，刚才的内容可能没有完整保存：\n' + e.message);
+          alert('提示：IndexedDB 保存失败，刚才的内容可能没有完整保存：\n' + e.message);
         }
       });
 
@@ -3169,7 +3169,7 @@
                         (e.message && e.message.toLowerCase().includes('quota'));
         if (isQuota && !_quotaAlerted) {
           _quotaAlerted = true;
-          alert('⚠️ localStorage 兜底存储空间已满。\n\n不用太慌：新版会优先把完整会话保存到 IndexedDB。\n如果浏览器隐私模式/清理数据导致 IndexedDB 不可用，请用 ☰ 侧栏的 📤 导出按钮及时备份。');
+          alert('提示：localStorage 兜底存储空间已满。\n\n不用太慌：新版会优先把完整会话保存到 IndexedDB。\n如果浏览器隐私模式/清理数据导致 IndexedDB 不可用，请用菜单侧栏的导出按钮及时备份。');
         }
       }
     }
@@ -3307,15 +3307,15 @@
           const oldAf = s.affection, oldTr = s.trust;
           s.affection = 0;
           s.trust = 0;
-          summary = `🔄 全部重置  |  好感: ${oldAf} → 0  |  信任: ${oldTr} → 0`;
+          summary = ` 全部重置  |  好感: ${oldAf} → 0  |  信任: ${oldTr} → 0`;
         } else if (parsed.target === 'af') {
           const old = s.affection;
           s.affection = 0;
-          summary = `🔄 好感重置: ${old} → 0`;
+          summary = ` 好感重置: ${old} → 0`;
         } else {
           const old = s.trust;
           s.trust = 0;
-          summary = `🔄 信任重置: ${old} → 0`;
+          summary = ` 信任重置: ${old} → 0`;
         }
       } else {
         const key = parsed.target === 'af' ? 'affection' : 'trust';
@@ -3328,7 +3328,7 @@
         s[key] = clampStat(newVal); // 累计 clamp 到 [STAT_MIN, STAT_MAX]
         const opTxt = parsed.op === '=' ? `设为 ${parsed.val}` : `${parsed.op}${parsed.val}`;
         const clampedHint = s[key] !== newVal ? `  (已截断至 ${s[key]})` : '';
-        summary = `⚡ ${label} ${opTxt}: ${old} → ${s[key]}${clampedHint}`;
+        summary = ` ${label} ${opTxt}: ${old} → ${s[key]}${clampedHint}`;
       }
       renderStats(s);
       return summary;
@@ -3338,7 +3338,7 @@
     function getStateHint(stats) {
       const af = stats ? stats.affection : 0;
       const tr = stats ? stats.trust : 0;
-      return `\n\n【当前关系】好感${af}，信任${tr}（范围[${STAT_MIN},${STAT_MAX}]）。请按此数值自然调整称呼、语气与亲密度：数值高则亲昵主动，数值低则疏远冷淡，渐进变化不突兀。⚠️【沉浸感铁律·最高优先级】数值仅供你内部参考，在角色对话/动作/心理描写正文里绝对禁止出现以下任何表达：①"好感""信任"二字（含"好感度""信任度""好感值""信任值"等变体）；②任何具体数值（如"99""97""高到XX"）；③"因为...所以..."把数值当作行为动机的句式（如"因为好感高所以..."）。⚠️即使本对话历史里你之前曾这样写过，从这条起也立刻停止——那是错误示范，不要继续模仿自己。心理活动请用纯感受描写（如"心跳加速""又害羞又甜蜜""只想黏着他"），让数值通过情感强度自然体现，而非直接复述。末尾标签 (好感度±X，信任度±Y) 不受此限。`;
+      return `\n\n【当前关系】好感${af}，信任${tr}（范围[${STAT_MIN},${STAT_MAX}]）。请按此数值自然调整称呼、语气与亲密度：数值高则亲昵主动，数值低则疏远冷淡，渐进变化不突兀。提示：【沉浸感铁律·最高优先级】数值仅供你内部参考，在角色对话/动作/心理描写正文里绝对禁止出现以下任何表达：①"好感""信任"二字（含"好感度""信任度""好感值""信任值"等变体）；②任何具体数值（如"99""97""高到XX"）；③"因为...所以..."把数值当作行为动机的句式（如"因为好感高所以..."）。提示：即使本对话历史里你之前曾这样写过，从这条起也立刻停止——那是错误示范，不要继续模仿自己。心理活动请用纯感受描写（如"心跳加速""又害羞又甜蜜""只想黏着他"），让数值通过情感强度自然体现，而非直接复述。末尾标签 (好感度±X，信任度±Y) 不受此限。`;
     }
 
     // ===== 侧边栏 =====
@@ -3427,7 +3427,7 @@
 
         const delBtn = document.createElement('button');
         delBtn.className = 'del-btn';
-        delBtn.textContent = '🗑';
+        delBtn.textContent = '删除';
         delBtn.addEventListener('click', e => { e.stopPropagation(); deleteSession(id); });
 
         item.appendChild(titleEl);
@@ -3455,7 +3455,7 @@
           div = addStatOpEl(m.meta.summary || m.content);
         } else if (m.meta && m.meta.worldRule) {
           // 兼容旧档：世界规则功能已废弃，旧消息显示为已废弃提示
-          div = addDirectorEl('🌍 [已废弃] 旧世界规则：' + (m.meta.rule || ''));
+          div = addDirectorEl(' [已废弃] 旧世界规则：' + (m.meta.rule || ''));
         } else if (m.meta && m.meta.metaCmd) {
           // 元指令用户消息：剥离附件区 + META_INSTRUCTION 后缀
           const cleaned = stripAttachBlock(m.content).replace(/\n*【系统级元指令[\s\S]*$/, '');
@@ -3509,12 +3509,12 @@
     function fileMimeFor(type) { return FILE_MIME_MAP[(type||'').toLowerCase()] || 'text/plain'; }
     function fileIconFor(type) {
       const t = (type||'').toLowerCase();
-      if (t === 'json') return '🧾';
-      if (t === 'csv' || t === 'tsv') return '📊';
-      if (t === 'md' || t === 'markdown') return '📝';
-      if (t === 'html' || t === 'htm' || t === 'xml' || t === 'svg') return '🌐';
-      if (['js','mjs','ts','py','java','go','rs','c','cpp','h','cs','sh','bash','sql','css','yml','yaml'].includes(t)) return '📜';
-      return '📄';
+      if (t === 'json') return 'JSON';
+      if (t === 'csv' || t === 'tsv') return '表格';
+      if (t === 'md' || t === 'markdown') return '文档';
+      if (t === 'html' || t === 'htm' || t === 'xml' || t === 'svg') return '网页';
+      if (['js','mjs','ts','py','java','go','rs','c','cpp','h','cs','sh','bash','sql','css','yml','yaml'].includes(t)) return '代码';
+      return '文件';
     }
     function fmtFileBytes(n) {
       if (n < 1024) return n + ' B';
@@ -3544,13 +3544,13 @@
         +   '<div class="file-card-meta">' + escapeHtml(f.type.toUpperCase()) + ' · ' + fmtFileBytes(bytes) + ' · ' + lines + ' 行</div>'
         + '</div>'
         + '<button class="file-card-btn" data-fact="download" title="下载">⬇</button>'
-        + '<button class="file-card-btn" data-fact="copy" title="复制内容">📋</button>'
+        + '<button class="file-card-btn" data-fact="copy" title="复制内容">复制</button>'
         + '</div>';
     }
     function renderFileGeneratingHtml(name) {
       const showName = name ? escapeHtml(name) : '正在生成文件…';
       return '<div class="file-card generating">'
-        + '<div class="file-card-icon">📄</div>'
+        + '<div class="file-card-icon">文件</div>'
         + '<div class="file-card-body">'
         +   '<div class="file-card-name">' + showName + '</div>'
         +   '<div class="file-card-meta">写入中…</div>'
@@ -3806,7 +3806,7 @@
     async function sendMessage(directorPayload) {
       if (!sessionsLoaded && sessionsLoadPromise) await sessionsLoadPromise;
       if (isSending) return;
-      if (!API_KEY) { alert('请先点击右上角 ⚙️ 填写你的 API Key～'); openSettingsModal(); return; }
+      if (!API_KEY) { alert('请先点击右上角 设置 填写你的 API Key～'); openSettingsModal(); return; }
 
       const isDirector = !!directorPayload;
       const text = isDirector ? directorPayload.text : userInput.value.trim();
@@ -3816,7 +3816,7 @@
       const isStatOp = !isDirector && text.startsWith('!') && text.length > 1;
       // 兼容旧用户习惯：// 双斜杠开头的旧世界规则指令已废弃，直接拦截避免被当元指令发出
       if (!isDirector && !isStatOp && text.startsWith('//')) {
-        alert('🌍 // 世界规则功能已废弃哦～\n现在请用 ! 命令直接改数值，比如：\n  !好感+10\n  !信任=50\n  !好感重置');
+        alert(' // 世界规则功能已废弃哦～\n现在请用 ! 命令直接改数值，比如：\n  !好感+10\n  !信任=50\n  !好感重置');
         return;
       }
       // 检测元指令（单斜杠开头，单次出戏对话）
@@ -3827,7 +3827,7 @@
       if (isStatOp) {
         statOpParsed = parseStatOp(text);
         if (!statOpParsed) {
-          alert('⚡ 数值操作格式不对哦～\n\n支持的格式：\n  !好感+1000   (加)\n  !好感-50     (减)\n  !好感=100    (直接设为)\n  !信任+/-/=N  (信任同理)\n  !重置  或  !清零   (好感和信任都归零)\n  !好感重置 / !信任重置 (单独重置)');
+          alert(' 数值操作格式不对哦～\n\n支持的格式：\n  !好感+1000   (加)\n  !好感-50     (减)\n  !好感=100    (直接设为)\n  !信任+/-/=N  (信任同理)\n  !重置  或  !清零   (好感和信任都归零)\n  !好感重置 / !信任重置 (单独重置)');
           return;
         }
       }
@@ -3911,7 +3911,7 @@
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
       const charBlock = (character && (character.name || character.description))
-        ? `\n\n# 🎭 角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
+        ? `\n\n#  角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
         : '';
       const systemContent = (SYSTEM_PROMPT.trim() + charBlock).trim();
 
@@ -4050,7 +4050,7 @@
         sessions[currentId].stats[key] = v;
         renderStats(sessions[currentId].stats);
         const clampedHint = v !== raw ? `  (输入 ${raw} 已截断至 ${v})` : '';
-        const summary = `⚡ ${label}度 手动设为 ${v}：${cur} → ${v}${clampedHint}`;
+        const summary = ` ${label}度 手动设为 ${v}：${cur} → ${v}${clampedHint}`;
         const opCmd = key === 'affection' ? `!好感=${v}` : `!信任=${v}`;
         const msgObj = { role: 'user', content: opCmd, meta: { statOp: true, summary } };
         sessions[currentId].messages.push(msgObj);
@@ -4308,7 +4308,7 @@
 
     async function regenerateRequest() {
       if (isSending || !currentId) return;
-      if (!API_KEY) { alert('请先点击右上角 ⚙️ 填写你的 API Key～'); openSettingsModal(); return; }
+      if (!API_KEY) { alert('请先点击右上角 设置 填写你的 API Key～'); openSettingsModal(); return; }
       const msgs = sessions[currentId].messages;
       let lastUserIdx = -1;
       for (let i = msgs.length - 1; i >= 0; i--) {
@@ -4339,7 +4339,7 @@
       // 角色卡（人设）注入到 SYSTEM_PROMPT 之后
       const character = sessions[currentId].character;
       const charBlock = (character && (character.name || character.description))
-        ? `\n\n# 🎭 角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
+        ? `\n\n#  角色卡（本次扮演的具体角色，请严格按此人设回应）\n${character.name ? `**角色名**：${character.name}\n` : ''}${character.description ? `**角色设定**：\n${character.description}\n` : ''}请始终保持上述人设，每轮回复都要符合这个角色的性格、说话方式、背景设定。`
         : '';
       const systemContent = (SYSTEM_PROMPT.trim() + charBlock).trim();
       const finalMessages = [];
@@ -4729,7 +4729,7 @@
     });
     document.getElementById('charLoadTpl').addEventListener('click', () => {
       const templates = loadCharacterTemplates();
-      if (!templates.length) { alert('还没有保存的角色卡模板哦～\n先填好角色信息，再点"💾 保存为模板"'); return; }
+      if (!templates.length) { alert('还没有保存的角色卡模板哦～\n先填好角色信息，再点" 保存为模板"'); return; }
       const list = templates.map((t, i) => `${i+1}. ${t.name || '（无名）'}${t.description ? '  -  ' + t.description.slice(0, 30) + (t.description.length > 30 ? '…' : '') : ''}`).join('\n');
       const input = prompt(`请输入要加载的模板编号 (1-${templates.length})：\n\n${list}`);
       if (!input) return;
@@ -4745,7 +4745,7 @@
       const templates = loadCharacterTemplates();
       templates.push({ name, description: desc, savedAt: Date.now() });
       saveCharacterTemplates(templates);
-      alert(`✅ 已保存为模板（当前共 ${templates.length} 个）`);
+      alert(` 已保存为模板（当前共 ${templates.length} 个）`);
     });
     document.getElementById('charDelTpl').addEventListener('click', () => {
       const templates = loadCharacterTemplates();
@@ -4758,7 +4758,7 @@
       if (!confirm(`确定要删除模板 "${templates[idx].name || '（无名）'}" 吗？`)) return;
       templates.splice(idx, 1);
       saveCharacterTemplates(templates);
-      alert('✅ 已删除');
+      alert(' 已删除');
     });
 
     // ===== 角色卡文件导出/导入（社群分享用，与对话备份格式区分） =====
@@ -4803,7 +4803,7 @@
           const data = JSON.parse(ev.target.result);
           // 类型识别：拒绝对话备份文件
           if (data && data.sessions && !data.character) {
-            alert('这是对话备份文件哦～\n要导入对话请去 ☰ 历史栏里点 📥 按钮\n这里只能导入角色卡文件');
+            alert('这是对话备份文件哦～\n要导入对话请去 菜单 历史栏里点 导入 按钮\n这里只能导入角色卡文件');
             return;
           }
           if (!data || data.type !== 'character-card' || !data.character) {
@@ -4813,7 +4813,7 @@
           const ch = data.character;
           charNameInput.value = ch.name || '';
           charDescInput.value = ch.description || '';
-          alert(`✅ 角色卡已导入：${ch.name || '（无名）'}\n\n📝 还需点击下方「保存」按钮才会生效到当前对话\n💾 想永久保留请点「保存为模板」`);
+          alert(` 角色卡已导入：${ch.name || '（无名）'}\n\n文档 还需点击下方「保存」按钮才会生效到当前对话\n 想永久保留请点「保存为模板」`);
         } catch(err) {
           alert('导入失败：' + err.message);
         }
@@ -4846,7 +4846,7 @@
     // 导出当前单个对话（格式与全量导出一致，导入时自动合并）
     function exportCurrentSession() {
       if (!currentId || !sessions[currentId]) {
-        alert('当前还没有打开任何对话哦～\n请先在 ☰ 历史里选一个，或开始一段新对话～');
+        alert('当前还没有打开任何对话哦～\n请先在 菜单 历史里选一个，或开始一段新对话～');
         return;
       }
       const s = sessions[currentId];
@@ -4877,7 +4877,7 @@
           const data = JSON.parse(e.target.result);
           // 友好提示：用户传了角色卡文件
           if (data && data.type === 'character-card') {
-            alert('这是角色卡文件哦～\n要导入角色卡请打开 👤 角色卡，点底部「📥 导入角色卡文件」\n这里只能导入对话备份文件');
+            alert('这是角色卡文件哦～\n要导入角色卡请打开角色卡，点底部「导入角色卡文件」\n这里只能导入对话备份文件');
             return;
           }
           if (!data || !data.sessions || typeof data.sessions !== 'object') {
@@ -4898,7 +4898,7 @@
           }
           saveSessions();
           renderHistoryList();
-          alert(`✅ 成功导入！\n对话总数：${Object.keys(sessions).length}\n模板总数：${loadCharacterTemplates().length}`);
+          alert(` 成功导入！\n对话总数：${Object.keys(sessions).length}\n模板总数：${loadCharacterTemplates().length}`);
         } catch(err) {
           alert('导入失败：' + err.message);
         }
@@ -4993,8 +4993,8 @@
     // 单文件全文注入上限：这里是“字符”不是 token。
     // 30 万字符足够覆盖约 2 万字小说/Java 文档；再大就很容易撞到模型上下文上限。
     const MAX_FILE_CHARS = 300000;
-    const ATTACH_START = '【📎附件区开始】';
-    const ATTACH_END   = '【📎附件区结束】';
+    const ATTACH_START = '【附件附件区开始】';
+    const ATTACH_END   = '【附件附件区结束】';
 
     // 纯文本类扩展名（零依赖直接 FileReader 读）
     const TEXT_EXTS = new Set([
@@ -5097,12 +5097,12 @@
       return (bytes / 1024 / 1024).toFixed(2) + 'MB';
     }
     function fileIcon(ext) {
-      if (ext === 'pdf') return '📕';
-      if (['docx','doc'].includes(ext)) return '📘';
-      if (['xlsx','xls','xlsm','ods','csv'].includes(ext)) return '📗';
-      if (['json','xml','yml','yaml','toml','ini'].includes(ext)) return '⚙️';
-      if (['js','ts','py','java','go','rs','c','cpp','rb','php','sh'].includes(ext)) return '💻';
-      return '📄';
+      if (ext === 'pdf') return 'PDF';
+      if (['docx','doc'].includes(ext)) return 'DOC';
+      if (['xlsx','xls','xlsm','ods','csv'].includes(ext)) return '表格';
+      if (['json','xml','yml','yaml','toml','ini'].includes(ext)) return '设置';
+      if (['js','ts','py','java','go','rs','c','cpp','rb','php','sh'].includes(ext)) return '代码';
+      return '文件';
     }
 
     function renderFileChips() {
@@ -5117,7 +5117,7 @@
         const chip = document.createElement('div');
         chip.className = 'file-chip' + (f.status === 'parsing' ? ' parsing' : f.status === 'error' ? ' error' : '');
         const ext = getFileExt(f.name);
-        const status = f.status === 'parsing' ? ' (解析中…)' : f.status === 'error' ? ' (失败)' : (f.truncated ? ' ⚠️截断' : '');
+        const status = f.status === 'parsing' ? ' (解析中…)' : f.status === 'error' ? ' (失败)' : (f.truncated ? ' 提示：截断' : '');
 
         // 用 DOM API 创建避免文件名含 < > & 等字符引发的显示错乱/XSS
         const iconSpan = document.createElement('span');
@@ -5135,7 +5135,7 @@
         const delBtn = document.createElement('button');
         delBtn.className = 'fc-del';
         delBtn.title = '移除';
-        delBtn.textContent = '✕';
+        delBtn.textContent = '?';
         delBtn.addEventListener('click', () => {
           pendingFiles = pendingFiles.filter(x => x.id !== f.id);
           renderFileChips();
@@ -5180,7 +5180,7 @@
       const ready = pendingFiles.filter(f => f.status === 'ok');
       if (!ready.length) return { text: '', names: [] };
       const parts = ready.map(f => {
-        const hint = f.truncated ? `（⚠️ 文件超长，仅保留前 ${MAX_FILE_CHARS} 字符）` : '';
+        const hint = f.truncated ? `（提示：文件超长，仅保留前 ${MAX_FILE_CHARS} 字符）` : '';
         return `\n----- 文件：${f.name}${hint} -----\n${f.content}`;
       });
       const text = `${ATTACH_START}\n用户附加了 ${ready.length} 个文件，请结合内容回应：${parts.join('\n')}\n${ATTACH_END}\n\n`;
@@ -5200,7 +5200,7 @@
       names.forEach(n => {
         const tag = document.createElement('span');
         tag.className = 'attach-tag';
-        tag.textContent = (n.truncated ? '⚠️' : '📎') + ' ' + n.name;
+        tag.textContent = (n.truncated ? '提示：' : '附件') + ' ' + n.name;
         wrap.appendChild(tag);
       });
       parentEl.insertBefore(wrap, parentEl.firstChild);
@@ -5315,7 +5315,7 @@ ${convo}
       return div;
     }
 
-    // 更新 statsBar 上 🧠 按钮的视觉状态
+    // 更新 statsBar 上 记忆 按钮的视觉状态
     function updateMemoryBtn(state) {
       const btn = document.getElementById('memoryBtn');
       if (!btn) return;
@@ -5328,7 +5328,7 @@ ${convo}
       const s = currentId && sessions[currentId];
       if (s && s.memory && s.memory.summary) {
         btn.classList.add('has-memory');
-        btn.textContent = '记忆 ✓';
+        btn.textContent = '记忆 完成';
       } else {
         btn.textContent = '记忆';
       }
@@ -5341,7 +5341,7 @@ ${convo}
       const s = sessions[sessionId];
       if (!s || !s.messages) return false;
       if (!API_KEY) {
-        if (manualTrigger) { alert('请先在 ⚙️ 设置中填写 API Key～'); openSettingsModal(); }
+        if (manualTrigger) { alert('请先在设置中填写 API Key～'); openSettingsModal(); }
         return false;
       }
 
@@ -5356,7 +5356,7 @@ ${convo}
       const prevSummary = (s.memory && s.memory.summary) || '';
 
       isCompressing = true;
-      const compressDiv = addCompressEl(`🧠 整理长期记忆中…(把 ${messagesToCompress.length} 条历史压缩成剧情大纲)`);
+      const compressDiv = addCompressEl(`记忆 整理长期记忆中…(把 ${messagesToCompress.length} 条历史压缩成剧情大纲)`);
       updateMemoryBtn('compressing');
 
       try {
@@ -5401,12 +5401,12 @@ ${convo}
           updatedAt: Date.now()
         };
         saveSessions();
-        compressDiv.innerText = `✅ 记忆整理完成 · 压缩了 ${messagesToCompress.length} 条历史 · 大纲 ${summary.length} 字 · 点 🧠 按钮可查看`;
+        compressDiv.innerText = ` 记忆整理完成 · 压缩了 ${messagesToCompress.length} 条历史 · 大纲 ${summary.length} 字 · 点 记忆 按钮可查看`;
         updateMemoryBtn();
         return true;
       } catch(err) {
         compressDiv.classList.add('error');
-        compressDiv.innerText = '❌ 记忆压缩失败：' + err.message + (manualTrigger ? '' : '（下次满足条件时会重试）');
+        compressDiv.innerText = ' 记忆压缩失败：' + err.message + (manualTrigger ? '' : '（下次满足条件时会重试）');
         updateMemoryBtn();
         if (manualTrigger) alert('压缩失败：' + err.message);
         return false;
@@ -5431,11 +5431,11 @@ ${convo}
     // 构造发给 AI 时的"长期记忆"system 消息(把 summary 包成醒目提示)
     function buildMemorySystemBlock(memory) {
       if (!memory || !memory.summary) return '';
-      return `# 📖 长期剧情记忆（早期对话的压缩大纲，是后续剧情的事实基础）
+      return `# 记忆 长期剧情记忆（早期对话的压缩大纲，是后续剧情的事实基础）
 
 ${memory.summary}
 
-⚠️ 上面是已经发生过的剧情大纲，请基于这些事实继续后续角色扮演，保持剧情、关系、人物状态的连贯性。不要遗忘大纲里提到的关键事件、承诺和心理状态。`;
+提示：上面是已经发生过的剧情大纲，请基于这些事实继续后续角色扮演，保持剧情、关系、人物状态的连贯性。不要遗忘大纲里提到的关键事件、承诺和心理状态。`;
     }
 
     // ===== 记忆面板 UI =====
