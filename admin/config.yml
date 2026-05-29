@@ -84,7 +84,8 @@ collections:
       - label: "正文"
         name: "body"
         widget: "markdown"
-        hint: "正文编辑器里可以直接插入图片或 GIF，生成的 ![说明](图片地址) 会在文章页正常显示。"
+        modes: ["raw"]
+        hint: "这里使用 Markdown 源码模式，避免 Decap 富文本图片组件显示破图。插入图片/GIF 写成：![说明](/assets/uploads/文件名.gif)，前台文章页会正常显示。"
         default: |
           ## 背景
           这里写清楚为什么要做这件事，问题来自哪里。

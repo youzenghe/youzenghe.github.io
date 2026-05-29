@@ -22,3 +22,11 @@ python scripts/build_content.py
 ```
 
 然后把 `content/` 里的 Markdown / JSON 生成到 `js/data.js`，再部署到 GitHub Pages。
+
+文章正文使用 Markdown 源码模式。插入图片或 GIF 时先在“媒体”里上传文件，然后在正文里写：
+
+```md
+![说明](/assets/uploads/cmd-bg.jpg)
+```
+
+不要切回富文本图片组件；Decap 的富文本图片块在当前站点路径下容易显示破损占位符，但 Markdown 源码发布到前台是稳定的。
