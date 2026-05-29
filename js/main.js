@@ -102,6 +102,23 @@ function resolvePagePath(path) {
   return `${getSiteConfig().rootPrefix}${path}`;
 }
 
+function normalizeLocalAssetPath(path) {
+  return path.replace(/^\.\.\//, '').replace(/^\//, '');
+}
+
+function resolveAssetUrl(path) {
+  if (!path || /^https?:\/\//i.test(path)) return path;
+  return `${getSiteConfig().rootPrefix}${normalizeLocalAssetPath(path)}`;
+}
+
+function resolveThumbnailUrl(path) {
+  if (!path || /^https?:\/\//i.test(path)) return path;
+  const normalized = normalizeLocalAssetPath(path);
+  if (!normalized.startsWith('assets/')) return resolveAssetUrl(path);
+  const withoutAssets = normalized.slice('assets/'.length);
+  return `${getSiteConfig().rootPrefix}assets/thumbs/${withoutAssets.replace(/\.[^.]+$/, '.webp')}`;
+}
+
 function normalizePageUrl(url) {
   const next = new URL(url, location.href);
   next.hash = '';

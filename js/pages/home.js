@@ -12,10 +12,12 @@ window.SiteApp.registerPage('home', () => {
     el.className = 'post-card reveal';
     el.style.transitionDelay = `${index * 0.1}s`;
     el.href = `pages/post.html?id=${post.id}`;
+    const cover = resolveAssetUrl(post.cover);
+    const thumb = resolveThumbnailUrl(post.cover);
     el.innerHTML = `
       <div class="post-card-img">
         ${post.cover
-          ? `<div class="img-bg" style="background-image:url('${post.cover.replace('../', '')}')"></div><img src="${post.cover.replace('../', '')}" alt="${post.title}" loading="lazy" decoding="async">`
+          ? `<div class="img-bg" style="background-image:url('${thumb}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${post.title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">`
           : post.emoji}
       </div>
       <div class="post-card-body">
@@ -37,10 +39,12 @@ window.SiteApp.registerPage('home', () => {
   function buildProjectCard(project) {
     const el = document.createElement('div');
     el.className = 'bm-card reveal';
+    const image = resolveAssetUrl(project.img);
+    const thumb = resolveThumbnailUrl(project.img);
     el.innerHTML = `
       <div class="bm-cover">
         ${project.img
-          ? `<div class="img-bg" style="position:absolute;inset:-4px;background:url('${project.img.replace('../', '')}') center/cover;filter:blur(10px) brightness(0.5);transform:scale(1.05)"></div><img src="${project.img.replace('../', '')}" alt="${project.title}" loading="lazy" decoding="async" style="position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block">`
+          ? `<div class="img-bg" style="position:absolute;inset:-4px;background:url('${thumb}') center/cover;filter:blur(10px) brightness(0.5);transform:scale(1.05)"></div><img src="${thumb}" data-full-src="${image}" alt="${project.title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc" style="position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block">`
           : project.emoji}
       </div>
       <div class="bm-info">

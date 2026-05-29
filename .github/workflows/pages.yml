@@ -27,6 +27,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install image tools
+        run: python -m pip install Pillow
+
+      - name: Generate thumbnails
+        run: python scripts/generate_thumbnails.py
+
       - name: Build content bundle
         run: python scripts/build_content.py
 

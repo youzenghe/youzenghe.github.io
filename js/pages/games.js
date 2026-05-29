@@ -17,8 +17,10 @@ window.SiteApp.registerPage('games', () => {
       });
 
       const eagerImage = index < 2;
+      const image = resolveAssetUrl(game.image);
+      const thumb = resolveThumbnailUrl(game.image);
       const imageContent = game.image
-        ? `<img src="${game.image}" alt="${game.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async"${index === 0 ? ' fetchpriority="high"' : ''}>`
+        ? `<img src="${thumb}" data-full-src="${image}" alt="${game.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''}>`
         : game.previewEmoji;
       card.innerHTML = `
         <div class="game-card-img">${imageContent}</div>
@@ -50,7 +52,7 @@ window.SiteApp.registerPage('games', () => {
     document.getElementById('modal-game-status').textContent = game.status;
     document.getElementById('modal-download-link').href = game.downloadLink;
     document.getElementById('modal-game-image').innerHTML = game.image
-      ? `<img src="${game.image}" alt="${game.title}" decoding="async">`
+      ? `<img src="${resolveAssetUrl(game.image)}" alt="${game.title}" decoding="async">`
       : game.previewEmoji;
     const modal = document.getElementById('game-modal');
     modal.style.display = 'flex';

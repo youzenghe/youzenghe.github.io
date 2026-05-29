@@ -25,8 +25,10 @@ window.SiteApp.registerPage('posts', () => {
 
   function renderCard(post, simple = false, index = 0) {
     const eagerImage = index < 2;
+    const cover = resolveAssetUrl(post.cover);
+    const thumb = resolveThumbnailUrl(post.cover);
     const thumbContent = post.cover
-      ? `<div class="img-bg" style="background-image:url('${post.cover}')"></div><img src="${post.cover}" alt="${post.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async"${index === 0 ? ' fetchpriority="high"' : ''} />`
+      ? `<div class="img-bg" style="background-image:url('${thumb}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${post.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
       : post.emoji;
     const tags = simple ? '' : `<div class="plc-tags">${post.tags.map((tag) => `<span class="plc-tag">#${tag}</span>`).join('')}</div>`;
     const readMeta = simple ? '' : `<span>· ${post.readTime} min</span>`;

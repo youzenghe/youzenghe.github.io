@@ -90,13 +90,15 @@ window.SiteApp.registerPage('projects', () => {
 
     currentProjectList.forEach((project, index) => {
       const eagerImage = index < 2;
+      const projectImage = resolveAssetUrl(project.img);
+      const projectThumb = resolveThumbnailUrl(project.img);
       const card = document.createElement('div');
       card.className = 'proj-card reveal';
       card.style.transitionDelay = `${index * 0.07}s`;
       card.innerHTML = `
         <div class="proj-preview" data-idx="${index}">
           ${project.img
-            ? `<img src="${project.img}" alt="${project.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async"${index === 0 ? ' fetchpriority="high"' : ''} />`
+            ? `<img src="${projectThumb}" data-full-src="${projectImage}" alt="${project.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
             : `<div class="proj-preview-placeholder"><span class="p-emoji">${project.emoji}</span><span class="p-hint">暂无预览图</span></div>`}
         </div>
         <div class="proj-body">
@@ -124,7 +126,7 @@ window.SiteApp.registerPage('projects', () => {
     if (!project) return;
 
     document.getElementById('lb-img-box').innerHTML = project.img
-      ? `<img src="${project.img}" alt="${project.title}" decoding="async" />`
+      ? `<img src="${resolveAssetUrl(project.img)}" alt="${project.title}" decoding="async" />`
       : `<div class="lb-placeholder"><span class="lbp-emoji">${project.emoji}</span><span class="lbp-name">${project.title}</span><span class="lbp-hint">暂时没有上传预览图</span></div>`;
 
     document.getElementById('lb-info').innerHTML = `
