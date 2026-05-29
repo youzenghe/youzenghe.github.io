@@ -6,9 +6,10 @@ series: 荣誉证明
 catColor: "#fbbf24"
 date: 2025-09-20
 status: published
+featured: true
 readTime: 3
 emoji: 📜
-cover: ../assets/posts/软著1.webp
+cover: ../assets/posts/流萤1.gif
 excerpt: 两本软著对应两个完整项目。这里记录一下项目边界、技术栈和申请材料准备时踩过的坑。
 tags:
   - 软著
