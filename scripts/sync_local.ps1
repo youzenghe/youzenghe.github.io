@@ -20,8 +20,13 @@ function Write-SyncLog {
 function Invoke-Git {
   param([string[]]$Arguments)
 
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
   $output = & git -C $RepoPath @Arguments 2>&1
-  if ($LASTEXITCODE -ne 0) {
+  $exitCode = $LASTEXITCODE
+  $ErrorActionPreference = $previousErrorActionPreference
+
+  if ($exitCode -ne 0) {
     throw ($output -join [Environment]::NewLine)
   }
   return $output
