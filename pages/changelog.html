@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>更新日志 · 次元日记</title>
+  <meta name="description" content="记录次元日记的功能更新、性能优化和内容调整。" />
+  <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/changelog.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://yzh1019.top/pages/changelog.html" />
+  <meta property="og:site_name" content="次元日记" />
+  <meta property="og:title" content="更新日志 · 次元日记" />
+  <meta property="og:description" content="记录次元日记的功能更新、性能优化和内容调整。" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta property="og:image:alt" content="次元日记更新日志封面" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="更新日志 · 次元日记" />
+  <meta name="twitter:description" content="记录次元日记的功能更新、性能优化和内容调整。" />
+  <meta name="twitter:image" content="https://yzh1019.top/assets/avatar.png" />
+  <meta name="twitter:image:alt" content="次元日记更新日志封面" />
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js" defer></script>
+  <style>
+    .changelog-page { padding-bottom: 6rem; }
+    .changelog-list {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .change-card {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 1.2rem;
+      padding: 1.2rem;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+    }
+    .change-date {
+      font-family: var(--font-ui);
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+    }
+    .change-type {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 0.55rem;
+      padding: 0.16rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--sakura);
+      font-size: 0.72rem;
+    }
+    .change-title {
+      font-family: var(--font-display);
+      font-size: 1.12rem;
+      margin-bottom: 0.65rem;
+    }
+    .change-items {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-size: 0.88rem;
+    }
+    @media (max-width: 640px) {
+      .change-card { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-root-prefix="../" data-active-nav="" data-loader-text="加载更新日志中...">
+  <div id="site-shell-top"></div>
+  <main class="site-wrapper changelog-page" id="main-content" tabindex="-1">
+    <div class="page-hero reveal">
+      <div class="section-label">Changelog</div>
+      <h1>更新日志</h1>
+      <p>把站点功能、性能和内容调整留一份清楚记录，方便以后复盘。</p>
+    </div>
+    <section class="changelog-list" id="changelog-list" aria-label="更新日志列表"></section>
+  </main>
+  <div id="site-shell-bottom"></div>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/changelog.js" defer></script>
+</body>
+</html>

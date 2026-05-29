@@ -24,6 +24,25 @@ window.SiteApp.registerPage('post-detail', () => {
     return temp.textContent?.replace(/\s+/g, ' ').trim() || '';
   }
 
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[char]);
+  }
+
+  function highlightCode(code) {
+    const raw = code.textContent || '';
+    const highlighted = escapeHtml(raw)
+      .replace(/(\/\/.*)$/gm, '<span class="code-token-comment">$1</span>')
+      .replace(/(&quot;.*?&quot;|&#39;.*?&#39;|`.*?`)/g, '<span class="code-token-string">$1</span>')
+      .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|from|export|async|await|def|try|except|catch|finally)\b/g, '<span class="code-token-keyword">$1</span>');
+    code.innerHTML = highlighted;
+  }
+
   document.title = `${post.title} · 次元日记`;
   setMeta('meta[name="description"]', 'content', post.excerpt);
   setMeta('meta[property="og:url"]', 'content', `https://yzh1019.top/pages/post.html?id=${post.id}`);
@@ -76,6 +95,7 @@ window.SiteApp.registerPage('post-detail', () => {
         <span>📅 ${post.date}</span>
         <span>⏱ ${post.readTime} 分钟阅读</span>
         <span>🏷 ${post.tags.join(' · ')}</span>
+        ${post.series ? `<span>📚 ${post.series}</span>` : ''}
       </div>
     `;
   }
@@ -92,19 +112,67 @@ window.SiteApp.registerPage('post-detail', () => {
     body.innerHTML = post.content;
   }
 
+  document.querySelectorAll('.code-block code').forEach(highlightCode);
+  document.querySelectorAll('.copy-code-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.textContent = '已复制';
+        window.setTimeout(() => {
+          btn.textContent = '复制';
+        }, 1200);
+      } catch (error) {
+        btn.textContent = '复制失败';
+      }
+    });
+  });
+
+  const gallery = document.getElementById('post-gallery');
+  if (gallery) {
+    const images = Array.isArray(post.images) ? post.images : [];
+    gallery.replaceChildren(...images.map((src) => {
+      const img = document.createElement('img');
+      img.src = resolveThumbnailUrl(src);
+      img.dataset.fullSrc = resolveAssetUrl(src);
+      img.alt = `${post.title} 图片`;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = img.dataset.fullSrc;
+      };
+      return img;
+    }));
+  }
+
   const tags = document.getElementById('post-tags');
   if (tags) {
     tags.innerHTML = post.tags.map((tag) => `<span class="post-tag">#${tag}</span>`).join('');
   }
 
   const toc = document.getElementById('toc');
+  const tocLinks = [];
   if (toc) {
     toc.innerHTML = '';
-    document.querySelectorAll('.post-body h2').forEach((heading, index) => {
+    document.querySelectorAll('.post-body h2, .post-body h3').forEach((heading, index) => {
       heading.id = `heading-${index}`;
-      toc.innerHTML += `<li><a href="#heading-${index}">${heading.textContent}</a></li>`;
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `#heading-${index}`;
+      link.textContent = heading.textContent;
+      if (heading.tagName === 'H3') link.style.paddingLeft = '1.2rem';
+      item.appendChild(link);
+      toc.appendChild(item);
+      tocLinks.push(link);
     });
   }
+
+  const tocToggle = document.getElementById('toc-toggle');
+  tocToggle?.addEventListener('click', () => {
+    const opened = toc?.classList.toggle('open') || false;
+    tocToggle.setAttribute('aria-expanded', String(opened));
+  });
 
   const related = POSTS.filter((item) => item.id !== id && item.cat === post.cat).slice(0, 3);
   const relatedEl = document.getElementById('related');
@@ -126,8 +194,23 @@ window.SiteApp.registerPage('post-detail', () => {
   }
 
   const backToTop = document.getElementById('back-to-top');
+  const progress = document.getElementById('reading-progress');
+  const headings = Array.from(document.querySelectorAll('.post-body h2, .post-body h3'));
   const syncBackToTop = () => {
     backToTop?.classList.toggle('visible', window.scrollY > 520);
+
+    const doc = document.documentElement;
+    const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+    const percent = Math.min(100, Math.max(0, (window.scrollY / max) * 100));
+    if (progress) progress.style.width = `${percent}%`;
+
+    let activeIndex = 0;
+    headings.forEach((heading, index) => {
+      if (heading.getBoundingClientRect().top <= 120) activeIndex = index;
+    });
+    tocLinks.forEach((link, index) => {
+      link.classList.toggle('active', index === activeIndex);
+    });
   };
   const scrollToTop = (event) => {
     event.preventDefault();

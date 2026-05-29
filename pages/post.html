@@ -40,6 +40,16 @@
   <link rel="stylesheet" href="../css/main.css" />
   <script src="../js/site-shell.js" defer></script>
   <style>
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      z-index: 1200;
+      background: linear-gradient(90deg, var(--sakura-deep), var(--accent2));
+      transition: width 0.08s linear;
+    }
     .post-layout {
       display: grid;
       grid-template-columns: 1fr 260px;
@@ -129,6 +139,68 @@
       color: var(--text-muted);
       font-style: italic;
     }
+    .post-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.18rem;
+      margin: 1.6rem 0 0.6rem;
+      color: var(--text);
+    }
+    .code-block {
+      margin: 1.5rem 0;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--glass-border);
+      background: rgba(8, 4, 14, 0.72);
+      overflow: hidden;
+    }
+    .code-block figcaption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0.8rem;
+      border-bottom: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-family: var(--font-ui);
+    }
+    .copy-code-btn {
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.22rem 0.65rem;
+      cursor: pointer;
+      font-size: 0.72rem;
+    }
+    .copy-code-btn:hover { background: var(--glass-mid); }
+    .code-block pre {
+      margin: 0;
+      padding: 1rem;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+    .code-block code {
+      font-family: Consolas, "Cascadia Code", "Fira Code", monospace;
+      font-size: 0.84rem;
+      color: #e7d9ff;
+    }
+    .code-token-keyword { color: #67e8f9; }
+    .code-token-string { color: #f9a8c9; }
+    .code-token-comment { color: rgba(237,228,245,0.46); }
+    .post-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .post-gallery img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+    }
     .post-tags {
       display: flex;
       flex-wrap: wrap;
@@ -184,6 +256,19 @@
     .post-sidebar {
       position: sticky;
       top: 90px;
+    }
+    .toc-toggle {
+      display: none;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      cursor: pointer;
+      margin-bottom: 0.8rem;
     }
     .toc-list { list-style: none; }
     .toc-list li { padding: 0.3rem 0; }
@@ -267,6 +352,9 @@
     @media (max-width: 860px) {
       .post-layout { grid-template-columns: 1fr; }
       .post-sidebar { position: static; }
+      .toc-toggle { display: flex; }
+      .toc-list { display: none; }
+      .toc-list.open { display: block; }
     }
     @media (max-width: 768px) {
       .back-to-top { right: 1rem; bottom: 1rem; }
@@ -292,6 +380,7 @@
   </style>
 </head>
 <body data-root-prefix="../" data-active-nav="posts" data-loader-text="加载中..." data-footer-html="&lt;a href=&quot;posts.html&quot;&gt;← 返回文章列表&lt;/a&gt;">
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
   <div id="site-shell-top"></div>
 
   <main class="site-wrapper" id="main-content" tabindex="-1">
@@ -300,6 +389,7 @@
       <article class="post-main">
         <div class="post-cover" id="post-cover"></div>
         <div class="post-body reveal" id="post-body"></div>
+        <div class="post-gallery reveal" id="post-gallery"></div>
         <div class="post-tags reveal" id="post-tags"></div>
         <div class="prev-next reveal" id="prev-next"></div>
         <div class="post-reading-note reveal">文章到这里就结束啦，去看看相关文章，或者继续逛逛别的页面吧。</div>
@@ -307,6 +397,7 @@
 
       <aside class="post-sidebar">
         <div class="sidebar-widget reveal">
+          <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="false">目录 <span>⌄</span></button>
           <div class="sw-title">目录</div>
           <ul class="toc-list" id="toc"></ul>
         </div>

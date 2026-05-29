@@ -8,6 +8,8 @@ const POSTS = [
     "readTime": 4,
     "emoji": "🏆",
     "cover": "../assets/posts/人工智能大赛国一.webp",
+    "images": [],
+    "series": "荣誉证明",
     "excerpt": "这篇记录一次 AI 竞赛项目从立项、调参到答辩的过程，重点放在系统设计、数据问题和现场答辩。",
     "tags": [
       "人工智能",
@@ -25,6 +27,8 @@ const POSTS = [
     "readTime": 3,
     "emoji": "📜",
     "cover": "../assets/posts/软著1.webp",
+    "images": [],
+    "series": "荣誉证明",
     "excerpt": "两本软著对应两个完整项目。这里记录一下项目边界、技术栈和申请材料准备时踩过的坑。",
     "tags": [
       "软著",
@@ -42,6 +46,8 @@ const POSTS = [
     "readTime": 3,
     "emoji": "🥉",
     "cover": "../assets/posts/校园算法精英大赛省三.webp",
+    "images": [],
+    "series": "荣誉证明",
     "excerpt": "省三不是很高的名次，但它暴露了我当时在图论和动态规划上的短板。",
     "tags": [
       "算法",
@@ -59,6 +65,8 @@ const POSTS = [
     "readTime": 3,
     "emoji": "🏢",
     "cover": "../assets/posts/实习证明.webp",
+    "images": [],
+    "series": "荣誉证明",
     "excerpt": "第一次进入真实团队开发环境，最大的差异不是代码本身，而是需求沟通、协作节奏和交付标准。",
     "tags": [
       "实习",
@@ -76,6 +84,8 @@ const POSTS = [
     "readTime": 2,
     "emoji": "📋",
     "cover": "../assets/posts/软件引入证明.webp",
+    "images": [],
+    "series": "荣誉证明",
     "excerpt": "软件引入证明说明项目离开了演示环境，开始进入真实使用场景。这里记录它对项目验收的意义。",
     "tags": [
       "软件引入",
@@ -93,6 +103,8 @@ const POSTS = [
     "readTime": 2,
     "emoji": "👤",
     "cover": "../assets/posts/神本无相.webp",
+    "images": [],
+    "series": "趣味生活",
     "excerpt": "一次拿 AI 识图开玩笑的记录。结论很简单：模型没识别出人脸，但这事挺有节目效果。",
     "tags": [
       "趣事",
@@ -110,6 +122,8 @@ const POSTS = [
     "readTime": 4,
     "emoji": "🎮",
     "cover": "../assets/posts/我深思熟虑，准备做一个由乔瓮执笔的GalGame.webp",
+    "images": [],
+    "series": "趣味生活",
     "excerpt": "准备做一款 GalGame，先把动机、剧本分工和当前进度记下来，免得这个坑开了就忘。",
     "tags": [
       "GalGame",
@@ -136,7 +150,11 @@ const PROJECTS = [
     "award": "gold",
     "awardText": "🥇 省级一等奖",
     "emoji": "⚖️",
-    "img": "../assets/projects/legalmind.webp"
+    "img": "../assets/projects/legalmind.webp",
+    "images": [
+      "../assets/projects/legalmind.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 2,
@@ -153,7 +171,11 @@ const PROJECTS = [
     "award": "silver",
     "awardText": "🥈 河南省二等奖",
     "emoji": "🏛️",
-    "img": "../assets/projects/moment-henan.webp"
+    "img": "../assets/projects/moment-henan.webp",
+    "images": [
+      "../assets/projects/moment-henan.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 3,
@@ -170,7 +192,11 @@ const PROJECTS = [
     "award": "none",
     "awardText": "合作项目",
     "emoji": "☁️",
-    "img": "../assets/projects/fuguang-cloud-classroom.webp"
+    "img": "../assets/projects/fuguang-cloud-classroom.webp",
+    "images": [
+      "../assets/projects/fuguang-cloud-classroom.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 4,
@@ -187,7 +213,11 @@ const PROJECTS = [
     "award": "bronze",
     "awardText": "🥉 赛区三等奖",
     "emoji": "📑",
-    "img": "../assets/projects/law-contract-assistant.webp"
+    "img": "../assets/projects/law-contract-assistant.webp",
+    "images": [
+      "../assets/projects/law-contract-assistant.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 5,
@@ -204,7 +234,11 @@ const PROJECTS = [
     "award": "none",
     "awardText": "已上线",
     "emoji": "🌿",
-    "img": "../assets/projects/green-credit.webp"
+    "img": "../assets/projects/green-credit.webp",
+    "images": [
+      "../assets/projects/green-credit.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 6,
@@ -221,7 +255,11 @@ const PROJECTS = [
     "award": "silver",
     "awardText": "📝 软著申请中",
     "emoji": "🥋",
-    "img": "../assets/projects/quanyi-zhongyuan.webp"
+    "img": "../assets/projects/quanyi-zhongyuan.webp",
+    "images": [
+      "../assets/projects/quanyi-zhongyuan.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 7,
@@ -238,7 +276,11 @@ const PROJECTS = [
     "award": "gold",
     "awardText": "🥇 全国一等奖",
     "emoji": "📚",
-    "img": "../assets/projects/literary-knowledge-map.webp"
+    "img": "../assets/projects/literary-knowledge-map.webp",
+    "images": [
+      "../assets/projects/literary-knowledge-map.webp"
+    ],
+    "detail": ""
   },
   {
     "id": 8,
@@ -255,7 +297,11 @@ const PROJECTS = [
     "award": "silver",
     "awardText": "🛡️ 已获软著",
     "emoji": "🪶",
-    "img": "../assets/projects/poem-project.webp"
+    "img": "../assets/projects/poem-project.webp",
+    "images": [
+      "../assets/projects/poem-project.webp"
+    ],
+    "detail": ""
   }
 ];
 
@@ -284,11 +330,45 @@ const FRIEND_LINKS = [
   }
 ];
 
+const CHANGELOG = [
+  {
+    "date": "2026-05-30",
+    "title": "后台与阅读体验升级",
+    "type": "功能",
+    "items": [
+      "接入文章和项目多图管理字段，方便在后台补充过程截图。",
+      "增强文章详情页目录、代码块复制和阅读进度。",
+      "新增项目复盘详情页与更新日志页面。"
+    ]
+  },
+  {
+    "date": "2026-05-29",
+    "title": "首屏加载优化",
+    "type": "性能",
+    "items": [
+      "首页改为本地固定背景，页面切换时再预取随机背景。",
+      "生成缩略图并用于文章、项目、游戏列表。",
+      "移动端降低粒子和挂件开销。"
+    ]
+  },
+  {
+    "date": "2026-05-28",
+    "title": "站点气质调整",
+    "type": "体验",
+    "items": [
+      "弱化模板化装饰，强调技术博客、项目记录和复盘内容。",
+      "精简暂不需要的播放入口。",
+      "保留 ACG 视觉元素，但减少首屏网络依赖。"
+    ]
+  }
+];
+
 const SITE_DATA = Object.freeze({
   posts: POSTS,
   projects: PROJECTS,
   games: GAMES,
   friendLinks: FRIEND_LINKS,
+  changelog: CHANGELOG,
 });
 
 window.SITE_DATA = SITE_DATA;

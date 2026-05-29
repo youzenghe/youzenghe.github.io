@@ -1,0 +1,63 @@
+from __future__ import annotations
+
+import json
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CONTENT_DIR = ROOT / "content"
+SITE_URL = "https://yzh1019.top"
+SITEMAP = ROOT / "sitemap.xml"
+
+
+def read_json(name: str):
+    return json.loads((CONTENT_DIR / name).read_text(encoding="utf-8"))
+
+
+def add_url(urlset: ET.Element, loc: str) -> None:
+    url = ET.SubElement(urlset, "url")
+    loc_el = ET.SubElement(url, "loc")
+    loc_el.text = loc
+
+
+def main() -> None:
+    ET.register_namespace("", "http://www.sitemaps.org/schemas/sitemap/0.9")
+    urlset = ET.Element("{http://www.sitemaps.org/schemas/sitemap/0.9}urlset")
+
+    static_paths = [
+        "/",
+        "/index.html",
+        "/404.html",
+        "/pages/posts.html",
+        "/pages/projects.html",
+        "/pages/games.html",
+        "/pages/gallery.html",
+        "/pages/changelog.html",
+        "/pages/about.html",
+    ]
+    for path in static_paths:
+        add_url(urlset, f"{SITE_URL}{path}")
+
+    posts = sorted(read_json("posts.json")["posts"] if (CONTENT_DIR / "posts.json").exists() else [], key=lambda item: item["id"])
+    if not posts:
+        for post_file in sorted((CONTENT_DIR / "posts").glob("*.md")):
+            text = post_file.read_text(encoding="utf-8")
+            for line in text.splitlines():
+                if line.startswith("id:"):
+                    posts.append({"id": int(line.split(":", 1)[1].strip())})
+                    break
+
+    for post in posts:
+        add_url(urlset, f"{SITE_URL}/pages/post.html?id={post['id']}")
+
+    for project in sorted(read_json("projects.json")["projects"], key=lambda item: item["id"]):
+        add_url(urlset, f"{SITE_URL}/pages/project.html?id={project['id']}")
+
+    tree = ET.ElementTree(urlset)
+    ET.indent(tree, space="  ")
+    tree.write(SITEMAP, encoding="utf-8", xml_declaration=True)
+
+
+if __name__ == "__main__":
+    main()

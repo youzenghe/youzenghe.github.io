@@ -70,6 +70,10 @@ window.SiteApp.registerPage('posts', () => {
     initReveal();
   }
 
+  function clearFilterState() {
+    document.querySelectorAll('.filter-btn, .sw-series-btn').forEach((item) => item.classList.remove('active'));
+  }
+
   function renderPosts(category) {
     const list = category === '全部' ? POSTS : POSTS.filter((post) => post.cat === category);
     mountPosts(list);
@@ -81,7 +85,7 @@ window.SiteApp.registerPage('posts', () => {
       const btn = event.target.closest('.filter-btn');
       if (!btn) return;
 
-      document.querySelectorAll('.filter-btn').forEach((item) => item.classList.remove('active'));
+      clearFilterState();
       btn.classList.add('active');
       renderPosts(btn.dataset.cat);
     });
@@ -108,9 +112,32 @@ window.SiteApp.registerPage('posts', () => {
       el.textContent = `#${tag}`;
       el.addEventListener('click', () => {
         mountPosts(POSTS.filter((post) => post.tags.includes(tag)), true);
-        document.querySelectorAll('.filter-btn').forEach((item) => item.classList.remove('active'));
+        clearFilterState();
       });
       tagsEl.appendChild(el);
+    });
+  }
+
+  const seriesMap = {};
+  POSTS.forEach((post) => {
+    const series = post.series || post.cat || '未分组';
+    seriesMap[series] = (seriesMap[series] || 0) + 1;
+  });
+
+  const seriesEl = document.getElementById('sw-series');
+  if (seriesEl) {
+    seriesEl.innerHTML = '';
+    Object.entries(seriesMap).forEach(([series, count]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sw-series-btn';
+      btn.innerHTML = `<span>${series}</span><span class="sw-series-count">${count} 篇</span>`;
+      btn.addEventListener('click', () => {
+        clearFilterState();
+        btn.classList.add('active');
+        mountPosts(POSTS.filter((post) => (post.series || post.cat || '未分组') === series), true);
+      });
+      seriesEl.appendChild(btn);
     });
   }
 

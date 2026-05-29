@@ -135,6 +135,8 @@ function getPageKey(url = location.href) {
   if (path.endsWith('/pages/posts.html')) return 'posts';
   if (path.endsWith('/pages/post.html')) return 'post-detail';
   if (path.endsWith('/pages/projects.html')) return 'projects';
+  if (path.endsWith('/pages/project.html')) return 'project-detail';
+  if (path.endsWith('/pages/changelog.html')) return 'changelog';
   if (path.endsWith('/pages/games.html')) return 'games';
   if (path.endsWith('/pages/gallery.html')) return 'gallery';
   if (path.endsWith('/pages/about.html')) return 'about';
@@ -412,24 +414,77 @@ function initSearch() {
   if (!overlay || !input || !results || typeof POSTS === 'undefined' || overlay.dataset.inited === 'true') return;
   overlay.dataset.inited = 'true';
 
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[char]);
+  }
+
+  function stripHtml(html) {
+    const temp = document.createElement('div');
+    temp.innerHTML = html || '';
+    return temp.textContent?.replace(/\s+/g, ' ').trim() || '';
+  }
+
+  function escapeRegExp(text) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function mark(text, query) {
+    const safe = escapeHtml(text || '');
+    if (!query) return safe;
+    return safe.replace(new RegExp(escapeRegExp(query), 'gi'), (match) => `<mark>${match}</mark>`);
+  }
+
+  function postSearchText(post) {
+    return [
+      post.title,
+      post.excerpt,
+      post.cat,
+      post.series,
+      post.tags.join(' '),
+      stripHtml(post.content),
+    ].join(' ');
+  }
+
+  function resultExcerpt(post, query) {
+    const body = stripHtml(post.content);
+    if (!query) return post.excerpt;
+    const lowerBody = body.toLowerCase();
+    const index = lowerBody.indexOf(query.toLowerCase());
+    if (index < 0) return post.excerpt;
+
+    const start = Math.max(0, index - 32);
+    const end = Math.min(body.length, index + query.length + 72);
+    return `${start > 0 ? '...' : ''}${body.slice(start, end)}${end < body.length ? '...' : ''}`;
+  }
+
   function render(query) {
     const list = query
-      ? POSTS.filter((post) =>
-          post.title.includes(query) ||
-          post.excerpt.includes(query) ||
-          post.tags.some((tag) => tag.includes(query)))
+      ? POSTS.filter((post) => postSearchText(post).toLowerCase().includes(query.toLowerCase()))
       : POSTS;
 
     if (!list.length) {
-      results.innerHTML = `<div class="search-empty">没有找到“${query}”相关的文章</div>`;
+      const picks = POSTS.slice(0, 3).map((post) => `
+        <a class="search-result-item" href="${resolvePagePath('pages/post.html')}?id=${post.id}">
+          <div class="sri-cat">${escapeHtml(post.cat)}</div>
+          <div class="sri-title">${escapeHtml(post.title)}</div>
+          <div class="sri-excerpt">${escapeHtml(post.excerpt)}</div>
+        </a>
+      `).join('');
+      results.innerHTML = `<div class="search-empty">没有找到“${escapeHtml(query)}”相关的文章，先看看这些：</div>${picks}`;
       return;
     }
 
     results.innerHTML = list.map((post) => `
       <a class="search-result-item" href="${resolvePagePath('pages/post.html')}?id=${post.id}">
-        <div class="sri-cat">${post.cat}</div>
-        <div class="sri-title">${post.title}</div>
-        <div class="sri-excerpt">${post.excerpt}</div>
+        <div class="sri-cat">${mark(post.cat, query)}</div>
+        <div class="sri-title">${mark(post.title, query)}</div>
+        <div class="sri-excerpt">${mark(resultExcerpt(post, query), query)}</div>
       </a>
     `).join('');
   }

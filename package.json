@@ -1,0 +1,12 @@
+{
+  "name": "acg-blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:dist": "node scripts/build_dist.mjs"
+  },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "terser": "^5.31.6"
+  }
+}

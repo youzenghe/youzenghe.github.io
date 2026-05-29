@@ -112,7 +112,7 @@ window.SiteApp.registerPage('projects', () => {
             ${project.tech.map((tech) => `<span class="proj-tech-tag">${tech}</span>`).join('')}
           </div>
         </div>
-        <div class="proj-footer"><span class="proj-date">📅 ${project.date}</span></div>
+        <div class="proj-footer"><span class="proj-date">📅 ${project.date}</span><a class="proj-detail-link" href="project.html?id=${project.id}">查看复盘 →</a></div>
       `;
       card.querySelector('.proj-preview')?.addEventListener('click', () => openProjectLightbox(index));
       grid.appendChild(card);

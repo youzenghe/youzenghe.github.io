@@ -249,6 +249,12 @@ nav {
 .sri-title { font-size: 0.95rem; margin-bottom: 0.15rem; }
 .sri-excerpt { font-size: 0.78rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .search-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem; }
+.search-result-item mark {
+  background: rgba(251,191,36,0.24);
+  color: var(--accent3);
+  border-radius: 0.2rem;
+  padding: 0 0.12rem;
+}
 
 /* ----- Sakana Widget ----- */
 .sakana-widget-root {

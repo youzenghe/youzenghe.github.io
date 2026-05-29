@@ -74,7 +74,9 @@ window.SiteApp.registerPage('gallery', () => {
     if (!trackEl) return null;
 
     const repeated = [];
-    while (repeated.length < Math.max(photos.length * 2, 30)) {
+    const isMobile = window.innerWidth <= 768;
+    const targetCount = isMobile ? Math.max(photos.length, 18) : Math.max(photos.length * 2, 30);
+    while (repeated.length < targetCount) {
       repeated.push(...shufflePhotos(photos));
     }
 
@@ -83,10 +85,16 @@ window.SiteApp.registerPage('gallery', () => {
       card.className = 'photo-card';
       card.dataset.src = photo.src;
       const img = document.createElement('img');
-      img.src = photo.src;
+      img.src = typeof resolveThumbnailUrl === 'function' ? resolveThumbnailUrl(photo.src) : photo.src;
+      img.dataset.fullSrc = photo.src;
       img.alt = '';
       img.loading = 'lazy';
+      img.decoding = 'async';
       img.draggable = false;
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = img.dataset.fullSrc;
+      };
       card.appendChild(img);
       trackEl.appendChild(card);
     });
