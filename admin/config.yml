@@ -85,7 +85,8 @@ collections:
         name: "body"
         widget: "markdown"
         modes: ["raw"]
-        hint: "这里使用 Markdown 源码模式，避免 Decap 富文本图片组件显示破图。插入图片/GIF 写成：![说明](/assets/uploads/文件名.gif)，前台文章页会正常显示。"
+        editor_components: ["image", "code-block"]
+        hint: "不用手写图片路径：点击编辑器工具栏里的 +，选择 IMAGE 后上传或选择图片/GIF，后台会自动插入稳定的 Markdown 图片语法，前台文章页会正常显示。"
         default: |
           ## 背景
           这里写清楚为什么要做这件事，问题来自哪里。
