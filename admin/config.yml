@@ -135,7 +135,7 @@ collections:
               - { label: "奖项键", name: "award", widget: "select", options: ["gold", "silver", "bronze", "none"] }
               - { label: "奖项文本", name: "awardText", widget: "string" }
               - { label: "表情", name: "emoji", widget: "string" }
-              - { label: "图片", name: "img", widget: "image", hint: "项目主图建议只放一张；详情正文里可以继续插入多张图片或 GIF。" }
+              - { label: "图片路径", name: "img", widget: "string", hint: "项目主图建议只放一张。可以先到“媒体”页上传图片/GIF，再填 /assets/uploads/文件名；旧项目也可以继续使用 ../assets/projects/xxx.webp。" }
               - label: "项目链接"
                 name: "links"
                 widget: "list"
@@ -161,7 +161,7 @@ collections:
                 required: false
                 summary: "{{fields.caption}}"
                 fields:
-                  - { label: "图片", name: "image", widget: "image", hint: "支持 JPG / PNG / WebP / GIF。" }
+                  - { label: "图片路径", name: "image", widget: "string", hint: "可以先到“媒体”页上传图片/GIF，再填 /assets/uploads/文件名。" }
                   - { label: "替代文本", name: "alt", widget: "string", required: false }
                   - { label: "图片说明", name: "caption", widget: "string", required: false }
 
@@ -201,7 +201,7 @@ collections:
               - { label: "分类", name: "category", widget: "string" }
               - { label: "描述", name: "description", widget: "text" }
               - { label: "预览表情", name: "previewEmoji", widget: "string" }
-              - { label: "图片", name: "image", widget: "image" }
+              - { label: "图片路径", name: "image", widget: "string", hint: "可以先到“媒体”页上传图片/GIF，再填 /assets/uploads/文件名。" }
               - { label: "类型", name: "type", widget: "string" }
               - { label: "平台", name: "platform", widget: "string" }
               - { label: "发布日期", name: "releaseDate", widget: "string" }
