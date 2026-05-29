@@ -59,6 +59,7 @@ window.SiteApp.registerPage('posts', () => {
     const container = document.getElementById('posts-list');
     if (!container) return;
     container.innerHTML = '';
+    container.scrollTop = 0;
 
     if (!list.length) {
       container.innerHTML = '<div class="no-results"><span>🔍</span>该分类下暂时没有文章</div>';

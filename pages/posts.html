@@ -66,6 +66,28 @@
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
+      max-height: min(68vh, 760px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scroll-snap-type: y proximity;
+      padding: 0.2rem 0.45rem 0.2rem 0.2rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(249,168,201,0.45) transparent;
+      mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+    }
+    .posts-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    .posts-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .posts-list::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(249,168,201,0.45);
+    }
+    .posts-list:focus-visible {
+      outline: 2px solid rgba(103,232,249,0.7);
+      outline-offset: 4px;
     }
     .post-list-card {
       display: grid;
@@ -79,6 +101,7 @@
       transition: transform 0.25s, box-shadow 0.25s;
       color: var(--text);
       text-decoration: none;
+      scroll-snap-align: start;
     }
     .post-list-card:hover {
       transform: translateX(6px);
@@ -272,6 +295,13 @@
     @media (max-width: 860px) {
       .posts-layout { grid-template-columns: 1fr; }
       .sidebar { order: -1; }
+      .posts-list {
+        max-height: none;
+        overflow: visible;
+        padding: 0;
+        mask-image: none;
+        scroll-snap-type: none;
+      }
     }
     @media (max-width: 560px) {
       .post-list-card {
@@ -324,7 +354,7 @@
           <button class="filter-btn" data-cat="荣誉证明">🏆 荣誉证明</button>
           <button class="filter-btn" data-cat="趣味生活">🌸 趣味生活</button>
         </div>
-        <div class="posts-list" id="posts-list"></div>
+        <div class="posts-list" id="posts-list" tabindex="0" aria-label="文章列表滚动区域"></div>
       </section>
 
       <aside class="sidebar">

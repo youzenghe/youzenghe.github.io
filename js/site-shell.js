@@ -74,7 +74,7 @@
   }
 
   function bottomMarkup(config) {
-    const changelogLink = `<a href="${pageHref(config.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
+    const changelogLink = `<a class="footer-changelog-link" href="${pageHref(config.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
     const footerExtra = config.footerHtml ? `<span>${config.footerHtml}</span>` : `<span>${changelogLink}</span>`;
 
     return `
@@ -128,7 +128,7 @@
 
       const footerExtra = document.getElementById('footer-extra');
       if (footerExtra) {
-        footerExtra.innerHTML = next.footerHtml || `<a href="${pageHref(next.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
+        footerExtra.innerHTML = next.footerHtml || `<a class="footer-changelog-link" href="${pageHref(next.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
       }
     },
   };

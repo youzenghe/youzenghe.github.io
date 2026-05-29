@@ -786,6 +786,7 @@ footer a { color: var(--sakura); }
   nav { padding: 0 1.2rem; }
   .nav-center { display: none; }
   .nav-toggle { display: block; }
+  .footer-changelog-link { display: none; }
 }
 @media (max-width: 480px) {
   .site-wrapper { padding: 0 1rem; }
