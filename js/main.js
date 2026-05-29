@@ -120,6 +120,42 @@ function resolveThumbnailUrl(path) {
   return `${getSiteConfig().rootPrefix}assets/thumbs/${withoutAssets.replace(/\.[^.]+$/, '.webp')}`;
 }
 
+function escapeHtml(text) {
+  return String(text ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[char]);
+}
+
+function escapeCssUrl(url) {
+  const safeUrl = String(url ?? '').replace(/['"()\\\n\r]/g, (char) => ({
+    "'": '%27',
+    '"': '%22',
+    '(': '%28',
+    ')': '%29',
+    '\\': '%5C',
+    '\n': '%0A',
+    '\r': '%0D',
+  })[char] || '');
+  return escapeHtml(safeUrl);
+}
+
+function safeExternalUrl(url, fallback = '#') {
+  const value = String(url ?? '').trim();
+  return /^https?:\/\//i.test(value) ? value : fallback;
+}
+
+function safeCssColor(color, fallback = 'inherit') {
+  const value = String(color ?? '').trim();
+  if (/^#[0-9a-f]{3,8}$/i.test(value)) return value;
+  if (/^[a-z]+$/i.test(value)) return value;
+  if (/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i.test(value)) return value;
+  return fallback;
+}
+
 function normalizePageUrl(url) {
   const next = new URL(url, location.href);
   next.hash = '';

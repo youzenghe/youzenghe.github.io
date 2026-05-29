@@ -48,7 +48,7 @@ window.SiteApp.registerPage('projects', () => {
     if (!el) return;
 
     el.innerHTML = allCategories.map((cat) =>
-      `<button class="tab-btn${cat === active ? ' active' : ''}" data-cat="${cat}">${cat}</button>`
+      `<button class="tab-btn${cat === active ? ' active' : ''}" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
     ).join('');
 
     el.querySelectorAll('.tab-btn').forEach((btn) => {
@@ -90,30 +90,32 @@ window.SiteApp.registerPage('projects', () => {
 
     currentProjectList.forEach((project, index) => {
       const eagerImage = index < 2;
-      const projectImage = resolveAssetUrl(project.img);
-      const projectThumb = resolveThumbnailUrl(project.img);
+      const projectImage = escapeHtml(resolveAssetUrl(project.img));
+      const projectThumb = escapeHtml(resolveThumbnailUrl(project.img));
+      const projectTitle = escapeHtml(project.title);
+      const awardClass = awardClassMap[project.award] || awardClassMap.none;
       const card = document.createElement('div');
       card.className = 'proj-card reveal';
       card.style.transitionDelay = `${index * 0.07}s`;
       card.innerHTML = `
         <div class="proj-preview" data-idx="${index}">
           ${project.img
-            ? `<img src="${projectThumb}" data-full-src="${projectImage}" alt="${project.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
-            : `<div class="proj-preview-placeholder"><span class="p-emoji">${project.emoji}</span><span class="p-hint">暂无预览图</span></div>`}
+            ? `<img src="${projectThumb}" data-full-src="${projectImage}" alt="${projectTitle}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
+            : `<div class="proj-preview-placeholder"><span class="p-emoji">${escapeHtml(project.emoji)}</span><span class="p-hint">暂无预览图</span></div>`}
         </div>
         <div class="proj-body">
           <div class="proj-header">
-            <div class="proj-title">${project.title}</div>
-            <span class="proj-award ${awardClassMap[project.award]}">${project.awardText}</span>
+            <div class="proj-title">${projectTitle}</div>
+            <span class="proj-award ${awardClass}">${escapeHtml(project.awardText)}</span>
           </div>
-          <p class="proj-desc">${project.desc}</p>
+          <p class="proj-desc">${escapeHtml(project.desc)}</p>
           <div class="proj-meta-row">
-            <span class="proj-cat">${project.cat}</span>
-            ${project.status ? `<span class="proj-tech-tag">${project.status}</span>` : ''}
-            ${project.tech.map((tech) => `<span class="proj-tech-tag">${tech}</span>`).join('')}
+            <span class="proj-cat">${escapeHtml(project.cat)}</span>
+            ${project.status ? `<span class="proj-tech-tag">${escapeHtml(project.status)}</span>` : ''}
+            ${project.tech.map((tech) => `<span class="proj-tech-tag">${escapeHtml(tech)}</span>`).join('')}
           </div>
         </div>
-        <div class="proj-footer"><span class="proj-date">📅 ${project.date}</span><a class="proj-detail-link" href="project.html?id=${project.id}">查看复盘 →</a></div>
+        <div class="proj-footer"><span class="proj-date">📅 ${escapeHtml(project.date)}</span><a class="proj-detail-link" href="project.html?id=${project.id}">查看复盘 →</a></div>
       `;
       card.querySelector('.proj-preview')?.addEventListener('click', () => openProjectLightbox(index));
       grid.appendChild(card);
@@ -127,13 +129,13 @@ window.SiteApp.registerPage('projects', () => {
     if (!project) return;
 
     document.getElementById('lb-img-box').innerHTML = project.img
-      ? `<img src="${resolveAssetUrl(project.img)}" alt="${project.title}" decoding="async" />`
-      : `<div class="lb-placeholder"><span class="lbp-emoji">${project.emoji}</span><span class="lbp-name">${project.title}</span><span class="lbp-hint">暂时没有上传预览图</span></div>`;
+      ? `<img src="${escapeHtml(resolveAssetUrl(project.img))}" alt="${escapeHtml(project.title)}" decoding="async" />`
+      : `<div class="lb-placeholder"><span class="lbp-emoji">${escapeHtml(project.emoji)}</span><span class="lbp-name">${escapeHtml(project.title)}</span><span class="lbp-hint">暂时没有上传预览图</span></div>`;
 
     document.getElementById('lb-info').innerHTML = `
       <div class="lb-info-left">
-        <h3>${project.title} <span class="proj-award ${awardClassMap[project.award]}" style="font-size:0.7rem;vertical-align:middle">${project.awardText}</span></h3>
-        <p>${project.desc}</p>
+        <h3>${escapeHtml(project.title)} <span class="proj-award ${awardClassMap[project.award] || awardClassMap.none}" style="font-size:0.7rem;vertical-align:middle">${escapeHtml(project.awardText)}</span></h3>
+        <p>${escapeHtml(project.desc)}</p>
       </div>
     `;
   }

@@ -11,12 +11,12 @@ window.SiteApp.registerPage('about', () => {
       return;
     }
     friendLinksContainer.innerHTML = friendLinks.map((item) => `
-      <a class="friend-link-card" href="${item.url}" target="_blank" rel="noreferrer">
+      <a class="friend-link-card" href="${escapeHtml(safeExternalUrl(item.url))}" target="_blank" rel="noreferrer">
         <div class="friend-link-main">
-          <div class="friend-link-name">${item.name}</div>
-          <div class="friend-link-url">${item.displayUrl || item.url.replace(/^https?:\/\//, '')}</div>
+          <div class="friend-link-name">${escapeHtml(item.name)}</div>
+          <div class="friend-link-url">${escapeHtml(item.displayUrl || String(item.url || '').replace(/^https?:\/\//, ''))}</div>
         </div>
-        <span class="friend-link-badge">${item.badge || 'Friend Link'}</span>
+        <span class="friend-link-badge">${escapeHtml(item.badge || 'Friend Link')}</span>
       </a>
     `).join('');
   }

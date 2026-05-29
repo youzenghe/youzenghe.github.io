@@ -25,13 +25,15 @@ window.SiteApp.registerPage('posts', () => {
 
   function renderCard(post, simple = false, index = 0) {
     const eagerImage = index < 2;
-    const cover = resolveAssetUrl(post.cover);
-    const thumb = resolveThumbnailUrl(post.cover);
+    const cover = escapeHtml(resolveAssetUrl(post.cover));
+    const thumb = escapeHtml(resolveThumbnailUrl(post.cover));
+    const thumbCss = escapeCssUrl(resolveThumbnailUrl(post.cover));
+    const title = escapeHtml(post.title);
     const thumbContent = post.cover
-      ? `<div class="img-bg" style="background-image:url('${thumb}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${post.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
-      : post.emoji;
-    const tags = simple ? '' : `<div class="plc-tags">${post.tags.map((tag) => `<span class="plc-tag">#${tag}</span>`).join('')}</div>`;
-    const readMeta = simple ? '' : `<span>· ${post.readTime} min</span>`;
+      ? `<div class="img-bg" style="background-image:url('${thumbCss}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
+      : escapeHtml(post.emoji);
+    const tags = simple ? '' : `<div class="plc-tags">${post.tags.map((tag) => `<span class="plc-tag">#${escapeHtml(tag)}</span>`).join('')}</div>`;
+    const readMeta = simple ? '' : `<span>· ${escapeHtml(post.readTime)} min</span>`;
     const flags = [
       post.pinned ? '<span class="plc-flag">置顶</span>' : '',
       post.featured ? '<span class="plc-flag">精选</span>' : '',
@@ -41,13 +43,13 @@ window.SiteApp.registerPage('posts', () => {
       <div class="plc-thumb">${thumbContent}</div>
       <div>
         <div class="plc-meta">
-          <span class="plc-cat" style="${simple ? '' : `color:${post.catColor}`}">${post.cat}</span>
-          <span>${post.date}</span>
+          <span class="plc-cat" style="${simple ? '' : `color:${safeCssColor(post.catColor)}`}">${escapeHtml(post.cat)}</span>
+          <span>${escapeHtml(post.date)}</span>
           ${readMeta}
           ${flags}
         </div>
-        <div class="plc-title">${post.title}</div>
-        <div class="plc-excerpt">${post.excerpt}</div>
+        <div class="plc-title">${title}</div>
+        <div class="plc-excerpt">${escapeHtml(post.excerpt)}</div>
         ${tags}
       </div>
     `;
@@ -103,7 +105,7 @@ window.SiteApp.registerPage('posts', () => {
   if (popular) {
     popular.innerHTML = '';
     POSTS.slice(0, 3).forEach((post, index) => {
-      popular.innerHTML += `<a href="post.html?id=${post.id}"><span class="sw-list-num">${index + 1}</span>${post.title}</a>`;
+      popular.innerHTML += `<a href="post.html?id=${post.id}"><span class="sw-list-num">${index + 1}</span>${escapeHtml(post.title)}</a>`;
     });
   }
 
@@ -136,7 +138,7 @@ window.SiteApp.registerPage('posts', () => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'sw-series-btn';
-      btn.innerHTML = `<span>${series}</span><span class="sw-series-count">${count} 篇</span>`;
+      btn.innerHTML = `<span>${escapeHtml(series)}</span><span class="sw-series-count">${count} 篇</span>`;
       btn.addEventListener('click', () => {
         clearFilterState();
         btn.classList.add('active');
@@ -159,7 +161,7 @@ window.SiteApp.registerPage('posts', () => {
       catsEl.innerHTML += `
         <div style="margin-bottom:0.7rem">
           <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.25rem">
-            <span>${cat}</span>
+            <span>${escapeHtml(cat)}</span>
             <span style="color:var(--text-muted)">${count}篇</span>
           </div>
           <div style="height:4px;background:var(--glass-border);border-radius:2px;overflow:hidden">

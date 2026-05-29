@@ -33,7 +33,7 @@ window.SiteApp.registerPage('post-detail', () => {
   }
 
   function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, (char) => ({
+    return String(text ?? '').replace(/[&<>"']/g, (char) => ({
       '&': '&amp;',
       '<': '&lt;',
       '>': '&gt;',
@@ -103,22 +103,23 @@ window.SiteApp.registerPage('post-detail', () => {
   const header = document.getElementById('post-header');
   if (header) {
     header.innerHTML = `
-      <span class="post-header-cat" style="color:${post.catColor}">${post.cat}</span>
-      <h1>${post.title}</h1>
+      <span class="post-header-cat" style="color:${safeCssColor(post.catColor)}">${escapeHtml(post.cat)}</span>
+      <h1>${escapeHtml(post.title)}</h1>
       <div class="post-header-meta">
-        <span>📅 ${post.date}</span>
-        <span>⏱ ${post.readTime} 分钟阅读</span>
-        <span>🏷 ${post.tags.join(' · ')}</span>
-        ${post.series ? `<span>📚 ${post.series}</span>` : ''}
+        <span>📅 ${escapeHtml(post.date)}</span>
+        <span>⏱ ${escapeHtml(post.readTime)} 分钟阅读</span>
+        <span>🏷 ${post.tags.map(escapeHtml).join(' · ')}</span>
+        ${post.series ? `<span>📚 ${escapeHtml(post.series)}</span>` : ''}
       </div>
     `;
   }
 
   const cover = document.getElementById('post-cover');
   if (cover) {
+    const coverUrl = resolveAssetUrl(post.cover);
     cover.innerHTML = post.cover
-      ? `<div class="img-bg" style="background-image:url('${post.cover}')"></div><img src="${post.cover}" alt="文章封面" loading="eager" decoding="async" fetchpriority="high" />`
-      : post.emoji;
+      ? `<div class="img-bg" style="background-image:url('${escapeCssUrl(coverUrl)}')"></div><img src="${escapeHtml(coverUrl)}" alt="文章封面" loading="eager" decoding="async" fetchpriority="high" />`
+      : escapeHtml(post.emoji);
   }
 
   const body = document.getElementById('post-body');
@@ -170,7 +171,7 @@ window.SiteApp.registerPage('post-detail', () => {
 
   const tags = document.getElementById('post-tags');
   if (tags) {
-    tags.innerHTML = post.tags.map((tag) => `<span class="post-tag">#${tag}</span>`).join('');
+    tags.innerHTML = post.tags.map((tag) => `<span class="post-tag">#${escapeHtml(tag)}</span>`).join('');
   }
 
   const toc = document.getElementById('toc');
@@ -209,7 +210,7 @@ window.SiteApp.registerPage('post-detail', () => {
   if (relatedEl) {
     relatedEl.innerHTML = '';
     (related.length ? related : POSTS.filter((item) => item.id !== id).slice(0, 3)).forEach((item) => {
-      relatedEl.innerHTML += `<a class="related-item" href="post.html?id=${item.id}"><span class="related-emoji">${item.emoji}</span>${item.title}</a>`;
+      relatedEl.innerHTML += `<a class="related-item" href="post.html?id=${item.id}"><span class="related-emoji">${escapeHtml(item.emoji)}</span>${escapeHtml(item.title)}</a>`;
     });
   }
 
@@ -218,8 +219,8 @@ window.SiteApp.registerPage('post-detail', () => {
   const prevNext = document.getElementById('prev-next');
   if (prevNext) {
     prevNext.innerHTML = `
-      ${prev ? `<a class="pn-card" href="post.html?id=${prev.id}"><div class="pn-label">← 上一篇</div><div class="pn-title">${prev.title}</div></a>` : '<div></div>'}
-      ${next ? `<a class="pn-card next" href="post.html?id=${next.id}"><div class="pn-label">下一篇 →</div><div class="pn-title">${next.title}</div></a>` : '<div></div>'}
+      ${prev ? `<a class="pn-card" href="post.html?id=${prev.id}"><div class="pn-label">← 上一篇</div><div class="pn-title">${escapeHtml(prev.title)}</div></a>` : '<div></div>'}
+      ${next ? `<a class="pn-card next" href="post.html?id=${next.id}"><div class="pn-label">下一篇 →</div><div class="pn-title">${escapeHtml(next.title)}</div></a>` : '<div></div>'}
     `;
   }
 

@@ -12,24 +12,26 @@ window.SiteApp.registerPage('home', () => {
     el.className = 'post-card reveal';
     el.style.transitionDelay = `${index * 0.1}s`;
     el.href = `pages/post.html?id=${post.id}`;
-    const cover = resolveAssetUrl(post.cover);
-    const thumb = resolveThumbnailUrl(post.cover);
+    const cover = escapeHtml(resolveAssetUrl(post.cover));
+    const thumb = escapeHtml(resolveThumbnailUrl(post.cover));
+    const thumbCss = escapeCssUrl(resolveThumbnailUrl(post.cover));
+    const title = escapeHtml(post.title);
     el.innerHTML = `
       <div class="post-card-img">
         ${post.cover
-          ? `<div class="img-bg" style="background-image:url('${thumb}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${post.title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">`
-          : post.emoji}
+          ? `<div class="img-bg" style="background-image:url('${thumbCss}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">`
+          : escapeHtml(post.emoji)}
       </div>
       <div class="post-card-body">
         <div class="post-meta">
-          <span class="post-cat" style="color:${post.catColor}">${post.cat}</span>
-          <span>${post.date}</span>
+          <span class="post-cat" style="color:${safeCssColor(post.catColor)}">${escapeHtml(post.cat)}</span>
+          <span>${escapeHtml(post.date)}</span>
         </div>
-        <div class="post-card-title">${post.title}</div>
-        <p class="post-card-excerpt">${post.excerpt}</p>
+        <div class="post-card-title">${title}</div>
+        <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
       </div>
       <div class="post-card-footer">
-        <span>阅读 · ${post.readTime} min</span>
+        <span>阅读 · ${escapeHtml(post.readTime)} min</span>
         <span class="post-read-more">继续阅读 →</span>
       </div>
     `;
@@ -39,18 +41,20 @@ window.SiteApp.registerPage('home', () => {
   function buildProjectCard(project) {
     const el = document.createElement('div');
     el.className = 'bm-card reveal';
-    const image = resolveAssetUrl(project.img);
-    const thumb = resolveThumbnailUrl(project.img);
+    const image = escapeHtml(resolveAssetUrl(project.img));
+    const thumb = escapeHtml(resolveThumbnailUrl(project.img));
+    const thumbCss = escapeCssUrl(resolveThumbnailUrl(project.img));
+    const title = escapeHtml(project.title);
     el.innerHTML = `
       <div class="bm-cover">
         ${project.img
-          ? `<div class="img-bg" style="position:absolute;inset:-4px;background:url('${thumb}') center/cover;filter:blur(10px) brightness(0.5);transform:scale(1.05)"></div><img src="${thumb}" data-full-src="${image}" alt="${project.title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc" style="position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block">`
-          : project.emoji}
+          ? `<div class="img-bg" style="position:absolute;inset:-4px;background:url('${thumbCss}') center/cover;filter:blur(10px) brightness(0.5);transform:scale(1.05)"></div><img src="${thumb}" data-full-src="${image}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc" style="position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block">`
+          : escapeHtml(project.emoji)}
       </div>
       <div class="bm-info">
-        <div class="bm-title">${project.title}</div>
+        <div class="bm-title">${title}</div>
         <div class="bm-bar"><div class="bm-fill" style="width:100%"></div></div>
-        <div class="bm-ep">${project.cat} · ${project.date}</div>
+        <div class="bm-ep">${escapeHtml(project.cat)} · ${escapeHtml(project.date)}</div>
       </div>
     `;
     return el;

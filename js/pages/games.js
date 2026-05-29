@@ -17,22 +17,23 @@ window.SiteApp.registerPage('games', () => {
       });
 
       const eagerImage = index < 2;
-      const image = resolveAssetUrl(game.image);
-      const thumb = resolveThumbnailUrl(game.image);
+      const image = escapeHtml(resolveAssetUrl(game.image));
+      const thumb = escapeHtml(resolveThumbnailUrl(game.image));
+      const title = escapeHtml(game.title);
       const imageContent = game.image
-        ? `<img src="${thumb}" data-full-src="${image}" alt="${game.title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''}>`
-        : game.previewEmoji;
+        ? `<img src="${thumb}" data-full-src="${image}" alt="${title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''}>`
+        : escapeHtml(game.previewEmoji);
       card.innerHTML = `
         <div class="game-card-img">${imageContent}</div>
         <div class="game-card-body">
           <div class="game-meta">
-            <span class="game-category">${game.category}</span>
-            <span>${game.releaseDate}</span>
+            <span class="game-category">${escapeHtml(game.category)}</span>
+            <span>${escapeHtml(game.releaseDate)}</span>
           </div>
-          <h3 class="game-title">${game.title}</h3>
-          <p class="game-description">${game.description}</p>
+          <h3 class="game-title">${title}</h3>
+          <p class="game-description">${escapeHtml(game.description)}</p>
           <div class="game-stats">
-            <span>${game.platform}</span>
+            <span>${escapeHtml(game.platform)}</span>
             <span class="game-download">点击查看详情 →</span>
           </div>
         </div>
@@ -50,10 +51,10 @@ window.SiteApp.registerPage('games', () => {
     document.getElementById('modal-game-platform').textContent = game.platform;
     document.getElementById('modal-game-date').textContent = game.releaseDate;
     document.getElementById('modal-game-status').textContent = game.status;
-    document.getElementById('modal-download-link').href = game.downloadLink;
+    document.getElementById('modal-download-link').href = safeExternalUrl(game.downloadLink);
     document.getElementById('modal-game-image').innerHTML = game.image
-      ? `<img src="${resolveAssetUrl(game.image)}" alt="${game.title}" decoding="async">`
-      : game.previewEmoji;
+      ? `<img src="${escapeHtml(resolveAssetUrl(game.image))}" alt="${escapeHtml(game.title)}" decoding="async">`
+      : escapeHtml(game.previewEmoji);
     const modal = document.getElementById('game-modal');
     modal.style.display = 'flex';
     modal.setAttribute('aria-hidden', 'false');
