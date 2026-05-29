@@ -10,7 +10,7 @@ const SAKANA_WIDGET_SCRIPT_ID = 'sakana-widget-script';
 const SAKANA_WIDGET_CSS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.css';
 const SAKANA_WIDGET_JS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.js';
 const LOCAL_BG_DESKTOP = 'assets/bg-pc.webp';
-const LOCAL_BG_MOBILE = 'assets/bg-phone.jpg';
+const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
@@ -282,7 +282,7 @@ function initParticles(canvasId) {
   resize();
   window.addEventListener('resize', resize);
 
-  const particleCount = window.innerWidth <= 768 ? 16 : 24;
+  const particleCount = window.innerWidth <= 768 ? 8 : 24;
   for (let i = 0; i < particleCount; i += 1) {
     const particle = createParticle();
     particle.y = Math.random() * canvas.height;
