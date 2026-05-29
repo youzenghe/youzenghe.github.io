@@ -23,10 +23,10 @@ python scripts/build_content.py
 
 然后把 `content/` 里的 Markdown / JSON 生成到 `js/data.js`，再部署到 GitHub Pages。
 
-文章正文默认使用富文本编辑模式。插入图片或 GIF 时点击编辑器工具栏里的 `+`，选择 `插入图片/GIF`，再上传或选择图片即可。后台会自动插入类似下面的 Markdown 内容：
+文章正文默认使用富文本编辑模式。插入图片或 GIF 时点击编辑器工具栏里的 `+`，选择 `IMAGE`，再上传或选择图片即可。后台会自动插入类似下面的 Markdown 内容：
 
 ```md
 ![说明](/assets/uploads/cmd-bg.jpg)
 ```
 
-不要切回富文本图片组件；Decap 的富文本图片块在当前站点路径下容易显示破损占位符，但 Markdown 源码发布到前台是稳定的。
+如果后台编辑区短暂显示图片占位符，不影响发布效果；前台会按 Markdown 图片语法正常渲染。

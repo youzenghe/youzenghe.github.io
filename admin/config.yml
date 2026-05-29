@@ -86,8 +86,8 @@ collections:
         widget: "markdown"
         modes: ["rich_text", "raw"]
         default_mode: "rich_text"
-        editor_components: ["cmsimage", "code-block"]
-        hint: "不用手写图片路径：点击编辑器工具栏里的 +，选择“插入图片/GIF”后上传或选择图片/GIF。不要选择默认 IMAGE。"
+        editor_components: ["image", "code-block"]
+        hint: "不用手写图片路径：点击编辑器工具栏里的 +，选择 IMAGE 后上传或选择图片/GIF，前台文章页会正常显示。后台编辑区若短暂显示占位图，不影响发布效果。"
         default: |
           ## 背景
           这里写清楚为什么要做这件事，问题来自哪里。

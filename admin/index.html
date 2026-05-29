@@ -4,61 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台 · 超级小识</title>
+  <style>
+    .cms-editor-image-fallback {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 180px;
+      min-height: 96px;
+      padding: 0.75rem 1rem;
+      border: 1px dashed #9ca3af;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  </style>
 </head>
 <body>
   <script>
-    window.CMS_MANUAL_INIT = true;
+    document.addEventListener('error', (event) => {
+      const img = event.target;
+      if (!(img instanceof HTMLImageElement)) return;
+      const src = img.getAttribute('src') || '';
+      if (!src.includes('/assets/')) return;
+
+      img.style.display = 'none';
+      if (img.nextElementSibling?.classList?.contains('cms-editor-image-fallback')) return;
+
+      const fallback = document.createElement('span');
+      fallback.className = 'cms-editor-image-fallback';
+      fallback.textContent = '图片已插入，发布后前台会正常显示';
+      img.insertAdjacentElement('afterend', fallback);
+    }, true);
   </script>
   <script src="https://unpkg.com/decap-cms@^3.4.0/dist/decap-cms.js"></script>
-  <script>
-    CMS.registerEditorComponent({
-      id: 'cmsimage',
-      label: '插入图片/GIF',
-      fields: [
-        {
-          name: 'src',
-          label: '图片/GIF 文件',
-          widget: 'file',
-          media_library: {
-            allow_multiple: false
-          }
-        },
-        {
-          name: 'alt',
-          label: '图片说明',
-          widget: 'string',
-          required: false
-        },
-        {
-          name: 'title',
-          label: '悬停标题',
-          widget: 'string',
-          required: false
-        }
-      ],
-      pattern: /^!\[(.*?)\]\((\S+?)(?:\s+"(.*?)")?\)$/m,
-      fromBlock(match) {
-        return {
-          alt: match[1] || '',
-          src: match[2] || '',
-          title: match[3] || ''
-        };
-      },
-      toBlock(data) {
-        const alt = data.alt || '';
-        const src = data.src || '';
-        const title = data.title ? ` "${data.title}"` : '';
-        return `![${alt}](${src}${title})`;
-      },
-      toPreview(data) {
-        const alt = data.alt || '';
-        const src = data.src || '';
-        const title = data.title ? `<figcaption>${data.title}</figcaption>` : '';
-        return `<figure><img src="${src}" alt="${alt}" style="max-width:100%;height:auto;" />${title}</figure>`;
-      }
-    });
-
-    CMS.init();
-  </script>
 </body>
 </html>
