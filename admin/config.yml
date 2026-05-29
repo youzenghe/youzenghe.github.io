@@ -112,9 +112,9 @@ collections:
               - { label: "描述", name: "desc", widget: "text" }
               - label: "查看复盘正文（项目详情页）"
                 name: "detail"
-                widget: "markdown"
+                widget: "text"
                 required: false
-                hint: "这里就是前台点击“查看复盘”后打开的正文。可以直接插入图片或 GIF，生成的 ![说明](图片地址) 会在项目详情页正常显示。"
+                hint: "这里就是前台点击“查看复盘”后打开的正文。支持 Markdown 写法，也可以写 ![说明](图片地址) 插入图片或 GIF。这里不用富文本编辑器，是为了避免 Decap 在嵌套项目列表里崩溃。"
                 default: |
                   ## 项目背景
                   这里说明项目目标、使用场景和核心需求。
