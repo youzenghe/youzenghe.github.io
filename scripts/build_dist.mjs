@@ -8,6 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const excludedRoots = new Set(['.git', '.github', '.idea', 'dist', 'node_modules']);
 const cleanCss = new CleanCSS({ level: 2 });
+const assetVersion = (process.env.GITHUB_SHA || String(Date.now())).slice(0, 12);
 
 function shouldSkip(relativePath) {
   const first = relativePath.split(path.sep)[0];
@@ -43,6 +44,34 @@ async function writeMinifiedCss(sourcePath, targetPath) {
   await fs.writeFile(targetPath, result.styles || source, 'utf8');
 }
 
+function appendAssetVersion(url) {
+  if (!url || /^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('//') || url.startsWith('#')) {
+    return url;
+  }
+
+  const hashIndex = url.indexOf('#');
+  const hash = hashIndex >= 0 ? url.slice(hashIndex) : '';
+  const withoutHash = hashIndex >= 0 ? url.slice(0, hashIndex) : url;
+  const separator = withoutHash.includes('?') ? '&' : '?';
+  return `${withoutHash}${separator}v=${assetVersion}${hash}`;
+}
+
+function versionHtmlAssets(html) {
+  return html
+    .replace(/(<script\b[^>]*\bsrc=["'])([^"']+?\.js(?:\?[^"']*)?)(["'][^>]*>)/gi, (_match, before, src, after) => (
+      `${before}${appendAssetVersion(src)}${after}`
+    ))
+    .replace(/(<link\b[^>]*\bhref=["'])([^"']+?\.css(?:\?[^"']*)?)(["'][^>]*>)/gi, (_match, before, href, after) => (
+      `${before}${appendAssetVersion(href)}${after}`
+    ));
+}
+
+async function writeVersionedHtml(sourcePath, targetPath) {
+  const source = await fs.readFile(sourcePath, 'utf8');
+  await ensureDir(targetPath);
+  await fs.writeFile(targetPath, versionHtmlAssets(source), 'utf8');
+}
+
 async function copyFile(sourcePath, targetPath) {
   await ensureDir(targetPath);
   await fs.copyFile(sourcePath, targetPath);
@@ -69,6 +98,10 @@ async function copyEntry(sourcePath, relativePath = '') {
   }
   if (ext === '.css') {
     await writeMinifiedCss(sourcePath, targetPath);
+    return;
+  }
+  if (ext === '.html') {
+    await writeVersionedHtml(sourcePath, targetPath);
     return;
   }
 
