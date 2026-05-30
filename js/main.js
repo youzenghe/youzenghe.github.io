@@ -14,6 +14,7 @@ const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
+const PAGE_CACHE_TTL = 30000;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 let currentPageCleanup = null;
@@ -1171,8 +1172,12 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
 
 async function fetchPageDocument(url) {
   const cacheKey = normalizePageUrl(url);
-  if (PAGE_CACHE.has(cacheKey)) {
-    return PAGE_CACHE.get(cacheKey);
+  const cached = PAGE_CACHE.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.promise;
+  }
+  if (cached) {
+    PAGE_CACHE.delete(cacheKey);
   }
 
   const task = fetch(cacheKey, {
@@ -1189,11 +1194,15 @@ async function fetchPageDocument(url) {
 
       return new DOMParser().parseFromString(html, 'text/html');
     })
-    .finally(() => {
+    .catch((error) => {
       PAGE_CACHE.delete(cacheKey);
+      throw error;
     });
 
-  PAGE_CACHE.set(cacheKey, task);
+  PAGE_CACHE.set(cacheKey, {
+    promise: task,
+    expiresAt: Date.now() + PAGE_CACHE_TTL,
+  });
   return task;
 }
 
