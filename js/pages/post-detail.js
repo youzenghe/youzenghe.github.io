@@ -1,8 +1,8 @@
 window.SiteApp.registerPage('post-detail', () => {
   const absoluteBase = 'https://yzh1019.top';
   const params = new URLSearchParams(location.search);
-  const id = parseInt(params.get('id'), 10) || 1;
-  const post = POSTS.find((item) => item.id === id) || POSTS[0];
+  const id = parseInt(params.get('id'), 10);
+  const post = POSTS.find((item) => item.id === id);
   const postIndex = POSTS.indexOf(post);
 
   function setMeta(selector, attr, value) {
@@ -49,6 +49,47 @@ window.SiteApp.registerPage('post-detail', () => {
       .replace(/(&quot;.*?&quot;|&#39;.*?&#39;|`.*?`)/g, '<span class="code-token-string">$1</span>')
       .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|from|export|async|await|def|try|except|catch|finally)\b/g, '<span class="code-token-keyword">$1</span>');
     code.innerHTML = highlighted;
+  }
+
+  function renderMissingPost() {
+    document.title = '文章未找到 · 次元日记';
+    setMeta('meta[name="description"]', 'content', '这篇文章不存在或已经被移除。');
+    setMeta('meta[property="og:title"]', 'content', '文章未找到 · 次元日记');
+    setMeta('meta[property="og:description"]', 'content', '这篇文章不存在或已经被移除。');
+    setMeta('meta[name="twitter:title"]', 'content', '文章未找到 · 次元日记');
+    setMeta('meta[name="twitter:description"]', 'content', '这篇文章不存在或已经被移除。');
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.href = `${absoluteBase}/pages/posts.html`;
+    }
+    document.getElementById('post-structured-data')?.remove();
+
+    const header = document.getElementById('post-header');
+    if (header) {
+      header.innerHTML = `
+        <span class="post-header-cat">404</span>
+        <h1>文章未找到</h1>
+        <div class="post-header-meta"><span>这篇文章不存在或已经被移除。</span></div>
+      `;
+    }
+
+    document.getElementById('post-cover')?.remove();
+    const body = document.getElementById('post-body');
+    if (body) {
+      body.innerHTML = '<p>可以返回文章列表，继续浏览其他内容。</p><p><a class="btn btn-ghost" href="posts.html">返回文章列表</a></p>';
+    }
+    document.getElementById('post-gallery')?.replaceChildren();
+    document.getElementById('post-tags')?.replaceChildren();
+    document.getElementById('prev-next')?.replaceChildren();
+    document.getElementById('toc')?.replaceChildren();
+    document.getElementById('related')?.replaceChildren();
+    document.getElementById('back-to-top')?.remove();
+    initReveal();
+    return null;
+  }
+
+  if (!post) {
+    return renderMissingPost();
   }
 
   const seo = post.seo || {};

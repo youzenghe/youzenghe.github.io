@@ -23,6 +23,43 @@
     return `${prefix}${href}`;
   }
 
+  function escapeHtml(text) {
+    return String(text ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[char]);
+  }
+
+  function safeFooterHref(href) {
+    const value = String(href ?? '').trim();
+    if (!value || /^javascript:/i.test(value)) return '';
+    if (/^(https?:\/\/|#|\.{0,2}\/|[a-z0-9_-]+\.html(?:[?#].*)?$)/i.test(value)) {
+      return value;
+    }
+    return '';
+  }
+
+  function sanitizeFooterHtml(html) {
+    const source = String(html ?? '').trim();
+    if (!source) return '';
+
+    const match = source.match(/^<a\s+href=["']([^"']+)["']>([\s\S]*?)<\/a>$/i);
+    if (!match) return escapeHtml(source);
+
+    const href = safeFooterHref(match[1]);
+    if (!href) return escapeHtml(match[2].replace(/<[^>]*>/g, ''));
+    return `<a href="${escapeHtml(href)}">${escapeHtml(match[2].replace(/<[^>]*>/g, ''))}</a>`;
+  }
+
+  function footerExtraMarkup(config) {
+    const customFooter = sanitizeFooterHtml(config.footerHtml);
+    if (customFooter) return customFooter;
+    return `<a class="footer-changelog-link" href="${pageHref(config.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
+  }
+
   function renderNavLinks(prefix, activeKey) {
     return NAV_ITEMS.map((item) => {
       const activeClass = item.key === activeKey ? ' class="active"' : '';
@@ -74,8 +111,7 @@
   }
 
   function bottomMarkup(config) {
-    const changelogLink = `<a class="footer-changelog-link" href="${pageHref(config.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
-    const footerExtra = config.footerHtml ? `<span>${config.footerHtml}</span>` : `<span>${changelogLink}</span>`;
+    const footerExtra = `<span>${footerExtraMarkup(config)}</span>`;
 
     return `
       <footer>
@@ -128,7 +164,7 @@
 
       const footerExtra = document.getElementById('footer-extra');
       if (footerExtra) {
-        footerExtra.innerHTML = next.footerHtml || `<a class="footer-changelog-link" href="${pageHref(next.rootPrefix, 'pages/changelog.html')}">更新日志</a>`;
+        footerExtra.innerHTML = footerExtraMarkup(next);
       }
     },
   };

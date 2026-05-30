@@ -87,7 +87,31 @@ window.SiteApp.registerPage('posts', () => {
     mountPosts(list);
   }
 
+  function categoryLabel(category) {
+    const labels = {
+      荣誉证明: '🏆 荣誉证明',
+      趣味生活: '🌸 趣味生活',
+      技术笔记: '💻 技术笔记',
+    };
+    return labels[category] || category;
+  }
+
+  function renderCategoryFilters() {
+    if (!filterBar) return;
+    const categories = ['全部', ...new Set(POSTS.map((post) => post.cat).filter(Boolean))];
+    filterBar.innerHTML = '';
+    categories.forEach((category, index) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `filter-btn${index === 0 ? ' active' : ''}`;
+      btn.dataset.cat = category;
+      btn.textContent = category === '全部' ? '全部' : categoryLabel(category);
+      filterBar.appendChild(btn);
+    });
+  }
+
   const filterBar = document.getElementById('filter-bar');
+  renderCategoryFilters();
   if (filterBar) {
     filterBar.addEventListener('click', (event) => {
       const btn = event.target.closest('.filter-btn');

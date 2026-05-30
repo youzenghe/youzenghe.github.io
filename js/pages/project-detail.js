@@ -1,8 +1,8 @@
 window.SiteApp.registerPage('project-detail', () => {
+  const absoluteBase = 'https://yzh1019.top';
   const params = new URLSearchParams(location.search);
-  const id = parseInt(params.get('id'), 10) || 1;
-  const project = PROJECTS.find((item) => item.id === id) || PROJECTS[0];
-  if (!project) return null;
+  const id = parseInt(params.get('id'), 10);
+  const project = PROJECTS.find((item) => item.id === id);
 
   function imageSrc(image) {
     return typeof image === 'string' ? image : image?.src || image?.image || '';
@@ -22,7 +22,104 @@ window.SiteApp.registerPage('project-detail', () => {
     })[char]);
   }
 
-  document.title = `${project.title} · 项目复盘`;
+  function setMeta(selector, attr, value) {
+    const el = document.querySelector(selector);
+    if (el) {
+      el.setAttribute(attr, value);
+    }
+  }
+
+  function toAbsoluteAssetUrl(path) {
+    if (!path) return `${absoluteBase}/assets/avatar.png`;
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${absoluteBase}/${path.replace(/^\.\.\//, '').replace(/^\//, '')}`;
+  }
+
+  function stripHtml(html) {
+    const temp = document.createElement('div');
+    temp.innerHTML = html || '';
+    return temp.textContent?.replace(/\s+/g, ' ').trim() || '';
+  }
+
+  function renderMissingProject() {
+    document.title = '项目未找到 · 次元日记';
+    setMeta('meta[name="description"]', 'content', '这个项目不存在或已经被移除。');
+    setMeta('meta[property="og:title"]', 'content', '项目未找到 · 次元日记');
+    setMeta('meta[property="og:description"]', 'content', '这个项目不存在或已经被移除。');
+    setMeta('meta[name="twitter:title"]', 'content', '项目未找到 · 次元日记');
+    setMeta('meta[name="twitter:description"]', 'content', '这个项目不存在或已经被移除。');
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.href = `${absoluteBase}/pages/projects.html`;
+    }
+    document.getElementById('project-structured-data')?.remove();
+
+    const head = document.getElementById('project-detail-head');
+    if (head) {
+      head.innerHTML = `
+        <div class="section-label">404</div>
+        <h1 class="project-detail-title">项目未找到</h1>
+        <p class="project-detail-desc">这个项目不存在或已经被移除。</p>
+      `;
+    }
+    document.getElementById('project-detail-cover')?.remove();
+    const body = document.getElementById('project-detail-body');
+    if (body) {
+      body.innerHTML = '<p>可以返回项目列表，继续查看其他项目复盘。</p>';
+    }
+    const side = document.getElementById('project-detail-side');
+    if (side) {
+      side.innerHTML = '<p><a class="btn btn-ghost" href="projects.html">返回项目列表</a></p>';
+    }
+    initReveal();
+    return null;
+  }
+
+  if (!project) {
+    return renderMissingProject();
+  }
+
+  const seoTitle = `${project.title} · 项目复盘`;
+  const seoDescription = project.desc || '查看项目背景、技术栈、截图和复盘记录。';
+  const seoImage = project.img;
+  const canonicalUrl = `${absoluteBase}/pages/project.html?id=${project.id}`;
+
+  document.title = seoTitle;
+  setMeta('meta[name="description"]', 'content', seoDescription);
+  setMeta('meta[property="og:url"]', 'content', canonicalUrl);
+  setMeta('meta[property="og:title"]', 'content', seoTitle);
+  setMeta('meta[property="og:description"]', 'content', seoDescription);
+  setMeta('meta[property="og:image"]', 'content', toAbsoluteAssetUrl(seoImage));
+  setMeta('meta[property="og:image:alt"]', 'content', `${project.title} 的项目封面`);
+  setMeta('meta[name="twitter:title"]', 'content', seoTitle);
+  setMeta('meta[name="twitter:description"]', 'content', seoDescription);
+  setMeta('meta[name="twitter:image"]', 'content', toAbsoluteAssetUrl(seoImage));
+  setMeta('meta[name="twitter:image:alt"]', 'content', `${project.title} 的项目封面`);
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) {
+    canonical.href = canonicalUrl;
+  }
+  const structuredData = document.getElementById('project-structured-data');
+  if (structuredData) {
+    structuredData.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: project.title,
+      description: seoDescription,
+      image: toAbsoluteAssetUrl(seoImage),
+      url: canonicalUrl,
+      keywords: project.tech.join(', '),
+      dateCreated: project.date,
+      genre: project.cat,
+      award: project.awardText,
+      text: stripHtml(project.detail || project.desc),
+      author: {
+        '@type': 'Person',
+        name: '次元日记',
+        url: `${absoluteBase}/pages/about.html`,
+      },
+    });
+  }
 
   const head = document.getElementById('project-detail-head');
   if (head) {
@@ -62,7 +159,7 @@ window.SiteApp.registerPage('project-detail', () => {
       : '';
     const result = project.result ? `<h2>结果复盘</h2><p>${escapeHtml(project.result)}</p>` : '';
     body.innerHTML = `
-      ${project.detail || `<p>${escapeHtml(project.desc)}</p><h2>复盘重点</h2><p>这里可以继续补充背景、技术选型、遇到的问题和最终结果。</p>`}
+      ${project.detail || `<p>${escapeHtml(project.desc)}</p>`}
       ${role}
       ${highlights}
       ${challenges}

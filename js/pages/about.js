@@ -6,8 +6,7 @@ window.SiteApp.registerPage('about', () => {
     const friendLinks = window.SITE_DATA?.friendLinks || [];
     if (!friendLinksContainer) return;
     if (friendLinks.length === 0) {
-      // SITE_DATA 可能还没准备好，等下一帧再试一次
-      requestAnimationFrame(renderFriendLinks);
+      friendLinksContainer.innerHTML = '<div class="friend-link-empty">暂时还没有友链。</div>';
       return;
     }
     friendLinksContainer.innerHTML = friendLinks.map((item) => `

@@ -723,7 +723,7 @@ function initLive2DWidget() {
   document.body.classList.add('live2d-loading');
   window.L2Dwidget.init({
     model: {
-      jsonPath: '/assets/live2d/haru/haru02.model.json',
+      jsonPath: resolveAssetUrl('assets/live2d/haru/haru02.model.json'),
     },
     display: {
       position: 'left',
@@ -1041,7 +1041,7 @@ function applyPageHead(doc) {
   document.title = doc.title;
 
   document.head.querySelectorAll(`style[${PAGE_STYLE_ATTR}]`).forEach((styleEl) => styleEl.remove());
-  document.head.querySelectorAll(`script[${PAGE_HEAD_JSON_LD_ATTR}]`).forEach((scriptEl) => scriptEl.remove());
+  document.head.querySelectorAll('script[type="application/ld+json"]').forEach((scriptEl) => scriptEl.remove());
   doc.head.querySelectorAll('style').forEach((styleEl) => {
     const clone = styleEl.cloneNode(true);
     clone.setAttribute(PAGE_STYLE_ATTR, 'true');
@@ -1175,19 +1175,26 @@ async function fetchPageDocument(url) {
     return PAGE_CACHE.get(cacheKey);
   }
 
-  const response = await fetch(cacheKey, {
+  const task = fetch(cacheKey, {
+    cache: 'no-store',
     headers: {
       'X-Requested-With': 'site-shell',
     },
-  });
-  const html = await response.text();
-  if (!response.ok && !html) {
-    throw new Error(`Navigation failed: ${response.status}`);
-  }
+  })
+    .then(async (response) => {
+      const html = await response.text();
+      if (!response.ok && !html) {
+        throw new Error(`Navigation failed: ${response.status}`);
+      }
 
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  PAGE_CACHE.set(cacheKey, doc);
-  return doc;
+      return new DOMParser().parseFromString(html, 'text/html');
+    })
+    .finally(() => {
+      PAGE_CACHE.delete(cacheKey);
+    });
+
+  PAGE_CACHE.set(cacheKey, task);
+  return task;
 }
 
 function prefetchPage(url) {
