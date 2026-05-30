@@ -450,15 +450,41 @@ function initReveal() {
   const els = document.querySelectorAll('.reveal:not(.visible)');
   if (!els.length) return;
 
+  const revealIfInView = (el, margin = 80) => {
+    const rect = el.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.top <= viewportHeight + margin && rect.bottom >= -margin) {
+      el.classList.add('visible');
+      return true;
+    }
+    return false;
+  };
+
+  if (typeof IntersectionObserver !== 'function') {
+    els.forEach((el) => el.classList.add('visible'));
+    return;
+  }
+
   const io = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add('visible');
       io.unobserve(entry.target);
     });
-  }, { threshold: 0.1 });
+  }, { rootMargin: '80px 0px', threshold: 0.01 });
 
-  els.forEach((el) => io.observe(el));
+  els.forEach((el) => {
+    if (revealIfInView(el)) return;
+    io.observe(el);
+  });
+
+  window.requestAnimationFrame(() => {
+    els.forEach((el) => {
+      if (!el.classList.contains('visible')) {
+        revealIfInView(el);
+      }
+    });
+  });
 }
 
 function initMobileNav() {
@@ -1105,6 +1131,11 @@ function applyShellConfig() {
   setActiveNav();
 }
 
+function resetTransientPageState() {
+  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
+}
+
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -1146,6 +1177,7 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
 
   teardownCurrentPageModule();
   syncBodyDataset(doc.body.dataset);
+  resetTransientPageState();
   applyPageHead(doc);
   applyShellConfig();
 
@@ -1167,6 +1199,7 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   pendingPageRunRaf = window.requestAnimationFrame(() => {
     pendingPageRunRaf = 0;
     runCurrentPageModule();
+    window.requestAnimationFrame(initReveal);
   });
 }
 
