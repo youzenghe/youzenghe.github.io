@@ -1,7 +1,7 @@
 window.SiteApp.registerPage('home', () => {
   const stopTypewriter = typewriter(
     document.getElementById('typewriter'),
-    ['前端开发者', 'AI 应用实践者', '项目复盘记录者', 'ACG 玩家'],
+    ['Java 后端开发者', 'AI 应用实践者', '项目复盘记录者', 'ACG 玩家'],
     120
   );
 
@@ -80,7 +80,7 @@ window.SiteApp.registerPage('home', () => {
               <h2>你好，我是超级小识 ✦</h2>
               <p>这里用来整理项目经历、技术选择和实际踩坑。ACG 内容会保留，但它更像个人标签，不会抢走技术记录的位置。</p>
               <div class="about-tags">
-                <span class="tag">前端</span>
+                <span class="tag">Java 后端</span>
                 <span class="tag">AI 应用</span>
                 <span class="tag">项目复盘</span>
                 <span class="tag">ACG</span>

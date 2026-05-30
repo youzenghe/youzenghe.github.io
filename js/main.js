@@ -98,6 +98,37 @@ function hideNavigationLoader() {
   }
 }
 
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+function hideInitialLoader() {
+  if (navigationPendingCount > 0) return;
+  document.getElementById('loader')?.classList.add('hidden');
+  syncLive2DVisibility();
+}
+
+function scheduleInitialLoaderHide(initialBgPromise) {
+  const bgReadyOrTimeout = Promise.race([
+    Promise.resolve(initialBgPromise).catch(() => ''),
+    wait(1800),
+  ]);
+
+  const hideAfterReady = () => {
+    bgReadyOrTimeout.finally(hideInitialLoader);
+  };
+
+  if (document.readyState === 'complete') {
+    hideAfterReady();
+  } else {
+    window.addEventListener('load', hideAfterReady, { once: true });
+  }
+
+  window.setTimeout(hideInitialLoader, 3200);
+}
+
 function resolvePagePath(path) {
   return `${getSiteConfig().rootPrefix}${path}`;
 }
@@ -1302,12 +1333,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyShellConfig();
   initRouter();
 
-  window.addEventListener('load', () => {
-    initialBgPromise.catch(() => '').finally(() => {
-      document.getElementById('loader')?.classList.add('hidden');
-      syncLive2DVisibility();
-    });
-  });
+  scheduleInitialLoaderHide(initialBgPromise);
 
   window.addEventListener('pagehide', markLive2DHidden);
 

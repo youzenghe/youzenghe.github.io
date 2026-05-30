@@ -141,23 +141,33 @@
     .plc-meta {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 0.5rem;
       font-size: 0.7rem;
       color: var(--text-muted);
       margin-bottom: 0.4rem;
       font-family: var(--font-ui);
     }
+    .plc-meta > span {
+      white-space: nowrap;
+    }
     .plc-cat {
+      display: inline-flex;
+      align-items: center;
       padding: 0.12rem 0.5rem;
       border-radius: 1rem;
       background: var(--glass);
+      white-space: nowrap;
     }
     .plc-flag {
+      display: inline-flex;
+      align-items: center;
       padding: 0.1rem 0.45rem;
       border-radius: 1rem;
       background: rgba(103,232,249,0.12);
       color: var(--accent2);
       border: 1px solid rgba(103,232,249,0.18);
+      white-space: nowrap;
     }
     .plc-title {
       font-family: var(--font-display);
@@ -327,6 +337,14 @@
       }
       .plc-title {
         font-size: 0.92rem;
+      }
+      .plc-meta {
+        gap: 0.28rem 0.42rem;
+        font-size: 0.66rem;
+      }
+      .plc-cat,
+      .plc-flag {
+        padding-inline: 0.42rem;
       }
       .plc-excerpt {
         font-size: 0.74rem;
