@@ -858,6 +858,11 @@ function initLive2D() {
 
     live2dLoading = true;
     document.body.classList.add('live2d-loading');
+
+    // 设置 webpack publicPath，让 L2Dwidget 知道从哪里加载 chunk 文件
+    const scriptPath = resolveAssetUrl('assets/live2d-widget/');
+    window.__webpack_public_path__ = scriptPath.endsWith('/') ? scriptPath : scriptPath + '/';
+
     const script = document.createElement('script');
     script.src = resolveAssetUrl('assets/live2d-widget/L2Dwidget.min.js');
     script.onload = () => {
