@@ -136,9 +136,20 @@ window.SiteApp.registerPage('project-detail', () => {
 
   const cover = document.getElementById('project-detail-cover');
   if (cover) {
-    cover.innerHTML = project.img
-      ? `<img src="${escapeHtml(resolveAssetUrl(project.img))}" alt="${escapeHtml(project.title)}" decoding="async" fetchpriority="high">`
-      : `<div style="padding:4rem;text-align:center;font-size:4rem">${escapeHtml(project.emoji || '🧩')}</div>`;
+    if (project.img) {
+      const fullUrl = resolveAssetUrl(project.img);
+      const thumbUrl = resolveThumbnailUrl(project.img);
+      // 先用列表页已缓存的缩略图即时显示，再后台加载大图无缝替换。
+      cover.innerHTML = `<img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(project.title)}" decoding="async">`;
+      const coverImg = cover.querySelector('img');
+      if (coverImg && fullUrl !== thumbUrl) {
+        const fullImage = new Image();
+        fullImage.onload = () => { coverImg.src = fullUrl; };
+        fullImage.src = fullUrl;
+      }
+    } else {
+      cover.innerHTML = `<div style="padding:4rem;text-align:center;font-size:4rem">${escapeHtml(project.emoji || '🧩')}</div>`;
+    }
   }
 
   const body = document.getElementById('project-detail-body');

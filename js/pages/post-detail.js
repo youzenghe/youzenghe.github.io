@@ -157,10 +157,21 @@ window.SiteApp.registerPage('post-detail', () => {
 
   const cover = document.getElementById('post-cover');
   if (cover) {
-    const coverUrl = resolveAssetUrl(post.cover);
-    cover.innerHTML = post.cover
-      ? `<div class="img-bg" style="background-image:url('${escapeCssUrl(coverUrl)}')"></div><img src="${escapeHtml(coverUrl)}" alt="文章封面" loading="eager" decoding="async" />`
-      : escapeHtml(post.emoji);
+    if (post.cover) {
+      const fullUrl = resolveAssetUrl(post.cover);
+      const thumbUrl = resolveThumbnailUrl(post.cover);
+      // 先用列表页已缓存的缩略图即时显示封面，再后台加载大图无缝替换，
+      // 避免「进文章后主图要等一下才出来」的卡顿感。
+      cover.innerHTML = `<div class="img-bg" style="background-image:url('${escapeCssUrl(thumbUrl)}')"></div><img src="${escapeHtml(thumbUrl)}" alt="文章封面" decoding="async" />`;
+      const coverImg = cover.querySelector('img');
+      if (coverImg && fullUrl !== thumbUrl) {
+        const fullImage = new Image();
+        fullImage.onload = () => { coverImg.src = fullUrl; };
+        fullImage.src = fullUrl;
+      }
+    } else {
+      cover.innerHTML = escapeHtml(post.emoji);
+    }
   }
 
   const body = document.getElementById('post-body');

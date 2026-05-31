@@ -35,6 +35,7 @@ let pendingPageRunRaf = 0;
 let randomBgReady = null;
 let randomBgPromise = null;
 let navigationPendingCount = 0;
+let navLoaderTimer = 0;
 
 function prefersReducedMotion() {
   return window.matchMedia?.(REDUCED_MOTION_QUERY).matches || false;
@@ -138,12 +139,24 @@ function getLocalBgUrl() {
 
 function showNavigationLoader() {
   navigationPendingCount += 1;
-  document.getElementById('loader')?.classList.remove('hidden');
+  // 延迟显示加载条：命中缓存的快速切换通常在 160ms 内完成，根本不闪 loader，
+  // 用户感觉是「瞬间出现」；只有真正较慢的导航才会显示加载反馈。
+  if (navLoaderTimer || !document.getElementById('loader')) return;
+  navLoaderTimer = window.setTimeout(() => {
+    navLoaderTimer = 0;
+    if (navigationPendingCount > 0) {
+      document.getElementById('loader')?.classList.remove('hidden');
+    }
+  }, 160);
 }
 
 function hideNavigationLoader() {
   navigationPendingCount = Math.max(0, navigationPendingCount - 1);
   if (navigationPendingCount === 0) {
+    if (navLoaderTimer) {
+      window.clearTimeout(navLoaderTimer);
+      navLoaderTimer = 0;
+    }
     document.getElementById('loader')?.classList.add('hidden');
   }
 }
@@ -522,7 +535,8 @@ function initReveal() {
     const rect = el.getBoundingClientRect();
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     if (rect.top <= viewportHeight + margin && rect.bottom >= -margin) {
-      el.classList.add('visible');
+      // 首屏就在视口内的内容立即显示，不播入场渐入；渐入动画留给滚动进入视口的元素。
+      el.classList.add('reveal-instant', 'visible');
       return true;
     }
     return false;
