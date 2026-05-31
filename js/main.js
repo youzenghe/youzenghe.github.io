@@ -20,7 +20,7 @@ const BG_POOL_SIZE_MOBILE = 154; // 移动端图片数量
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
-const PAGE_CACHE_TTL = 30000;
+const PAGE_CACHE_TTL = 120000; // 2分钟缓存，减少重复请求
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 let currentPageCleanup = null;
@@ -82,6 +82,9 @@ function preloadBg(url, priority = 'auto', retryCount = 0, customRootPrefix = un
         }
       } catch (error) {
         // 图片已加载即可继续，解码失败不阻塞背景显示。
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          console.warn('[Background] Image decode failed:', url, error);
+        }
       }
       resolve({
         url,
@@ -92,10 +95,16 @@ function preloadBg(url, priority = 'auto', retryCount = 0, customRootPrefix = un
     img.onerror = () => {
       // 如果加载失败，尝试重试或使用fallback
       if (retryCount < MAX_RETRIES) {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          console.warn(`[Background] Load failed (retry ${retryCount + 1}/${MAX_RETRIES}):`, url);
+        }
         // 重试：生成新的随机图片，使用相同的 rootPrefix
         const newUrl = createBgUrl(customRootPrefix);
         preloadBg(newUrl, priority, retryCount + 1, customRootPrefix).then(resolve).catch(reject);
       } else {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          console.error('[Background] All retries failed, using fallback:', url);
+        }
         // 重试失败，使用固定背景作为fallback
         const fallbackUrl = getLocalBgUrl();
         const fallbackImg = new Image();

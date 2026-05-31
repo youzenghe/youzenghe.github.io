@@ -31,6 +31,7 @@ def valid_url(url: str) -> bool:
 
 def validate_posts(errors: list[str]) -> set[int]:
     ids: set[int] = set()
+    slugs: set[str] = set()
     for path in sorted(POSTS_DIR.glob("*.md")):
         meta, _ = parse_front_matter(path.read_text(encoding="utf-8"))
         label = path.relative_to(ROOT)
@@ -45,6 +46,13 @@ def validate_posts(errors: list[str]) -> set[int]:
         if post_id in ids:
             fail(f"{label}: duplicate post id {post_id}", errors)
         ids.add(post_id)
+
+        # 验证 slug 唯一性
+        slug = str(meta.get("slug", ""))
+        if slug:
+            if slug in slugs:
+                fail(f"{label}: duplicate post slug '{slug}'", errors)
+            slugs.add(slug)
 
         status = str(meta.get("status", "published"))
         if status not in {"published", "draft"}:
