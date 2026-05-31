@@ -2,7 +2,7 @@
 id: 6
 title: "神本无相——豆包说，它识别不出我的脸"
 cat: "趣味生活"
-catColor: "#f9a8c9"
+catColor: "#52e0e0"
 date: "2025-08-22"
 readTime: 2
 emoji: "👤"

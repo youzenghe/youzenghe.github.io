@@ -444,7 +444,7 @@ function initParticles(canvasId) {
       op: Math.random() * 0.55 + 0.15,
       rot: Math.random() * Math.PI * 2,
       rs: (Math.random() - 0.5) * 0.035,
-      hue: Math.random() * 40 + 320,
+      hue: Math.random() * 50 + 190,
     };
   }
 

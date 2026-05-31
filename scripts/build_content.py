@@ -221,7 +221,7 @@ def load_posts() -> list[dict]:
             "id": int(meta["id"]),
             "title": str(meta["title"]),
             "cat": str(meta["cat"]),
-            "catColor": str(meta.get("catColor", "#f9a8c9")),
+            "catColor": str(meta.get("catColor", "#52e0e0")),
             "date": str(meta["date"]),
             "updatedAt": str(meta.get("updatedAt", meta["date"])),
             "status": status,

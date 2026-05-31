@@ -3,7 +3,7 @@ id: 7
 title: 我深思熟虑，决定做一款由乔瓮执笔的 GalGame
 cat: 趣味生活
 series: 趣味生活
-catColor: "#f9a8c9"
+catColor: "#52e0e0"
 date: 2025-12-01
 status: published
 readTime: 4
