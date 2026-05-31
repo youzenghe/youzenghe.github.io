@@ -85,20 +85,24 @@
     }
     .plc-thumb {
       position: absolute;
-      right: 0;
+      inset-inline-end: 0;
       top: 0;
-      width: 35%;
-      min-width: 280px;
+      width: min(56%, 440px);
       height: 100%;
       border-radius: 0;
-      background: linear-gradient(135deg, rgba(91,157,255,0.15), rgba(91,157,255,0.15));
+      background: linear-gradient(135deg, rgba(91,157,255,0.12), rgba(82,224,224,0.12));
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2.5rem;
       overflow: hidden;
       z-index: 0;
+      opacity: 0.62;
+      -webkit-mask-image: linear-gradient(to right, transparent 4%, rgba(0,0,0,0.45) 38%, #000 72%);
+      mask-image: linear-gradient(to right, transparent 4%, rgba(0,0,0,0.45) 38%, #000 72%);
+      transition: opacity 0.4s ease;
     }
+    .post-list-card:hover .plc-thumb { opacity: 0.88; }
     .plc-thumb .img-bg {
       position: absolute;
       inset: 0;
@@ -124,12 +128,6 @@
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
-      background: linear-gradient(to right,
-        var(--card-bg) 0%,
-        var(--card-bg) 50%,
-        rgba(26, 28, 32, 0.9) 70%,
-        rgba(26, 28, 32, 0.6) 85%,
-        transparent 100%);
     }
     .plc-meta {
       display: flex;
@@ -310,6 +308,9 @@
         min-width: 100%;
         height: auto;
         aspect-ratio: 16/9;
+        opacity: 1;
+        -webkit-mask-image: none;
+        mask-image: none;
       }
       .plc-content {
         width: 100%;
