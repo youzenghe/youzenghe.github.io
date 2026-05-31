@@ -66,11 +66,14 @@ function createBgUrl() {
   return `${config.rootPrefix}assets/bg-pool/${folder}/bg${index}.webp`;
 }
 
-function preloadBg(url, priority = 'auto') {
+function preloadBg(url, priority = 'auto', retryCount = 0) {
+  const MAX_RETRIES = 2; // 最多重试2次
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.decoding = 'async';
     img.fetchPriority = priority;
+
     img.onload = async () => {
       try {
         if (typeof img.decode === 'function') {
@@ -84,7 +87,23 @@ function preloadBg(url, priority = 'auto') {
         img,
       });
     };
-    img.onerror = reject;
+
+    img.onerror = () => {
+      // 如果加载失败，尝试重试或使用fallback
+      if (retryCount < MAX_RETRIES) {
+        // 重试：生成新的随机图片
+        const newUrl = createBgUrl();
+        preloadBg(newUrl, priority, retryCount + 1).then(resolve).catch(reject);
+      } else {
+        // 重试失败，使用固定背景作为fallback
+        const fallbackUrl = getLocalBgUrl();
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => resolve({ url: fallbackUrl, img: fallbackImg });
+        fallbackImg.onerror = () => reject(new Error('All background loading attempts failed'));
+        fallbackImg.src = fallbackUrl;
+      }
+    };
+
     img.src = url;
   });
 }
