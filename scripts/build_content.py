@@ -5,12 +5,29 @@ import re
 from html import escape
 from pathlib import Path
 
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT_DIR = ROOT / "content"
 POSTS_DIR = CONTENT_DIR / "posts"
 DATA_JS = ROOT / "js" / "data.js"
 IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
+
+
+def is_animated_asset(src: str) -> bool:
+    if not src or re.match(r"^https?://", src, re.I):
+        return False
+    normalized = src.replace("\\", "/").lstrip("/")
+    while normalized.startswith("../"):
+        normalized = normalized[3:]
+    path = ROOT / normalized
+    if not path.is_file():
+        return False
+    try:
+        with Image.open(path) as image:
+            return getattr(image, "n_frames", 1) > 1
+    except Exception:
+        return False
 
 
 def parse_scalar(value: str):
@@ -230,6 +247,7 @@ def load_posts() -> list[dict]:
             "readTime": int(meta.get("readTime", 3)),
             "emoji": str(meta.get("emoji", "📝")),
             "cover": str(meta.get("cover", "")),
+            "coverAnimated": is_animated_asset(str(meta.get("cover", ""))),
             "images": images,
             "series": str(meta.get("series", meta.get("cat", ""))),
             "excerpt": str(meta.get("excerpt", "")),

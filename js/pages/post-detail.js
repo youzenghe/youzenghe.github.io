@@ -159,7 +159,7 @@ window.SiteApp.registerPage('post-detail', () => {
   if (cover) {
     if (post.cover) {
       const fullUrl = resolveAssetUrl(post.cover);
-      const thumbUrl = resolveThumbnailUrl(post.cover);
+      const thumbUrl = post.coverAnimated ? fullUrl : resolveThumbnailUrl(post.cover);
       // 先用列表页已缓存的缩略图即时显示封面，再后台加载大图无缝替换，
       // 避免「进文章后主图要等一下才出来」的卡顿感。
       cover.innerHTML = `<div class="img-bg" style="background-image:url('${escapeCssUrl(thumbUrl)}')"></div><img src="${escapeHtml(thumbUrl)}" alt="文章封面" decoding="async" />`;

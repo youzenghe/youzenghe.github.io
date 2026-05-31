@@ -13,8 +13,9 @@ window.SiteApp.registerPage('home', () => {
     el.style.transitionDelay = `${index * 0.1}s`;
     el.href = `pages/post.html?id=${post.id}`;
     const cover = escapeHtml(resolveAssetUrl(post.cover));
-    const thumb = escapeHtml(resolveThumbnailUrl(post.cover));
-    const thumbCss = escapeCssUrl(resolveThumbnailUrl(post.cover));
+    const previewSource = post.coverAnimated ? resolveAssetUrl(post.cover) : resolveThumbnailUrl(post.cover);
+    const thumb = escapeHtml(previewSource);
+    const thumbCss = escapeCssUrl(previewSource);
     const title = escapeHtml(post.title);
     el.innerHTML = `
       <div class="post-card-img">
