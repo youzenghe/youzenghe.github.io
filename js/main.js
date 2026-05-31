@@ -7,8 +7,8 @@ const PAGE_STYLE_ATTR = 'data-page-style';
 const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
 const SAKANA_WIDGET_STYLE_ID = 'sakana-widget-style';
 const SAKANA_WIDGET_SCRIPT_ID = 'sakana-widget-script';
-const SAKANA_WIDGET_CSS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.css';
-const SAKANA_WIDGET_JS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.js';
+const SAKANA_WIDGET_CSS_URL = 'assets/sakana-widget/sakana.min.css';
+const SAKANA_WIDGET_JS_URL = 'assets/sakana-widget/sakana.min.js';
 const LOCAL_BG_DESKTOP = 'assets/bg-pc.webp';
 const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
 
@@ -903,7 +903,8 @@ function loadExternalStylesheet(id, href) {
   const link = document.createElement('link');
   link.id = id;
   link.rel = 'stylesheet';
-  link.href = href;
+  // 如果是相对路径，使用 resolveAssetUrl 处理
+  link.href = /^https?:\/\//i.test(href) ? href : resolveAssetUrl(href);
   document.head.appendChild(link);
 }
 
@@ -920,7 +921,8 @@ function loadExternalScript(id, src) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.id = id;
-    script.src = src;
+    // 如果是相对路径，使用 resolveAssetUrl 处理
+    script.src = /^https?:\/\//i.test(src) ? src : resolveAssetUrl(src);
     script.async = true;
     script.onload = () => {
       script.dataset.loaded = 'true';
