@@ -59,17 +59,23 @@ window.SiteApp.registerPage('posts', () => {
     const container = document.getElementById('posts-list');
     if (!container) return;
     container.innerHTML = '';
-    container.scrollTop = 0;
 
     if (!list.length) {
       container.innerHTML = '<div class="no-results"><span>🔍</span>该分类下暂时没有文章</div>';
       return;
     }
 
-    list.forEach((post, index) => {
+    // 如果文章数量少于 12 篇，循环重复
+    const minPosts = 12;
+    const postsToRender = [];
+    while (postsToRender.length < minPosts) {
+      postsToRender.push(...list);
+    }
+
+    postsToRender.forEach((post, index) => {
       const el = document.createElement('a');
       el.className = 'post-list-card reveal';
-      el.style.transitionDelay = `${index * 0.07}s`;
+      el.style.transitionDelay = `${(index % 12) * 0.07}s`;
       el.href = `post.html?id=${post.id}`;
       el.innerHTML = renderCard(post, simple, index);
       container.appendChild(el);

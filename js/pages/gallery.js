@@ -33,28 +33,43 @@ window.SiteApp.registerPage('gallery', () => {
   let previousActiveElement = null;
   const gallerySources = ALL_PHOTOS.map((item) => item.src);
 
+  // 随机高度数组（像素）
+  const randomHeights = [180, 220, 260, 300, 340, 200, 240, 280, 320];
+
   function renderGallery() {
     const container = document.getElementById('gallery-masonry');
     if (!container) return;
 
-    gallerySources.forEach((src, index) => {
+    // 如果图片数量少于 30 张，循环重复
+    const minPhotos = 30;
+    const photosToRender = [];
+    while (photosToRender.length < minPhotos) {
+      photosToRender.push(...gallerySources);
+    }
+
+    photosToRender.forEach((src, index) => {
       const card = document.createElement('div');
       card.className = 'photo-card';
-      card.dataset.index = String(index);
+      card.dataset.index = String(index % gallerySources.length);
 
       const img = document.createElement('img');
       img.src = typeof resolveThumbnailUrl === 'function' ? resolveThumbnailUrl(src) : src;
       img.dataset.fullSrc = src;
       img.alt = '';
-      img.loading = 'lazy';
+      img.loading = index < 12 ? 'eager' : 'lazy';
       img.decoding = 'async';
+
+      // 随机高度
+      const randomHeight = randomHeights[index % randomHeights.length];
+      img.style.height = `${randomHeight}px`;
+
       img.onerror = () => {
         img.onerror = null;
         img.src = img.dataset.fullSrc;
       };
 
       card.appendChild(img);
-      card.addEventListener('click', () => openGalleryLightbox(index));
+      card.addEventListener('click', () => openGalleryLightbox(index % gallerySources.length));
       container.appendChild(card);
     });
   }
