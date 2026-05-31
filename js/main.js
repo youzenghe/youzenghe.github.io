@@ -364,6 +364,7 @@ async function loadNavigationBg(bgLayer) {
 
   if (readyBg?.url) {
     swapBgPane(bgLayer, readyBg);
+    // 立即预加载下一张，加快切换速度
     prefetchRandomBg();
     return readyBg.url;
   }
@@ -372,6 +373,7 @@ async function loadNavigationBg(bgLayer) {
   const fallbackBg = await preloadBg(fallbackUrl, 'low').catch(() => null);
   if (fallbackBg?.url) {
     swapBgPane(bgLayer, fallbackBg);
+    // 即使使用fallback，也预加载随机背景
     prefetchRandomBg();
     return fallbackBg.url;
   }
@@ -1233,8 +1235,8 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   scrollToNavigationTarget(hash);
 
   const bgLayer = document.getElementById('bg-layer');
-  const pageKey = getPageKey(targetUrl);
-  const bgTask = pageKey === 'home' ? loadInitialBg(bgLayer) : loadNavigationBg(bgLayer);
+  // 所有页面都使用随机背景池（包括首页）
+  const bgTask = loadNavigationBg(bgLayer);
   Promise.resolve(bgTask).catch(() => {});
 
   pendingPageRunRaf = window.requestAnimationFrame(() => {
@@ -1408,7 +1410,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const bgLayer = document.getElementById('bg-layer');
   let initialBgPromise = Promise.resolve('');
   if (bgLayer) {
-    initialBgPromise = Promise.resolve(loadInitialBg(bgLayer));
+    // 首次加载也使用随机背景池
+    initialBgPromise = Promise.resolve(loadNavigationBg(bgLayer));
   }
 
   ensureAppContentRoot();
@@ -1428,4 +1431,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pagehide', markLive2DHidden);
 
   runCurrentPageModule();
+
+  // 页面加载完成后，立即预加载下一张背景图片，加快切换速度
+  if (USE_BG_POOL) {
+    initialBgPromise.finally(() => {
+      // 延迟一点点，让首屏渲染优先
+      setTimeout(() => prefetchRandomBg(), 500);
+    });
+  }
 });
