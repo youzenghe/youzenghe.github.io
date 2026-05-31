@@ -266,13 +266,13 @@ window.SiteApp.registerPage('post-detail', () => {
     });
   }
 
-  const prev = POSTS[postIndex - 1];
-  const next = POSTS[postIndex + 1];
+  const newer = POSTS[postIndex - 1];
+  const older = POSTS[postIndex + 1];
   const prevNext = document.getElementById('prev-next');
   if (prevNext) {
     prevNext.innerHTML = `
-      ${prev ? `<a class="pn-card" href="post.html?id=${prev.id}"><div class="pn-label">← 上一篇</div><div class="pn-title">${escapeHtml(prev.title)}</div></a>` : '<div></div>'}
-      ${next ? `<a class="pn-card next" href="post.html?id=${next.id}"><div class="pn-label">下一篇 →</div><div class="pn-title">${escapeHtml(next.title)}</div></a>` : '<div></div>'}
+      ${older ? `<a class="pn-card" href="post.html?id=${older.id}"><div class="pn-label">← 上一篇</div><div class="pn-title">${escapeHtml(older.title)}</div></a>` : '<div></div>'}
+      ${newer ? `<a class="pn-card next" href="post.html?id=${newer.id}"><div class="pn-label">下一篇 →</div><div class="pn-title">${escapeHtml(newer.title)}</div></a>` : '<div></div>'}
     `;
   }
 

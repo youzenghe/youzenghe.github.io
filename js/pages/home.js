@@ -132,7 +132,7 @@ window.SiteApp.registerPage('home', () => {
     const projectContainer = document.getElementById('home-projects');
     if (projectContainer) {
       const projectFragment = document.createDocumentFragment();
-      PROJECTS.slice(0, 4).forEach((project) => {
+      [...PROJECTS].sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 4).forEach((project) => {
         projectFragment.appendChild(buildProjectCard(project));
       });
       projectContainer.replaceChildren(projectFragment);

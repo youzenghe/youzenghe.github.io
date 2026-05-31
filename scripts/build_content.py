@@ -244,7 +244,7 @@ def load_posts() -> list[dict]:
             "content": markdown_to_html(body),
         }
         posts.append(post)
-    return sorted(posts, key=lambda item: (not item["pinned"], -item["id"]))
+    return sorted(posts, key=lambda item: (item["pinned"], item["date"], item["id"]), reverse=True)
 
 
 def read_json(name: str):

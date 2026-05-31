@@ -145,15 +145,19 @@ window.SiteApp.registerPage('projects', () => {
     projectLightboxIndex = index;
     renderProjectLightbox();
     const lightbox = document.getElementById('lightbox');
+    if (lightbox.classList.contains('open')) return;
     lightbox.classList.add('open');
     lightbox.setAttribute('aria-hidden', 'false');
+    window.SiteApp?.lockBodyScroll?.();
     document.getElementById('lb-close')?.focus();
   }
 
   function closeProjectLightbox() {
     const lightbox = document.getElementById('lightbox');
+    if (!lightbox.classList.contains('open')) return;
     lightbox.classList.remove('open');
     lightbox.setAttribute('aria-hidden', 'true');
+    window.SiteApp?.unlockBodyScroll?.();
     previousActiveElement?.focus?.();
   }
 

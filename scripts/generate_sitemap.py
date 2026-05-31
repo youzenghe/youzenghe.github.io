@@ -34,7 +34,6 @@ def main() -> None:
         "/pages/posts.html",
         "/pages/projects.html",
         "/pages/games.html",
-        "/pages/gallery.html",
         "/pages/changelog.html",
         "/pages/about.html",
     ]

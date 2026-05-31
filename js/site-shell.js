@@ -103,7 +103,7 @@
           <button class="nav-icon-btn search-trigger" type="button" title="搜索" aria-label="打开站内搜索">🔍</button>
           <button class="nav-icon-btn theme-toggle" type="button" title="切换主题" aria-label="切换明暗主题">☀️</button>
         </div>
-        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="打开菜单">☰</button>
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="打开菜单" aria-controls="mobile-menu" aria-expanded="false">☰</button>
       </nav>
       <div class="mobile-menu" id="mobile-menu" aria-label="移动端导航">${navLinks}</div>
     `;

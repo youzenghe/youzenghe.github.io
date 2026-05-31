@@ -56,19 +56,20 @@ window.SiteApp.registerPage('games', () => {
       ? `<img src="${escapeHtml(resolveAssetUrl(game.image))}" alt="${escapeHtml(game.title)}" decoding="async">`
       : escapeHtml(game.previewEmoji);
     const modal = document.getElementById('game-modal');
+    if (modal.style.display === 'flex') return;
     modal.style.display = 'flex';
     modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    window.SiteApp?.lockBodyScroll?.();
     document.getElementById('modal-close')?.focus();
   }
 
   function closeGameModal() {
     const modal = document.getElementById('game-modal');
-    if (modal) {
+    if (modal?.style.display === 'flex') {
       modal.style.display = 'none';
       modal.setAttribute('aria-hidden', 'true');
+      window.SiteApp?.unlockBodyScroll?.();
     }
-    document.body.style.overflow = '';
     previousActiveElement?.focus?.();
   }
 

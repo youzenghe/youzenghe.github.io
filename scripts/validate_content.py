@@ -9,6 +9,7 @@ from build_content import CONTENT_DIR, POSTS_DIR, ROOT, normalize_images, parse_
 
 
 IMAGE_FIELDS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"}
+IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
 
 
 def fail(message: str, errors: list[str]) -> None:
@@ -22,6 +23,13 @@ def local_asset_exists(path: str) -> bool:
     return (ROOT / normalized).exists()
 
 
+def validate_markdown_images(text: str, label: str, errors: list[str]) -> None:
+    for match in IMAGE_MARKDOWN_RE.finditer(text):
+        src = match.group("src") or ""
+        if src and not local_asset_exists(src):
+            fail(f"{label}: markdown image does not exist: {src}", errors)
+
+
 def valid_url(url: str) -> bool:
     if not url:
         return False
@@ -33,7 +41,8 @@ def validate_posts(errors: list[str]) -> set[int]:
     ids: set[int] = set()
     slugs: set[str] = set()
     for path in sorted(POSTS_DIR.glob("*.md")):
-        meta, _ = parse_front_matter(path.read_text(encoding="utf-8"))
+        raw_text = path.read_text(encoding="utf-8")
+        meta, body = parse_front_matter(raw_text)
         label = path.relative_to(ROOT)
         required = ["id", "title", "cat", "date", "excerpt"]
         for key in required:
@@ -66,6 +75,8 @@ def validate_posts(errors: list[str]) -> set[int]:
         for image in normalize_images(meta.get("images", [])):
             if not local_asset_exists(image["src"]):
                 fail(f"{label}: image does not exist: {image['src']}", errors)
+
+        validate_markdown_images(body, str(label), errors)
 
     for path in sorted(POSTS_DIR.glob("*.md")):
         meta, _ = parse_front_matter(path.read_text(encoding="utf-8"))

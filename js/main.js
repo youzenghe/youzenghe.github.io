@@ -36,6 +36,7 @@ let randomBgReady = null;
 let randomBgPromise = null;
 let navigationPendingCount = 0;
 let navLoaderTimer = 0;
+let modalLockCount = 0;
 
 function prefersReducedMotion() {
   return window.matchMedia?.(REDUCED_MOTION_QUERY).matches || false;
@@ -167,6 +168,18 @@ function wait(ms) {
   });
 }
 
+function lockBodyScroll() {
+  modalLockCount += 1;
+  document.body.classList.add('modal-open');
+}
+
+function unlockBodyScroll() {
+  modalLockCount = Math.max(0, modalLockCount - 1);
+  if (modalLockCount === 0) {
+    document.body.classList.remove('modal-open');
+  }
+}
+
 function hideInitialLoader() {
   if (navigationPendingCount > 0) return;
   document.getElementById('loader')?.classList.add('hidden');
@@ -269,7 +282,6 @@ function getPageKey(url = location.href) {
   if (path.endsWith('/pages/project.html')) return 'project-detail';
   if (path.endsWith('/pages/changelog.html')) return 'changelog';
   if (path.endsWith('/pages/games.html')) return 'games';
-  if (path.endsWith('/pages/gallery.html')) return 'gallery';
   if (path.endsWith('/pages/about.html')) return 'about';
   if (path.endsWith('/404.html')) return '404';
   return '';
@@ -575,9 +587,25 @@ function initMobileNav() {
   if (!toggle || !menu || toggle.dataset.inited === 'true') return;
 
   toggle.dataset.inited = 'true';
-  toggle.addEventListener('click', () => menu.classList.toggle('open'));
+  function setOpen(opened) {
+    menu.classList.toggle('open', opened);
+    toggle.setAttribute('aria-expanded', String(opened));
+    toggle.setAttribute('aria-label', opened ? '关闭菜单' : '打开菜单');
+  }
+
+  toggle.addEventListener('click', () => setOpen(!menu.classList.contains('open')));
   menu.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => menu.classList.remove('open'));
+    link.addEventListener('click', () => setOpen(false));
+  });
+  document.addEventListener('click', (event) => {
+    if (!menu.classList.contains('open')) return;
+    if (menu.contains(event.target) || toggle.contains(event.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setOpen(false);
+    }
   });
 }
 
@@ -587,9 +615,11 @@ function initSearch() {
   const results = document.getElementById('search-results');
   const openBtns = document.querySelectorAll('.search-trigger');
   const closeBtn = document.getElementById('search-close');
+  let previousActiveElement = null;
 
   if (!overlay || !input || !results || typeof POSTS === 'undefined' || overlay.dataset.inited === 'true') return;
   overlay.dataset.inited = 'true';
+  overlay.setAttribute('aria-hidden', 'true');
 
   function escapeHtml(text) {
     return String(text).replace(/[&<>"']/g, (char) => ({
@@ -667,13 +697,21 @@ function initSearch() {
   }
 
   function open() {
+    if (overlay.classList.contains('open')) return;
+    previousActiveElement = document.activeElement;
     overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    lockBodyScroll();
     input.focus();
     render('');
   }
 
   function close() {
+    if (!overlay.classList.contains('open')) return;
     overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    unlockBodyScroll();
+    previousActiveElement?.focus?.();
   }
 
   openBtns.forEach((btn) => btn.addEventListener('click', open));
@@ -1223,6 +1261,7 @@ function applyShellConfig() {
 function resetTransientPageState() {
   document.body.style.overflow = '';
   document.body.classList.remove('modal-open');
+  modalLockCount = 0;
 }
 
 function loadScript(src) {
@@ -1460,6 +1499,8 @@ window.SiteApp = {
   registerPage: registerPageModule,
   navigate: navigateTo,
   runPageModule: runCurrentPageModule,
+  lockBodyScroll,
+  unlockBodyScroll,
 };
 
 document.addEventListener('DOMContentLoaded', () => {
