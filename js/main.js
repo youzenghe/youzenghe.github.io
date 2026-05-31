@@ -321,7 +321,9 @@ function swapBgPane(bgLayer, readyBg) {
 
 function loadInitialBg(bgLayer) {
   if (!bgLayer) return Promise.resolve('');
-  const url = getLocalBgUrl();
+
+  // 如果启用了背景图片池，使用随机背景；否则使用固定背景
+  const url = USE_BG_POOL ? createBgUrl() : getLocalBgUrl();
   if (bgLayer.dataset.bgUrl === url) return Promise.resolve(url);
 
   return preloadBg(url, 'high')
