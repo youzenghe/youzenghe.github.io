@@ -11,6 +11,12 @@ const SAKANA_WIDGET_CSS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/
 const SAKANA_WIDGET_JS_URL = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.js';
 const LOCAL_BG_DESKTOP = 'assets/bg-pc.webp';
 const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
+
+// 本地背景图片池配置
+const USE_BG_POOL = true; // 是否启用背景图片池（false则使用固定背景）
+const BG_POOL_SIZE_PC = 241; // PC端图片数量
+const BG_POOL_SIZE_MOBILE = 154; // 移动端图片数量
+
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
@@ -43,7 +49,21 @@ function requestIdleWork(callback, timeout = 1200) {
 }
 
 function createBgUrl() {
-  return `https://www.loliapi.com/acg/?t=${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const config = getSiteConfig();
+
+  // 如果不启用背景图片池，使用固定背景
+  if (!USE_BG_POOL) {
+    return getLocalBgUrl();
+  }
+
+  // 根据设备选择对应的图片池大小
+  const isMobile = window.matchMedia?.('(max-width: 768px)').matches || window.innerWidth <= 768;
+  const poolSize = isMobile ? BG_POOL_SIZE_MOBILE : BG_POOL_SIZE_PC;
+  const folder = isMobile ? 'mobile' : 'pc';
+
+  // 随机选择一张图片（1到poolSize）
+  const index = Math.floor(Math.random() * poolSize) + 1;
+  return `${config.rootPrefix}assets/bg-pool/${folder}/bg${index}.webp`;
 }
 
 function preloadBg(url, priority = 'auto') {

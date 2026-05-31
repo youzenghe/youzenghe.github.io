@@ -24,6 +24,7 @@ __pycache__/
 
 # Local-only helper files
 鸣潮启动.bat
+.claude/
 
 # Unused original image sources
 assets/game1.png
