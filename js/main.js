@@ -356,18 +356,31 @@ function prefetchRandomBg(customRootPrefix) {
 async function loadNavigationBg(bgLayer) {
   if (!bgLayer) return '';
 
+  // 获取当前页面的 rootPrefix
+  const currentRootPrefix = getSiteConfig().rootPrefix;
+
   let readyBg = randomBgReady;
+
+  // 检查缓存的图片 URL 是否匹配当前页面的 rootPrefix
+  if (readyBg?.url) {
+    const expectedPrefix = `${currentRootPrefix}assets/bg-pool/`;
+    if (!readyBg.url.startsWith(expectedPrefix)) {
+      // 缓存的图片 URL 不匹配当前页面，丢弃缓存
+      readyBg = null;
+    }
+  }
+
   randomBgReady = null;
 
   if (!readyBg) {
-    readyBg = await prefetchRandomBg();
+    // 如果没有预加载的图片，立即加载一张，使用当前页面的 rootPrefix
+    readyBg = await prefetchRandomBg(currentRootPrefix);
     randomBgReady = null;
   }
 
   if (readyBg?.url) {
     swapBgPane(bgLayer, readyBg);
     // 立即预加载下一张，使用当前页面的 rootPrefix
-    const currentRootPrefix = getSiteConfig().rootPrefix;
     prefetchRandomBg(currentRootPrefix);
     return readyBg.url;
   }
@@ -377,7 +390,6 @@ async function loadNavigationBg(bgLayer) {
   if (fallbackBg?.url) {
     swapBgPane(bgLayer, fallbackBg);
     // 即使使用fallback，也预加载随机背景，使用当前页面的 rootPrefix
-    const currentRootPrefix = getSiteConfig().rootPrefix;
     prefetchRandomBg(currentRootPrefix);
     return fallbackBg.url;
   }
