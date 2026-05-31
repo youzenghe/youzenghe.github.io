@@ -2,8 +2,9 @@
    次元日记 · Global Styles
    ============================================================ */
 
-/* ----- Clarity 风字体：Inter(西文) + JetBrains Mono(代码)；中文走思源/系统字体栈 ----- */
+/* ----- Clarity 风字体：Inter(西文) + 思源黑(中文) + JetBrains Mono(代码) ----- */
 @import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/inter/index.css');
+@import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc/index.css');
 @import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/jetbrains-mono/index.css');
 
 /* ----- CSS Variables: Dark (default) ----- */
@@ -26,9 +27,9 @@
   --shadow:        rgba(0,0,0,0.5);
   --card-bg:       rgba(26,28,32,0.72);
   --nav-bg:        rgba(18,20,24,0.68);
-  --font-body:      "Inter Variable", "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-display:   "Inter Variable", "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-ui:        "Inter Variable", "Inter", system-ui, "Segoe UI", sans-serif;
+  --font-body:      "Inter Variable", "Inter", "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display:   "Inter Variable", "Inter", "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-ui:        "Inter Variable", "Inter", "Noto Sans SC Variable", "Noto Sans SC", system-ui, "Segoe UI", sans-serif;
   --radius:        0.5rem;
   --radius-sm:     0.25rem;
   --transition:    0.25s ease;
