@@ -26,35 +26,14 @@
   <style>
     .gallery-page { padding-bottom: 6rem; }
     .page-hero { padding: 7rem 0 3rem; }
-    .track-section { margin-bottom: 2.8rem; overflow: hidden; position: relative; }
-    .track-section::before,
-    .track-section::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 80px;
-      z-index: 2;
-      pointer-events: none;
+    .gallery-masonry {
+      column-count: 4;
+      column-gap: 16px;
+      padding: 0 1rem;
     }
-    .track-section::before {
-      left: 0;
-      background: linear-gradient(to right, var(--bg, #120b18), transparent);
-    }
-    .track-section::after {
-      right: 0;
-      background: linear-gradient(to left, var(--bg, #120b18), transparent);
-    }
-    .track {
-      display: flex;
-      gap: 12px;
-      width: max-content;
-      will-change: transform;
-      cursor: grab;
-    }
-    .track:active { cursor: grabbing; }
     .photo-card {
-      flex-shrink: 0;
+      break-inside: avoid;
+      margin-bottom: 16px;
       border-radius: 14px;
       overflow: hidden;
       position: relative;
@@ -70,15 +49,11 @@
     }
     .photo-card img {
       display: block;
-      height: 220px;
-      width: auto;
-      max-width: 320px;
-      min-width: 120px;
-      object-fit: contain;
-      background: transparent;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      aspect-ratio: 1;
     }
-    .track-row-2 .photo-card img { height: 180px; }
-    .track-row-3 .photo-card img { height: 250px; }
     #lightbox {
       position: fixed;
       inset: 0;
@@ -156,28 +131,14 @@
     .lb-nav:hover { background: rgba(255,255,255,0.2); }
     .lb-prev { left: -3.2rem; }
     .lb-next { right: -3.2rem; }
-    .pause-hint {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px);
-      padding: 0.4rem 1.2rem;
-      border-radius: 2rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      opacity: 0;
-      transition: opacity 0.4s;
-      pointer-events: none;
-      z-index: 50;
+    @media (max-width: 1200px) {
+      .gallery-masonry { column-count: 3; }
     }
-    .pause-hint.show { opacity: 1; }
+    @media (max-width: 768px) {
+      .gallery-masonry { column-count: 2; column-gap: 12px; padding: 0 0.5rem; }
+      .photo-card { margin-bottom: 12px; }
+    }
     @media (max-width: 600px) {
-      .photo-card img { height: 150px; max-width: 240px; }
-      .track-row-2 .photo-card img { height: 130px; }
-      .track-row-3 .photo-card img { height: 170px; }
       .lb-prev { left: -1.5rem; }
       .lb-next { right: -1.5rem; }
     }
@@ -199,18 +160,14 @@
     </div>
   </div>
 
-  <div class="pause-hint" id="pause-hint">已暂停 · 点击空白处继续</div>
-
   <main class="site-wrapper gallery-page" id="main-content" tabindex="-1">
     <div class="page-hero reveal">
       <div class="section-label">Gallery</div>
       <h1>相册</h1>
-      <p>用图片记录走过的每一段路，悬停或点击都可以放大查看。</p>
+      <p>用图片记录走过的每一段路，点击可以放大查看。</p>
     </div>
 
-    <div class="track-section" id="section-1"><div class="track track-row-1" id="track-1"></div></div>
-    <div class="track-section" id="section-2"><div class="track track-row-2" id="track-2"></div></div>
-    <div class="track-section" id="section-3"><div class="track track-row-3" id="track-3"></div></div>
+    <div class="gallery-masonry" id="gallery-masonry"></div>
   </main>
 
   <div id="site-shell-bottom"></div>

@@ -74,11 +74,13 @@
     }
     .sum-label { font-size: 0.72rem; color: var(--text-muted); }
     .project-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.4rem;
+      column-count: 3;
+      column-gap: 1.4rem;
+      padding: 0 0.2rem;
     }
     .proj-card {
+      break-inside: avoid;
+      margin-bottom: 1.4rem;
       border-radius: var(--radius);
       background: var(--card-bg);
       border: 1px solid var(--glass-border);
@@ -306,8 +308,12 @@
     .lb-next { right: -3.2rem; }
     .no-results { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
     .no-results span { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
+    @media (max-width: 1024px) {
+      .project-grid { column-count: 2; }
+    }
     @media (max-width: 680px) {
-      .project-grid { grid-template-columns: 1fr; }
+      .project-grid { column-count: 1; column-gap: 0; }
+      .proj-card { margin-bottom: 1.2rem; }
       .lb-prev { left: -1rem; }
       .lb-next { right: -1rem; }
     }
