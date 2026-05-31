@@ -670,7 +670,7 @@ footer a { color: var(--sakura); }
   height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--sakura-deep), var(--accent));
-  background-image: url('../assets/avatar.webp');
+  background-image: url('../assets/avatar-sm.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -861,4 +861,37 @@ body.live2d-ready #live2dcanvas {
 #live2dcanvas {
   opacity: 0;
   transition: opacity 0.24s ease;
+}
+
+/* ============================================================
+   渲染降负：移动端关闭常驻全屏毛玻璃
+   ------------------------------------------------------------
+   固定定位的导航 / 移动菜单 / 搜索遮罩 / 加载层在滚动时每帧都要重算
+   backdrop-filter 模糊，是移动端掉帧、发热的主因。这里在窄屏关掉它们
+   的模糊，并用更不透明的纯色兜底以保持可读性。卡片类毛玻璃刻意保留，
+   以维持桌面与移动端一致的质感。
+   ============================================================ */
+@media (max-width: 768px) {
+  nav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 11, 24, 0.9);
+  }
+  body.light nav { background: rgba(245, 238, 254, 0.95); }
+  .mobile-menu {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 11, 24, 0.96);
+  }
+  body.light .mobile-menu { background: rgba(245, 238, 254, 0.97); }
+  #search-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 11, 24, 0.95);
+  }
+  body.light #search-overlay { background: rgba(245, 238, 254, 0.96); }
+  #loader {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

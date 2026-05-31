@@ -161,7 +161,7 @@ const POSTS = [
     "pinned": false,
     "readTime": 3,
     "emoji": "📜",
-    "cover": "../assets/uploads/流萤1.gif",
+    "cover": "../assets/uploads/流萤1.webp",
     "images": [],
     "series": "荣誉证明",
     "excerpt": "两本软著对应两个完整项目。这里记录一下项目边界、技术栈和申请材料准备时踩过的坑。",

@@ -159,7 +159,7 @@ window.SiteApp.registerPage('post-detail', () => {
   if (cover) {
     const coverUrl = resolveAssetUrl(post.cover);
     cover.innerHTML = post.cover
-      ? `<div class="img-bg" style="background-image:url('${escapeCssUrl(coverUrl)}')"></div><img src="${escapeHtml(coverUrl)}" alt="文章封面" loading="eager" decoding="async" fetchpriority="high" />`
+      ? `<div class="img-bg" style="background-image:url('${escapeCssUrl(coverUrl)}')"></div><img src="${escapeHtml(coverUrl)}" alt="文章封面" loading="eager" decoding="async" />`
       : escapeHtml(post.emoji);
   }
 

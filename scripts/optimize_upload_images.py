@@ -57,6 +57,10 @@ def save_optimized(image: Image.Image, path: Path, target: Path) -> None:
 def optimize_image(path: Path, dry_run: bool = False) -> tuple[bool, int, int]:
     before = path.stat().st_size
     with Image.open(path) as source:
+        # 跳过多帧动图（如动画 WebP/PNG）：这里的保存流程只会写出单帧，
+        # 会丢失动画，因此交给专门的转换脚本处理。
+        if getattr(source, "n_frames", 1) > 1:
+            return False, before, before
         image = ImageOps.exif_transpose(source)
         image = resized(image)
 
