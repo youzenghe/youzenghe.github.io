@@ -859,7 +859,7 @@ function initLive2D() {
     live2dLoading = true;
     document.body.classList.add('live2d-loading');
     const script = document.createElement('script');
-    script.src = 'https://unpkg.com/live2d-widget@3.0.4/lib/L2Dwidget.min.js';
+    script.src = resolveAssetUrl('assets/live2d-widget/L2Dwidget.min.js');
     script.onload = () => {
       live2dLoading = false;
       initLive2DWidget();
