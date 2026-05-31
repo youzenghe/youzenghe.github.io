@@ -67,7 +67,7 @@ function createBgUrl(customRootPrefix) {
   return `${rootPrefix}assets/bg-pool/${folder}/bg${index}.webp`;
 }
 
-function preloadBg(url, priority = 'auto', retryCount = 0) {
+function preloadBg(url, priority = 'auto', retryCount = 0, customRootPrefix = undefined) {
   const MAX_RETRIES = 2; // 最多重试2次
 
   return new Promise((resolve, reject) => {
@@ -92,9 +92,9 @@ function preloadBg(url, priority = 'auto', retryCount = 0) {
     img.onerror = () => {
       // 如果加载失败，尝试重试或使用fallback
       if (retryCount < MAX_RETRIES) {
-        // 重试：生成新的随机图片
-        const newUrl = createBgUrl();
-        preloadBg(newUrl, priority, retryCount + 1).then(resolve).catch(reject);
+        // 重试：生成新的随机图片，使用相同的 rootPrefix
+        const newUrl = createBgUrl(customRootPrefix);
+        preloadBg(newUrl, priority, retryCount + 1, customRootPrefix).then(resolve).catch(reject);
       } else {
         // 重试失败，使用固定背景作为fallback
         const fallbackUrl = getLocalBgUrl();
@@ -339,7 +339,8 @@ function prefetchRandomBg(customRootPrefix) {
   if (randomBgReady) return Promise.resolve(randomBgReady);
   if (randomBgPromise) return randomBgPromise;
 
-  randomBgPromise = preloadBg(createBgUrl(customRootPrefix), 'low')
+  const bgUrl = createBgUrl(customRootPrefix);
+  randomBgPromise = preloadBg(bgUrl, 'low', 0, customRootPrefix)
     .then((readyBg) => {
       randomBgReady = readyBg;
       return readyBg;
