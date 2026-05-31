@@ -80,6 +80,8 @@
       padding: 0 0.2rem;
     }
     .proj-card {
+      --preview-width: min(58%, 460px);
+      --content-safe-width: calc(100% - var(--preview-width) + 96px);
       position: relative;
       display: flex;
       flex-direction: column;
@@ -99,7 +101,7 @@
       position: absolute;
       inset-inline-end: 0;
       top: 0;
-      width: min(58%, 460px);
+      width: var(--preview-width);
       height: 100%;
       overflow: hidden;
       cursor: zoom-in;
@@ -142,7 +144,8 @@
     .proj-body {
       position: relative;
       z-index: 1;
-      width: 70%;
+      width: min(70%, var(--content-safe-width));
+      max-width: var(--content-safe-width);
       padding: 1.5rem 1.8rem 0.5rem;
       display: flex;
       flex-direction: column;
@@ -199,7 +202,8 @@
     .proj-footer {
       position: relative;
       z-index: 1;
-      width: 70%;
+      width: min(70%, var(--content-safe-width));
+      max-width: var(--content-safe-width);
       padding: 0.5rem 1.8rem 1.3rem;
       display: flex;
       align-items: center;
@@ -311,13 +315,19 @@
     .no-results { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
     .no-results span { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
     @media (max-width: 1024px) {
+      .proj-card {
+        --preview-width: 280px;
+        --content-safe-width: calc(100% - var(--preview-width) + 72px);
+      }
       .proj-preview {
-        width: 280px;
+        width: var(--preview-width);
         min-width: 280px;
       }
     }
     @media (max-width: 680px) {
       .proj-card {
+        --preview-width: 100%;
+        --content-safe-width: 100%;
         flex-direction: column;
         min-height: auto;
       }
