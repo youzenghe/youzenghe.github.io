@@ -88,14 +88,7 @@ window.SiteApp.registerPage('projects', () => {
       return;
     }
 
-    // 如果项目数量少于 12 个，循环重复
-    const minProjects = 12;
-    const projectsToRender = [];
-    while (projectsToRender.length < minProjects) {
-      projectsToRender.push(...currentProjectList);
-    }
-
-    projectsToRender.forEach((project, index) => {
+    currentProjectList.forEach((project, index) => {
       const eagerImage = index < 2;
       const projectImage = escapeHtml(resolveAssetUrl(project.img));
       const projectThumb = escapeHtml(resolveThumbnailUrl(project.img));
@@ -103,9 +96,9 @@ window.SiteApp.registerPage('projects', () => {
       const awardClass = awardClassMap[project.award] || awardClassMap.none;
       const card = document.createElement('div');
       card.className = 'proj-card reveal';
-      card.style.transitionDelay = `${(index % 12) * 0.07}s`;
+      card.style.transitionDelay = `${index * 0.07}s`;
       card.innerHTML = `
-        <div class="proj-preview" data-idx="${index % currentProjectList.length}">
+        <div class="proj-preview" data-idx="${index}">
           ${project.img
             ? `<img src="${projectThumb}" data-full-src="${projectImage}" alt="${projectTitle}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
             : `<div class="proj-preview-placeholder"><span class="p-emoji">${escapeHtml(project.emoji)}</span><span class="p-hint">暂无预览图</span></div>`}
@@ -124,7 +117,7 @@ window.SiteApp.registerPage('projects', () => {
         </div>
         <div class="proj-footer"><span class="proj-date">📅 ${escapeHtml(project.date)}</span><a class="proj-detail-link" href="project.html?id=${project.id}">查看复盘 →</a></div>
       `;
-      card.querySelector('.proj-preview')?.addEventListener('click', () => openProjectLightbox(index % currentProjectList.length));
+      card.querySelector('.proj-preview')?.addEventListener('click', () => openProjectLightbox(index));
       grid.appendChild(card);
     });
 

@@ -2,7 +2,6 @@
   const NAV_ITEMS = [
     { key: 'home', label: '首页', href: 'index.html' },
     { key: 'posts', label: '文章', href: 'pages/posts.html' },
-    { key: 'gallery', label: '相册', href: 'pages/gallery.html' },
     { key: 'projects', label: '项目', href: 'pages/projects.html' },
     { key: 'games', label: '游戏', href: 'pages/games.html' },
     { key: 'about', label: '关于', href: 'pages/about.html' },
