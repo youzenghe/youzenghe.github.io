@@ -37,6 +37,11 @@ async function writeMinifiedJs(sourcePath, targetPath) {
 
 async function writeMinifiedCss(sourcePath, targetPath) {
   const source = await fs.readFile(sourcePath, 'utf8');
+  if (/@import\s+/i.test(source)) {
+    await ensureDir(targetPath);
+    await fs.writeFile(targetPath, source, 'utf8');
+    return;
+  }
   const result = cleanCss.minify(source);
   if (result.errors.length) {
     throw new Error(`CSS minify failed for ${sourcePath}: ${result.errors.join(', ')}`);

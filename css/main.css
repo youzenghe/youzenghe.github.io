@@ -2,7 +2,16 @@
    次元日记 · Global Styles
    ============================================================ */
 
+@import url('./qijie-chinese-fonts.css');
+@import url('../assets/fonts/qijie/JetBrainsMono-Regular/jetBrainsMonoRegular.css');
+@import url('../assets/fonts/qijie/JetBrainsMono-Italic/jetBrainsMonoItalic.css');
+
 /* ----- Clarity 风字体（自托管 woff2，避免公共 CDN 在国内不稳导致字体加载失败）----- */
+@font-face {
+  font-family: 'Jinnan';
+  font-style: normal; font-display: swap;
+  src: url('../assets/fonts/qijie/jinnanbold.ttf') format('truetype');
+}
 @font-face {
   font-family: 'Inter Variable';
   font-style: normal; font-weight: 100 900; font-display: swap;
@@ -51,9 +60,11 @@
   --shadow:        rgba(0,0,0,0.5);
   --card-bg:       rgba(26,28,32,0.72);
   --nav-bg:        rgba(18,20,24,0.68);
-  --font-body:      "Inter Variable", "Inter", "Noto Sans SC Local", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-display:   "Inter Variable", "Inter", "Noto Sans SC Local", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-ui:        "Inter Variable", "Inter", "Noto Sans SC Local", system-ui, "Segoe UI", sans-serif;
+  --font-body:      "Jinnan", "快看世界体", "Inter Variable", "Inter", "Noto Sans SC Local", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display:   "快看世界体", "Jinnan", "Inter Variable", "Inter", "Noto Sans SC Local", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-ui:        "Jinnan", "快看世界体", "Inter Variable", "Inter", "Noto Sans SC Local", system-ui, "Segoe UI", sans-serif;
+  --font-creative:  "快看世界体", "Jinnan", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-monospace: "JetBrains Mono", "JetBrains Mono Variable", "Cascadia Code", Consolas, ui-monospace, monospace;
   --radius:        0.5rem;
   --radius-sm:     0.25rem;
   --transition:    0.25s ease;
@@ -89,6 +100,9 @@ body {
   overflow-x: hidden;
   transition: background var(--transition), color var(--transition);
 }
+body.modal-open {
+  overflow: hidden;
+}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -120,6 +134,13 @@ a { text-decoration: none; color: inherit; }
 img { display: block; max-width: 100%; }
 ul { list-style: none; }
 button { font-family: inherit; }
+code, kbd, pre, samp {
+  font-family: var(--font-monospace);
+}
+.text-creative {
+  font-family: var(--font-creative);
+  font-weight: 550;
+}
 
 /* ----- Scrollbar ----- */
 ::-webkit-scrollbar { width: 5px; }
