@@ -366,8 +366,9 @@ async function loadNavigationBg(bgLayer) {
 
   if (readyBg?.url) {
     swapBgPane(bgLayer, readyBg);
-    // 立即预加载下一张，加快切换速度
-    prefetchRandomBg();
+    // 立即预加载下一张，使用当前页面的 rootPrefix
+    const currentRootPrefix = getSiteConfig().rootPrefix;
+    prefetchRandomBg(currentRootPrefix);
     return readyBg.url;
   }
 
@@ -375,8 +376,9 @@ async function loadNavigationBg(bgLayer) {
   const fallbackBg = await preloadBg(fallbackUrl, 'low').catch(() => null);
   if (fallbackBg?.url) {
     swapBgPane(bgLayer, fallbackBg);
-    // 即使使用fallback，也预加载随机背景
-    prefetchRandomBg();
+    // 即使使用fallback，也预加载随机背景，使用当前页面的 rootPrefix
+    const currentRootPrefix = getSiteConfig().rootPrefix;
+    prefetchRandomBg(currentRootPrefix);
     return fallbackBg.url;
   }
 
