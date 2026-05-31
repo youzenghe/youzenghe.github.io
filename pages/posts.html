@@ -65,6 +65,7 @@
       padding: 0 0.2rem;
     }
     .post-list-card {
+      position: relative;
       display: flex;
       flex-direction: row;
       padding: 0;
@@ -76,14 +77,17 @@
       color: var(--text);
       text-decoration: none;
       overflow: hidden;
-      min-height: 180px;
+      min-height: 200px;
     }
     .post-list-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 32px var(--shadow);
     }
     .plc-thumb {
-      width: 280px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 35%;
       min-width: 280px;
       height: 100%;
       border-radius: 0;
@@ -92,9 +96,8 @@
       align-items: center;
       justify-content: center;
       font-size: 2.5rem;
-      flex-shrink: 0;
       overflow: hidden;
-      position: relative;
+      z-index: 0;
     }
     .plc-thumb .img-bg {
       position: absolute;
@@ -105,8 +108,8 @@
       transform: scale(1.1);
     }
     .plc-thumb img {
-      position: relative;
-      z-index: 1;
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -114,10 +117,19 @@
       display: block;
     }
     .plc-content {
-      padding: 1.2rem;
+      position: relative;
+      z-index: 1;
+      width: 70%;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
+      background: linear-gradient(to right,
+        var(--card-bg) 0%,
+        var(--card-bg) 50%,
+        rgba(26, 20, 36, 0.9) 70%,
+        rgba(26, 20, 36, 0.6) 85%,
+        transparent 100%);
     }
     .plc-meta {
       display: flex;
@@ -293,9 +305,15 @@
         min-height: auto;
       }
       .plc-thumb {
+        position: relative;
         width: 100%;
         min-width: 100%;
+        height: auto;
         aspect-ratio: 16/9;
+      }
+      .plc-content {
+        width: 100%;
+        background: var(--card-bg);
       }
     }
     @media (max-width: 560px) {
