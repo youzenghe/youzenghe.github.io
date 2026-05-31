@@ -48,8 +48,9 @@ function requestIdleWork(callback, timeout = 1200) {
   return window.setTimeout(callback, Math.min(timeout, 300));
 }
 
-function createBgUrl() {
+function createBgUrl(customRootPrefix) {
   const config = getSiteConfig();
+  const rootPrefix = customRootPrefix !== undefined ? customRootPrefix : config.rootPrefix;
 
   // 如果不启用背景图片池，使用固定背景
   if (!USE_BG_POOL) {
@@ -63,7 +64,7 @@ function createBgUrl() {
 
   // 随机选择一张图片（1到poolSize）
   const index = Math.floor(Math.random() * poolSize) + 1;
-  return `${config.rootPrefix}assets/bg-pool/${folder}/bg${index}.webp`;
+  return `${rootPrefix}assets/bg-pool/${folder}/bg${index}.webp`;
 }
 
 function preloadBg(url, priority = 'auto', retryCount = 0) {
@@ -334,11 +335,11 @@ function loadInitialBg(bgLayer) {
     .catch(() => '');
 }
 
-function prefetchRandomBg() {
+function prefetchRandomBg(customRootPrefix) {
   if (randomBgReady) return Promise.resolve(randomBgReady);
   if (randomBgPromise) return randomBgPromise;
 
-  randomBgPromise = preloadBg(createBgUrl(), 'low')
+  randomBgPromise = preloadBg(createBgUrl(customRootPrefix), 'low')
     .then((readyBg) => {
       randomBgReady = readyBg;
       return readyBg;
@@ -1294,7 +1295,17 @@ function prefetchPage(url) {
 function prefetchNavigationBgFor(url) {
   const pageKey = getPageKey(url);
   if (!pageKey || pageKey === 'home') return;
-  prefetchRandomBg();
+
+  // 根据目标 URL 计算正确的 rootPrefix
+  const targetUrl = new URL(url, location.href);
+  const targetPath = targetUrl.pathname;
+
+  // 判断目标页面是否在 pages/ 子目录下
+  const isInPagesDir = targetPath.includes('/pages/');
+  const targetRootPrefix = isInPagesDir ? '../' : '';
+
+  // 使用目标页面的 rootPrefix 预加载背景
+  prefetchRandomBg(targetRootPrefix);
 }
 
 function isSameDocumentHashNavigation(url) {
