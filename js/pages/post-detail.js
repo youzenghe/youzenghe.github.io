@@ -13,7 +13,7 @@ window.SiteApp.registerPage('post-detail', () => {
   }
 
   function toAbsoluteAssetUrl(path) {
-    if (!path) return `${absoluteBase}/assets/avatar.png`;
+    if (!path) return `${absoluteBase}/assets/avatar.webp`;
     if (/^https?:\/\//i.test(path)) return path;
     return `${absoluteBase}/${path.replace(/^\.\.\//, '').replace(/^\//, '')}`;
   }
