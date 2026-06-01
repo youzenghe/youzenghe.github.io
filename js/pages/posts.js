@@ -26,8 +26,9 @@ window.SiteApp.registerPage('posts', () => {
   function renderCard(post, simple = false, index = 0) {
     const eagerImage = index < 2;
     const cover = escapeHtml(resolveAssetUrl(post.cover));
-    const thumb = escapeHtml(resolveThumbnailUrl(post.cover));
-    const thumbCss = escapeCssUrl(resolveThumbnailUrl(post.cover));
+    const previewSource = post.coverAnimated ? resolveAssetUrl(post.cover) : resolveThumbnailUrl(post.cover);
+    const thumb = escapeHtml(previewSource);
+    const thumbCss = escapeCssUrl(previewSource);
     const title = escapeHtml(post.title);
     const thumbContent = post.cover
       ? `<div class="img-bg" style="background-image:url('${thumbCss}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${title}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
