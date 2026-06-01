@@ -51,9 +51,9 @@ let pianoNotesTimer = 0;
 let audioCtx = null;
 let musicNoteAnchor = musicToggle;
 let truthMusic = null;
+let cmdDataPromise = null;
 
 initDate();
-loadCmdData();
 spawnDreamParticles();
 initParallax();
 initProfileNote();
@@ -65,11 +65,27 @@ initSayoriDrag();
 initTerminal();
 
 async function loadCmdData() {
+  if (cmdData) return cmdData;
+  if (cmdDataPromise) return cmdDataPromise;
+  cmdDataPromise = (async () => {
+    try {
+      const res = await fetch('assets/data/landing-lines.json');
+      if (res.ok) cmdData = await res.json();
+    } catch {
+      cmdData = null;
+    }
+    return cmdData;
+  })();
+  return cmdDataPromise;
+}
+
+async function ensureCmdData() {
+  if (cmdData) return cmdData;
   try {
-    const res = await fetch('assets/data/landing-lines.json', { cache: 'no-cache' });
-    if (res.ok) cmdData = await res.json();
+    return await loadCmdData();
   } catch {
     cmdData = null;
+    return null;
   }
 }
 
@@ -185,26 +201,36 @@ function initMusic() {
   deskAudio.addEventListener('loadedmetadata', syncMusicProgress);
 }
 
-async function toggleMusic() {
+function ensureDeskAudioSource() {
   if (!deskAudio) return;
+  if (!deskAudio.getAttribute('src')) {
+    const src = deskAudio.dataset.src;
+    if (src) deskAudio.src = src;
+  }
+}
+
+async function toggleMusic() {
+  if (!deskAudio) return 'missing';
   if (deskAudio.paused) {
     try {
+      ensureDeskAudioSource();
       await deskAudio.play();
       setMusicPlayingState(true, musicToggle);
       musicPanel?.classList.remove('is-open');
       musicPanel?.setAttribute('aria-hidden', 'true');
       startPianoNotes(musicToggle);
+      return 'playing';
     } catch {
       musicPanel?.classList.add('is-open');
       musicPanel?.setAttribute('aria-hidden', 'false');
+      return 'blocked';
     }
-    return;
   }
 
   if (!musicPanel?.classList.contains('is-open')) {
     musicPanel?.classList.add('is-open');
     musicPanel?.setAttribute('aria-hidden', 'false');
-    return;
+    return 'panel';
   }
 
   deskAudio.pause();
@@ -212,28 +238,32 @@ async function toggleMusic() {
   musicPanel?.classList.remove('is-open');
   musicPanel?.setAttribute('aria-hidden', 'true');
   stopPianoNotes();
+  return 'paused';
 }
 
 async function toggleMusicFromPiano() {
-  if (!deskAudio) return;
+  if (!deskAudio) return 'missing';
   if (deskAudio.paused) {
     try {
+      ensureDeskAudioSource();
       await deskAudio.play();
       setMusicPlayingState(true, pianoToggle || musicToggle);
       musicPanel?.classList.remove('is-open');
       musicPanel?.setAttribute('aria-hidden', 'true');
       startPianoNotes(pianoToggle || musicToggle);
+      return 'playing';
     } catch {
       musicPanel?.classList.add('is-open');
       musicPanel?.setAttribute('aria-hidden', 'false');
+      return 'blocked';
     }
-    return;
   }
   deskAudio.pause();
   setMusicPlayingState(false);
   musicPanel?.classList.remove('is-open');
   musicPanel?.setAttribute('aria-hidden', 'true');
   stopPianoNotes();
+  return 'paused';
 }
 
 function setMusicPlayingState(isPlaying, anchor = musicNoteAnchor) {
@@ -565,6 +595,7 @@ function openTerminal() {
   if (locked || currentLayer !== 'dream') return;
   locked = true;
   currentLayer = 'transition';
+  ensureCmdData();
   closeProfileNote({ restoreFocus: false });
   closeServicesNote({ restoreFocus: false });
   terminalOpen?.setAttribute('aria-expanded', 'true');
@@ -618,8 +649,9 @@ function restoreDream() {
   }, durMs);
 }
 
-function bootTerminal() {
+async function bootTerminal() {
   if (!terminalOutput) return;
+  await ensureCmdData();
   terminalOutput.innerHTML = '';
   appendOutput(cmdData?.greeting || 'xiaoshi.exe 已启动。输入 /help 查看可用指令。', 'sayori-text');
   setTimeout(() => terminalInput?.focus(), 80);
@@ -655,8 +687,15 @@ function handleCommand(raw) {
   } else if (cmd === 'poem') {
     printLines(cmdData?.responses?.poem || []);
   } else if (cmd === 'music') {
-    toggleMusic();
-    appendOutput(deskAudio?.paused ? '音乐已暂停。' : 'bg.mp3 播放中。', 'ok');
+    toggleMusic().then((state) => {
+      const message = {
+        playing: 'bg.mp3 播放中。',
+        paused: '音乐已暂停。',
+        panel: '音乐信息已展开。',
+        blocked: '浏览器暂时拦截了播放，点击音乐按钮试试。'
+      }[state] || '没有找到音乐播放器。';
+      appendOutput(message, state === 'blocked' ? 'sayori-text' : 'ok');
+    });
   } else if (cmd === 'restore' || cmd === 'exit' || cmd === 'quit' || cmd === 'y') {
     appendOutput(cmdData?.responses?.restore || 'restoring...', 'sayori-text');
     setTimeout(restoreDream, 800);

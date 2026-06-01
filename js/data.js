@@ -661,6 +661,14 @@ const FRIEND_LINKS = [
     "description": "朋友的个人博客，记录技术与生活。"
   },
   {
+    "name": "veyliss",
+    "url": "https://blog.veyliss.top/",
+    "displayUrl": "https://blog.veyliss.top/",
+    "avatar": "https://blog.veyliss.top/avatar/avatar.png",
+    "description": "探索技术，记录成长，分享所学。",
+    "badge": "Friend Link"
+  },
+  {
     "name": "三叶の小窝",
     "url": "https://blog.mitsuha.space/",
     "displayUrl": "blog.mitsuha.space",
