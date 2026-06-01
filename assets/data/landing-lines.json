@@ -1,0 +1,71 @@
+{
+  "greeting": "xiaoshi.exe 已启动。输入 /help 查看可用指令。",
+  "fallback": [
+    "这条命令暂时没有写进纸页。试试 /help。",
+    "光标晃了一下，但什么都没有发生。",
+    "没有这个命令，不过你可以试试 /blog、/projects 或 /music。"
+  ],
+  "responses": {
+    "help": [
+      "可用指令：",
+      "/blog        进入博客首页",
+      "/github      打开 GitHub 主页",
+      "/projects    打开项目列表",
+      "/posts       打开文章列表",
+      "/about       查看个人简介",
+      "/skills      查看技能关键词",
+      "/resume      输出简历摘要",
+      "/classic     四大名著图谱项目记录",
+      "/poem        一首诗词项目记录",
+      "/music       播放或暂停 bg.mp3",
+      "/matrix      开关字符雨",
+      "/glitch      手动触发一次故障闪烁",
+      "/color pink|green|amber|reset  切换终端色调",
+      "/clear       清空终端",
+      "/exit        返回书桌"
+    ],
+    "about": [
+      "超级小识：Java 后端开发与测试开发方向。",
+      "常用技术：Spring Boot、MyBatis-Plus、Redis、MySQL、RabbitMQ、Neo4j、TestNG、RestAssured、Selenium、JMeter。",
+      "这个站点记录项目、文章、ACG 兴趣和一些踩坑复盘。"
+    ],
+    "skills": [
+      "后端：接口设计、认证授权、缓存、消息队列、数据库建模。",
+      "测试：接口自动化、UI 自动化、性能压测、测试用例设计。",
+      "工程：Redis 缓存一致性、分布式锁、RabbitMQ 削峰、MySQL + Neo4j 混合存储。"
+    ],
+    "resume": [
+      "项目 1：四大名著智能可视化推演平台，后端开发&测试开发，2026.01-2026.03。",
+      "项目 2：一首诗词学习平台，后端开发&测试开发，2025.11-2026.01。",
+      "成果：软件著作权记录 ClassicSage、PoetryNest。"
+    ],
+    "classic": [
+      "ClassicSage：四大名著智能可视化推演平台。",
+      "关键词：Spring Boot、Redis 多级缓存、Redis+Lua 限流、Redisson 分布式锁、RabbitMQ、MySQL、Neo4j。",
+      "项目地址：https://github.com/youzenghe/ClassicSage"
+    ],
+    "poem": [
+      "PoetryNest：一首诗词学习平台。",
+      "关键词：JWT 登录认证、Spring Cache + Redis、WebSocket 学习提醒、ThreadLocal、Java + Selenium 自动化测试。",
+      "项目地址：https://github.com/youzenghe/PoetryNest"
+    ],
+    "glitch_msg": "纸页开始抖动。接口没挂，只是演出效果。",
+    "matrix_msg": "Matrix 字符雨已切换。",
+    "color_help": "用法：/color pink | green | amber | reset",
+    "color_changed": "终端色调已更新。",
+    "restore": "正在把纸页折回书桌..."
+  },
+  "eggs": {
+    "sayori": "她把便利贴贴歪了，但还是认真写了“今天也要好好写代码”。",
+    "monika": "这个终端没有删除角色的权限。只有博客按钮是可靠入口。",
+    "miku": "世界第一的公主殿下路过终端，留下了一串 01。",
+    "redis": [
+      "Redis：缓存命中。",
+      "TTL：别忘了加随机抖动，兄弟。"
+    ],
+    "rabbitmq": "消息已入队。别担心，消费者正在慢慢处理。",
+    "neo4j": "MATCH (you)-[:BUILD]->(blog) RETURN passion;",
+    "spring": "ApplicationContext 已启动，Bean 都坐好了。",
+    "galgame": "选项 A：继续写博客。选项 B：继续写博客。"
+  }
+}

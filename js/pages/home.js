@@ -11,7 +11,7 @@ window.SiteApp.registerPage('home', () => {
     const el = document.createElement('a');
     el.className = 'post-card reveal';
     el.style.transitionDelay = `${index * 0.1}s`;
-    el.href = `pages/post.html?id=${post.id}`;
+    el.href = resolvePagePath(`pages/post.html?id=${post.id}`);
     const cover = escapeHtml(resolveAssetUrl(post.cover));
     const previewSource = post.coverAnimated ? resolveAssetUrl(post.cover) : resolveThumbnailUrl(post.cover);
     const thumb = escapeHtml(previewSource);
@@ -99,7 +99,7 @@ window.SiteApp.registerPage('home', () => {
               <div class="divider"></div>
               <h2 class="section-title">最近记录</h2>
             </div>
-            <a href="pages/posts.html" class="btn btn-ghost" style="align-self: flex-end;">查看全部 →</a>
+            <a href="${resolvePagePath('pages/posts.html')}" class="btn btn-ghost" style="align-self: flex-end;">查看全部 →</a>
           </div>
         </div>
         <div class="posts-grid" id="home-posts"></div>
@@ -112,7 +112,7 @@ window.SiteApp.registerPage('home', () => {
               <div class="divider"></div>
               <h2 class="section-title">项目复盘</h2>
             </div>
-            <a href="pages/projects.html" class="btn btn-ghost" style="align-self: flex-end;">项目列表 →</a>
+            <a href="${resolvePagePath('pages/projects.html')}" class="btn btn-ghost" style="align-self: flex-end;">项目列表 →</a>
           </div>
         </div>
         <div class="project-mini reveal" id="home-projects"></div>

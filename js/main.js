@@ -276,7 +276,8 @@ function normalizePageUrl(url) {
 function getPageKey(url = location.href) {
   const path = new URL(url, location.href).pathname.replace(/\/+$/, '');
 
-  if (path === '' || path === '/' || path.endsWith('/index.html')) return 'home';
+  if (path === '' || path === '/' || path.endsWith('/index.html')) return 'landing';
+  if (path.endsWith('/pages/blog.html')) return 'home';
   if (path.endsWith('/pages/posts.html')) return 'posts';
   if (path.endsWith('/pages/post.html')) return 'post-detail';
   if (path.endsWith('/pages/archive.html')) return 'archive';

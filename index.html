@@ -1,75 +1,274 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="baidu-site-verification" content="codeva-b9fXeZxHnT" />
-  <title>超级小识 · 技术日志</title>
-  <meta name="description" content="记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。" />
-  <meta name="theme-color" content="#120b18" />
+  <title>超级小识的书桌 · 启动页</title>
+  <meta name="description" content="超级小识的个人启动页，通往技术博客、项目复盘、个人信息和隐藏终端。" />
+  <meta name="theme-color" content="#a8d4e6" />
   <link rel="canonical" href="https://yzh1019.top/" />
   <meta property="og:url" content="https://yzh1019.top/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="次元日记" />
-  <meta property="og:title" content="超级小识 · 技术日志" />
-  <meta property="og:description" content="记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。" />
+  <meta property="og:title" content="超级小识的书桌 · 启动页" />
+  <meta property="og:description" content="从这张书桌进入技术博客、项目复盘和隐藏终端。" />
   <meta property="og:image" content="https://yzh1019.top/assets/avatar.webp" />
   <meta property="og:image:alt" content="次元日记站点头像" />
   <meta property="og:locale" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="超级小识 · 技术日志" />
-  <meta name="twitter:description" content="记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。" />
+  <meta name="twitter:title" content="超级小识的书桌 · 启动页" />
+  <meta name="twitter:description" content="从这张书桌进入技术博客、项目复盘和隐藏终端。" />
   <meta name="twitter:image" content="https://yzh1019.top/assets/avatar.webp" />
   <meta name="twitter:image:alt" content="次元日记站点头像" />
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "name": "次元日记",
-          "url": "https://yzh1019.top/",
-          "description": "记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。"
-        },
-        {
-          "@type": "Person",
-          "name": "超级小识",
-          "url": "https://yzh1019.top/pages/about.html",
-          "sameAs": [
-            "https://github.com/youzenghe",
-            "https://space.bilibili.com/220928497"
-          ]
-        }
-      ]
+      "@type": "WebSite",
+      "name": "次元日记",
+      "url": "https://yzh1019.top/",
+      "description": "超级小识的个人启动页与技术博客入口。"
     }
   </script>
   <link rel="icon" type="image/png" href="assets/favicon.png" />
-  <link rel="stylesheet" href="css/main.css" />
-  <script src="js/site-shell.js" defer></script>
+  <link rel="stylesheet" href="css/landing.css" />
 </head>
-<body data-root-prefix="" data-active-nav="home" data-loader-text="加载次元世界中..." data-search-placeholder="搜索文章...（Ctrl+K）">
-  <div id="site-shell-top"></div>
+<body>
+  <div class="desk-surface">
+    <div class="dream-motion" aria-hidden="true">
+      <div class="desk-light desk-light-1"></div>
+      <div class="desk-light desk-light-2"></div>
+      <div class="dream-particles" id="dream-particles"></div>
+      <i class="paper-float paper-float-1"></i>
+      <i class="paper-float paper-float-2"></i>
+      <i class="paper-float paper-float-3"></i>
+      <i class="paper-float paper-float-4"></i>
+    </div>
 
-  <main class="site-wrapper" id="main-content" tabindex="-1">
-    <section class="hero" style="position: relative;">
-      <div class="hero-badge"><span class="dot"></span>TECH NOTES / ACG LOG</div>
-      <h1 class="hero-title">超级小识的技术日志</h1>
-      <div class="hero-typewriter-row">我是一个<span id="typewriter"></span></div>
-      <p class="hero-sub">这里主要记录项目、代码、AI 应用和一些踩坑复盘。ACG 是长期兴趣，也会作为生活侧的记录留下来。</p>
-      <div class="hero-actions">
-        <a href="pages/posts.html" class="btn btn-primary">读文章</a>
-        <a href="pages/projects.html" class="btn btn-ghost">看项目 →</a>
+    <button class="desk-deco sticker-heart" type="button" aria-label="点击心跳" id="sticker-heart">♡</button>
+    <div class="heart-burst" id="heart-burst" aria-hidden="true"></div>
+    <div class="desk-deco tape-1" aria-hidden="true"></div>
+    <div class="desk-deco tape-2" aria-hidden="true"></div>
+    <div class="desk-deco coffee-ring" aria-hidden="true"></div>
+
+    <button class="desk-piano" type="button" aria-label="钢琴涂鸦，播放音乐" id="piano-toggle">
+      <svg viewBox="0 0 180 128" aria-hidden="true">
+        <path class="piano-shadow" d="M27 91 Q75 104 142 91" />
+        <path class="piano-case" d="M27 34 Q79 22 146 35 L154 78 Q94 94 22 79 Z" />
+        <path class="piano-lid" d="M34 36 Q78 15 140 31 Q107 45 62 48 Q43 49 34 36 Z" />
+        <path class="piano-front" d="M27 59 Q84 71 151 58" />
+        <path class="piano-keys" d="M39 61 Q88 70 135 60" />
+        <path class="piano-keys" d="M45 65 L43 79 M58 67 L56 82 M72 69 L70 84 M86 70 L84 86 M101 69 L99 84 M116 66 L114 80 M130 63 L128 77" />
+        <path class="piano-leg" d="M45 81 Q41 97 36 108" />
+        <path class="piano-leg" d="M128 79 Q132 96 139 106" />
+        <path class="piano-stool" d="M72 99 Q93 105 113 99" />
+      </svg>
+    </button>
+
+    <main class="notebook-page" id="main-content" tabindex="-1">
+      <div class="paper-glow" aria-hidden="true"></div>
+      <div class="paper-tear-strip" aria-hidden="true"></div>
+      <div class="page-holes" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+      <button class="music-btn" type="button" aria-label="播放音乐" id="music-toggle">
+        <span class="music-icon" aria-hidden="true">♪</span>
+        <span class="music-label">放点音乐</span>
+      </button>
+      <div class="music-panel local-music-panel" id="music-panel" aria-hidden="true">
+        <img class="music-cover" src="assets/avatar.webp" alt="" loading="lazy" decoding="async" />
+        <div class="music-info">
+          <strong>呐呐呐</strong>
+          <span>Miku</span>
+          <div class="music-progress" aria-hidden="true"><span id="music-progress"></span></div>
+        </div>
+        <span class="music-time" id="music-time">--:--</span>
       </div>
-      <div class="hero-scroll"><span class="scroll-arrow">↓</span>向下滚动</div>
+      <audio id="desk-audio" src="assets/audio/bg.mp3" preload="metadata" loop></audio>
+
+      <header class="page-header">
+        <div class="date-row">
+          <span class="date-main" id="date-display">--/--</span>
+        </div>
+        <h1 class="page-title">随手记几行</h1>
+        <p class="page-subtitle">这里是超级小识的启动页。真正的文章、项目复盘和 ACG 记录，放在里面那本博客里。</p>
+      </header>
+
+      <nav class="entries" aria-label="入口">
+        <a href="pages/blog.html" class="entry">
+          <span class="entry-num">01</span>
+          <span class="entry-body">
+            <span class="entry-title">博客</span>
+            <span class="entry-desc">— 文章、笔记、碎碎念</span>
+          </span>
+          <span class="entry-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="https://github.com/youzenghe/" class="entry" target="_blank" rel="noreferrer noopener">
+          <span class="entry-num">02</span>
+          <span class="entry-body">
+            <span class="entry-title">GitHub</span>
+            <span class="entry-desc">— 代码、项目和仓库</span>
+          </span>
+          <span class="entry-arrow" aria-hidden="true">→</span>
+        </a>
+        <button class="entry entry-button" type="button" id="about-open" aria-controls="profile-note" aria-expanded="false">
+          <span class="entry-num">03</span>
+          <span class="entry-body">
+            <span class="entry-title">关于我</span>
+            <span class="entry-desc">— 简历和联系方式</span>
+          </span>
+          <span class="entry-arrow" aria-hidden="true">↓</span>
+        </button>
+        <button class="entry entry-button" type="button" id="services-open" aria-controls="services-note" aria-expanded="false">
+          <span class="entry-num">04</span>
+          <span class="entry-body">
+            <span class="entry-title">服务</span>
+            <span class="entry-desc">— 可以公开使用的小东西</span>
+          </span>
+          <span class="entry-arrow" aria-hidden="true">↓</span>
+        </button>
+      </nav>
+
+      <div class="margin-note" aria-hidden="true">
+        <span class="margin-arrow">↳</span>
+        <span class="margin-text">先喝口水，再打开 IDE。</span>
+      </div>
+
+      <div class="notebook-extras">
+        <div class="sketch-area" aria-hidden="true">
+          <svg class="doodle doodle-cloud-1" viewBox="0 0 120 60">
+            <path d="M20 45 Q25 20 45 25 Q50 10 70 20 Q90 10 95 30 Q110 35 100 45 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <svg class="doodle doodle-star" viewBox="0 0 40 40">
+            <path d="M20 5 L23 15 L34 15 L25 22 L28 33 L20 26 L12 33 L15 22 L6 15 L17 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg class="doodle doodle-arrow" viewBox="0 0 80 40">
+            <path d="M5 20 Q25 5 50 18 L46 12 M50 18 L44 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sticky-note" id="sticky-note" aria-hidden="true">
+          <span class="sticky-pin"></span>
+          <p class="sticky-text" id="sticky-text">今天也把接口测完。</p>
+        </div>
+      </div>
+
+      <footer class="page-footer">
+        <span>个人致敬 · 非官方</span>
+        <span>小识 · v.2026</span>
+      </footer>
+
+      <button class="corner-fold" type="button" id="terminal-open" aria-label="翻页进入终端" aria-controls="truth-layer" aria-expanded="false">
+        <span class="fold-hint">翻翻看？</span>
+      </button>
+    </main>
+
+    <div class="sayori-sketch" id="sayori-img" aria-hidden="true">
+      <img src="assets/landing/sayori-lineart.webp" alt="" loading="lazy" decoding="async" class="sayori-art sayori-art-front" />
+      <img src="assets/landing/sayori-lineart.webp" alt="" aria-hidden="true" class="sayori-art sayori-art-ghost" />
+    </div>
+
+    <section class="profile-note" id="profile-note" aria-hidden="true" aria-label="关于超级小识">
+      <button class="profile-back" type="button" id="about-close" aria-label="返回主纸页">← 返回</button>
+      <span class="profile-pin" aria-hidden="true"></span>
+      <header class="profile-head">
+        <p class="profile-kicker">03 / About me</p>
+        <h2>超级小识</h2>
+        <p>Java 后端开发与测试开发方向，习惯把项目拆成可落地的接口、缓存、消息队列、数据库和自动化测试流程。这个站点用来记录项目、技术复盘和 ACG 兴趣。</p>
+      </header>
+      <div class="profile-columns">
+        <div class="profile-block">
+          <h3>项目经历</h3>
+          <ul>
+            <li>四大名著智能可视化推演平台：Spring Boot、Redis、RabbitMQ、MySQL、Neo4j，支持人物关系图谱、章节管理与统计分析。</li>
+            <li>一首诗词学习平台：微信小程序诗词学习系统，覆盖登录认证、热门数据缓存、WebSocket 学习提醒和后台自动化测试。</li>
+            <li>两项软件著作权记录：ClassicSage、PoetryNest，对应图谱平台与诗词学习平台。</li>
+          </ul>
+        </div>
+        <div class="profile-block">
+          <h3>技术栈</h3>
+          <ul>
+            <li>后端：Spring Boot、MyBatis / MyBatis-Plus、Redis、MySQL、RabbitMQ、Neo4j。</li>
+            <li>测试：TestNG、RestAssured、Selenium、JMeter、接口自动化和性能压测。</li>
+            <li>工程能力：JWT 权限控制、缓存一致性、分布式锁、消息削峰、接口文档与项目复盘。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="profile-learning">
+        <span>Java 后端</span>
+        <span>接口自动化</span>
+        <span>Redis</span>
+        <span>RabbitMQ</span>
+        <span>Neo4j</span>
+        <span>ACG</span>
+      </div>
+      <footer class="profile-contact">
+        <a href="https://github.com/youzenghe" target="_blank" rel="noreferrer noopener">GitHub</a>
+        <a href="pages/about.html">完整关于页</a>
+        <a href="pages/projects.html">项目列表</a>
+      </footer>
     </section>
 
-    <div id="home-secondary"></div>
-  </main>
+    <section class="services-note" id="services-note" aria-hidden="true" aria-label="公开服务">
+      <button class="profile-back" type="button" id="services-close" aria-label="返回主纸页">← 返回</button>
+      <span class="profile-pin" aria-hidden="true"></span>
+      <header class="profile-head">
+        <p class="profile-kicker">04 / 服务</p>
+        <h2>桌角的小服务</h2>
+        <p>这里先放几个公开入口。真正需要跳转到其他系统的服务先做占位，等兄长大人给链接后再接上。</p>
+      </header>
+      <div class="services-board">
+        <a class="service-note service-note-large" href="rss.xml" target="_blank" rel="noreferrer noopener">
+          <span class="service-index">RSS</span>
+          <strong>博客订阅</strong>
+          <em>文章更新会进入 RSS，放进阅读器就能慢慢看。</em>
+        </a>
+        <a class="service-note service-note-large" href="services/index.html">
+          <span class="service-index">LINKS</span>
+          <strong>资源索引</strong>
+          <em>把博客、项目、订阅和公开入口整理成一个独立目录。</em>
+        </a>
+        <a class="service-note service-note-large" href="https://yzh1019.top/games/chat.html">
+          <span class="service-index">LAB</span>
+          <strong>实验入口</strong>
+          <em>进入公开实验页面，先接到聊天小工具。</em>
+        </a>
+      </div>
+      <p class="services-footnote">其他后台、监控和未完成实验先不公开。</p>
+    </section>
+  </div>
 
-  <div id="site-shell-bottom"></div>
+  <div class="flash-plane" aria-hidden="true"></div>
+  <div class="glitch-field" id="glitch-field" aria-hidden="true"></div>
+  <div class="spooky-flash" aria-hidden="true"></div>
+  <div class="restore-field" id="restore-field" aria-hidden="true">
+    <div class="warm-bloom" aria-hidden="true"></div>
+  </div>
+  <div class="truth-player" id="truth-player" aria-hidden="true">
+    <iframe id="truth-frame" title="hidden terminal music" loading="lazy" allow="autoplay; encrypted-media"></iframe>
+  </div>
+  <div class="noise-overlay" aria-hidden="true"></div>
 
-  <script src="js/data.js?v=20260601-6" defer></script>
-  <script src="js/main.js" defer></script>
-  <script src="js/pages/home.js" defer></script>
+  <section class="truth-layer" id="truth-layer" aria-label="终端" hidden>
+    <div class="truth-grid" aria-hidden="true"></div>
+    <div class="data-stream" id="data-stream" aria-hidden="true"></div>
+    <canvas class="matrix-canvas" id="matrix-canvas" aria-hidden="true"></canvas>
+    <div class="terminal-window" id="terminal-window">
+      <div class="terminal-title" id="terminal-title">
+        <button class="title-dot dot-close" type="button" aria-label="关闭终端"></button>
+        <button class="title-dot dot-minimize" type="button" aria-label="最小化终端"></button>
+        <span class="title-dot dot-maximize"></span>
+        <p>xiaoshi.exe — terminal</p>
+      </div>
+      <div class="terminal-body" id="terminal-body">
+        <div class="terminal-output" id="terminal-output"></div>
+      </div>
+      <div class="terminal-input-line">
+        <span class="prompt-char">&gt;</span>
+        <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" placeholder="/help" aria-label="输入指令" />
+      </div>
+    </div>
+    <div class="scanlines" aria-hidden="true"></div>
+  </section>
+
+  <script src="js/landing.js" defer></script>
 </body>
 </html>

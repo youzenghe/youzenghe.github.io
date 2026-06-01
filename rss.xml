@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>次元日记 · 超级小识</title>
+    <link>https://yzh1019.top/pages/blog.html</link>
+    <atom:link href="https://yzh1019.top/rss.xml" rel="self" type="application/rss+xml" />
+    <description>记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 01 Mar 2026 00:00:00 +0800</lastBuildDate>
+    <item>
+      <title>项目：一首诗词</title>
+      <link>https://yzh1019.top/pages/project.html?id=8</link>
+      <guid>https://yzh1019.top/pages/project.html?id=8</guid>
+      <pubDate>Sun, 01 Mar 2026 00:00:00 +0800</pubDate>
+      <category>Java 全栈 / 传统文化</category>
+      <description>Java 全栈诗词项目，功能集中在诗词展示、检索和内容管理，已经完成软著登记。 技术栈：Java、Spring Boot、MySQL、Vue。</description>
+    </item>
+    <item>
+      <title>项目：文智融典</title>
+      <link>https://yzh1019.top/pages/project.html?id=7</link>
+      <guid>https://yzh1019.top/pages/project.html?id=7</guid>
+      <pubDate>Sun, 01 Feb 2026 00:00:00 +0800</pubDate>
+      <category>AI / 知识图谱</category>
+      <description>个人全栈开发的名著知识图谱项目，后端负责数据建模和图谱查询，前端负责人物关系、事件脉络的可视化。 技术栈：Java、Spring Boot、Neo4j、Vue。</description>
+    </item>
+    <item>
+      <title>项目：拳意中原</title>
+      <link>https://yzh1019.top/pages/project.html?id=6</link>
+      <guid>https://yzh1019.top/pages/project.html?id=6</guid>
+      <pubDate>Thu, 01 Jan 2026 00:00:00 +0800</pubDate>
+      <category>文化传播 / 体育宣传</category>
+      <description>和体育学部合作的拳法宣传项目，主要做内容展示、图片资料整理和品牌页面，目前在走软著申请流程。 技术栈：Vue、前端展示、内容运营、品牌宣传。</description>
+    </item>
+    <item>
+      <title>我深思熟虑，决定做一款由乔瓮执笔的 GalGame</title>
+      <link>https://yzh1019.top/pages/post.html?id=7</link>
+      <guid>https://yzh1019.top/pages/post.html?id=7</guid>
+      <pubDate>Mon, 01 Dec 2025 00:00:00 +0800</pubDate>
+      <category>趣味生活</category>
+      <description>准备做一款 GalGame，先把动机、剧本分工和当前进度记下来，免得这个坑开了就忘。</description>
+    </item>
+    <item>
+      <title>项目：监测者</title>
+      <link>https://yzh1019.top/pages/project.html?id=5</link>
+      <guid>https://yzh1019.top/pages/project.html?id=5</guid>
+      <pubDate>Mon, 01 Dec 2025 00:00:00 +0800</pubDate>
+      <category>微信小程序 / 企业环保</category>
+      <description>企业环保方向的小程序项目，接手后主要处理信息管理、评价流程和上线细节，目前已经部署到微信小程序。 技术栈：微信小程序、云开发、数据管理、企业环保服务。</description>
+    </item>
+    <item>
+      <title>软件引入证明——我写的东西，被真正地用上了</title>
+      <link>https://yzh1019.top/pages/post.html?id=5</link>
+      <guid>https://yzh1019.top/pages/post.html?id=5</guid>
+      <pubDate>Wed, 05 Nov 2025 00:00:00 +0800</pubDate>
+      <category>荣誉证明</category>
+      <description>软件引入证明说明项目离开了演示环境，开始进入真实使用场景。这里记录它对项目验收的意义。</description>
+    </item>
+    <item>
+      <title>项目：律图合同助手</title>
+      <link>https://yzh1019.top/pages/project.html?id=4</link>
+      <guid>https://yzh1019.top/pages/project.html?id=4</guid>
+      <pubDate>Sat, 01 Nov 2025 00:00:00 +0800</pubDate>
+      <category>法律科技 / 智能辅助</category>
+      <description>合同审阅方向的小工具，核心是条款解析、风险提示和结果解释。难点在于让输出足够具体，不能只给一段泛泛的 AI 回复。 技术栈：JavaScript、Python、NLP、合同分析。</description>
+    </item>
+    <item>
+      <title>软件著作权 × 2 ——我的代码，正式有了名字</title>
+      <link>https://yzh1019.top/pages/post.html?id=2</link>
+      <guid>https://yzh1019.top/pages/post.html?id=2</guid>
+      <pubDate>Sat, 20 Sep 2025 00:00:00 +0800</pubDate>
+      <category>荣誉证明</category>
+      <description>两本软著对应两个完整项目。这里记录一下项目边界、技术栈和申请材料准备时踩过的坑。</description>
+    </item>
+    <item>
+      <title>项目：扶光云课堂</title>
+      <link>https://yzh1019.top/pages/project.html?id=3</link>
+      <guid>https://yzh1019.top/pages/project.html?id=3</guid>
+      <pubDate>Mon, 01 Sep 2025 00:00:00 +0800</pubDate>
+      <category>公益平台</category>
+      <description>和扶光志愿者团队合作的公益项目，用来整理和展示白血病儿童治疗相关知识。我主要负责把内容管理和前端展示流程做顺。 技术栈：Vue、Node.js、内容管理、公益传播。</description>
+    </item>
+    <item>
+      <title>神本无相——豆包说，它识别不出我的脸</title>
+      <link>https://yzh1019.top/pages/post.html?id=6</link>
+      <guid>https://yzh1019.top/pages/post.html?id=6</guid>
+      <pubDate>Fri, 22 Aug 2025 00:00:00 +0800</pubDate>
+      <category>趣味生活</category>
+      <description>一次拿 AI 识图开玩笑的记录。结论很简单：模型没识别出人脸，但这事挺有节目效果。</description>
+    </item>
+    <item>
+      <title>实习证明——第一次以「员工」的身份进入职场</title>
+      <link>https://yzh1019.top/pages/post.html?id=4</link>
+      <guid>https://yzh1019.top/pages/post.html?id=4</guid>
+      <pubDate>Thu, 10 Jul 2025 00:00:00 +0800</pubDate>
+      <category>荣誉证明</category>
+      <description>第一次进入真实团队开发环境，最大的差异不是代码本身，而是需求沟通、协作节奏和交付标准。</description>
+    </item>
+    <item>
+      <title>项目：此刻汴相豫</title>
+      <link>https://yzh1019.top/pages/project.html?id=2</link>
+      <guid>https://yzh1019.top/pages/project.html?id=2</guid>
+      <pubDate>Tue, 01 Jul 2025 00:00:00 +0800</pubDate>
+      <category>文化传播 / Web 展示</category>
+      <description>中原文化展示类 Web 项目，重点在内容结构、页面交互和视觉设计。这个项目更多考验信息组织，而不是单纯堆页面效果。 技术栈：Vue、前端可视化、交互设计、内容策划。</description>
+    </item>
+    <item>
+      <title>人工智能大赛国家一等奖——这一次，算法站在了最高处</title>
+      <link>https://yzh1019.top/pages/post.html?id=1</link>
+      <guid>https://yzh1019.top/pages/post.html?id=1</guid>
+      <pubDate>Sun, 15 Jun 2025 00:00:00 +0800</pubDate>
+      <category>荣誉证明</category>
+      <description>这篇记录一次 AI 竞赛项目从立项、调参到答辩的过程，重点放在系统设计、数据问题和现场答辩。</description>
+    </item>
+    <item>
+      <title>项目：智审云枢</title>
+      <link>https://yzh1019.top/pages/project.html?id=1</link>
+      <guid>https://yzh1019.top/pages/project.html?id=1</guid>
+      <pubDate>Sun, 01 Jun 2025 00:00:00 +0800</pubDate>
+      <category>AI / 法律科技</category>
+      <description>法律场景的 AI 辅助系统，主要做知识库检索、文本理解和案例分析。我负责把模型能力和业务流程接起来，并处理答辩时最容易被问到的准确性问题。 技术栈：Vue、Python、NLP、法律知识库。</description>
+    </item>
+    <item>
+      <title>校园算法精英大赛省三——不完美的名次，真实的成长</title>
+      <link>https://yzh1019.top/pages/post.html?id=3</link>
+      <guid>https://yzh1019.top/pages/post.html?id=3</guid>
+      <pubDate>Mon, 28 Apr 2025 00:00:00 +0800</pubDate>
+      <category>荣誉证明</category>
+      <description>省三不是很高的名次，但它暴露了我当时在图论和动态规划上的短板。</description>
+    </item>
+  </channel>
+</rss>

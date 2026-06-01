@@ -6,10 +6,11 @@
     "optimize:uploads": "python scripts/optimize_upload_images.py",
     "build:thumbs": "python scripts/generate_thumbnails.py",
     "build:content": "python scripts/build_content.py",
+    "build:rss": "python scripts/generate_rss.py",
     "build:sitemap": "python scripts/generate_sitemap.py",
     "build:fonts": "python scripts/build_fonts.py",
     "validate:content": "python scripts/validate_content.py",
-    "prepare:site": "npm run optimize:uploads && npm run build:thumbs && npm run validate:content && npm run build:content && npm run build:sitemap && npm run build:fonts",
+    "prepare:site": "npm run optimize:uploads && npm run build:thumbs && npm run validate:content && npm run build:content && npm run build:rss && npm run build:sitemap && npm run build:fonts",
     "prebuild:dist": "npm run prepare:site",
     "build:dist": "node scripts/build_dist.mjs"
   },

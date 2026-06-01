@@ -1,6 +1,6 @@
 (function (global) {
   const NAV_ITEMS = [
-    { key: 'home', label: '首页', href: 'index.html' },
+    { key: 'home', label: '首页', href: 'pages/blog.html' },
     { key: 'posts', label: '文章', href: 'pages/posts.html' },
     { key: 'archive', label: '归档', href: 'pages/archive.html' },
     { key: 'projects', label: '项目', href: 'pages/projects.html' },
@@ -100,7 +100,7 @@
       </div>
 
       <nav aria-label="主导航">
-        <a id="site-logo" class="nav-logo" href="${pageHref(config.rootPrefix, 'index.html')}">✦ 技术日志</a>
+        <a id="site-logo" class="nav-logo" href="${pageHref(config.rootPrefix, 'pages/blog.html')}">✦ 技术日志</a>
         <div class="nav-center">${navLinks}</div>
         <div class="nav-right">
           <button class="nav-icon-btn search-trigger" type="button" title="搜索" aria-label="打开站内搜索">🔍</button>
@@ -144,7 +144,7 @@
       const next = { ...getBodyConfig(), ...config };
       const logo = document.getElementById('site-logo');
       if (logo) {
-        logo.href = pageHref(next.rootPrefix, 'index.html');
+        logo.href = pageHref(next.rootPrefix, 'pages/blog.html');
       }
 
       document.querySelectorAll('[data-nav-key]').forEach((link) => {

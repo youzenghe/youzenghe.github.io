@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>创作资源索引 · 次元日记</title>
+  <meta name="description" content="超级小识整理的公开资源索引，覆盖站内入口、音乐音效、游戏素材、美术动画、学习开发、AI 效率和实用工具。" />
+  <meta name="theme-color" content="#f7f4f7" />
+  <link rel="canonical" href="https://yzh1019.top/services/" />
+  <meta property="og:url" content="https://yzh1019.top/services/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="次元日记" />
+  <meta property="og:title" content="创作资源索引 · 次元日记" />
+  <meta property="og:description" content="站内入口、创作素材、学习开发、AI 工具和公开资源的集中索引。" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.webp" />
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js" defer></script>
+  <style>
+    :root {
+      --resource-bg: #f7f4f7;
+      --resource-card: rgba(255, 255, 255, 0.78);
+      --resource-line: rgba(58, 48, 58, 0.1);
+      --resource-text: #2e2930;
+      --resource-muted: rgba(46, 41, 48, 0.58);
+      --resource-primary: #e85d88;
+      --resource-primary-soft: rgba(232, 93, 136, 0.12);
+      --resource-blue: #5a9fd6;
+      --resource-green: #4fae88;
+      --resource-amber: #d89a32;
+    }
+    body {
+      background:
+        radial-gradient(circle at 8% 10%, rgba(232, 93, 136, 0.13), transparent 28rem),
+        radial-gradient(circle at 92% 20%, rgba(90, 159, 214, 0.14), transparent 30rem),
+        linear-gradient(180deg, #fff 0%, var(--resource-bg) 38%, #f1eef3 100%);
+    }
+    .resource-shell {
+      color: var(--resource-text);
+      padding-top: 2rem;
+    }
+    .resource-hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--resource-line);
+      border-radius: 1.1rem;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.58)),
+        repeating-linear-gradient(0deg, transparent 0 34px, rgba(232,93,136,0.08) 34px 35px);
+      box-shadow: 0 24px 70px rgba(55, 45, 60, 0.1);
+      padding: clamp(1.3rem, 4vw, 2.4rem);
+    }
+    .resource-hero::after {
+      content: "";
+      position: absolute;
+      right: -5rem;
+      top: -5rem;
+      width: 17rem;
+      height: 17rem;
+      border-radius: 50%;
+      border: 2rem solid rgba(232,93,136,0.08);
+      pointer-events: none;
+    }
+    .resource-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--resource-primary);
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .resource-hero h1 {
+      width: min(48rem, 100%);
+      margin: 0.8rem 0 0.7rem;
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    .resource-hero p {
+      width: min(48rem, 100%);
+      margin: 0;
+      color: var(--resource-muted);
+      line-height: 1.85;
+    }
+    .resource-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 1.4rem;
+    }
+    .resource-stat {
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--resource-line);
+      border-radius: 0.85rem;
+      background: rgba(255,255,255,0.68);
+    }
+    .resource-stat strong {
+      display: block;
+      color: var(--resource-primary);
+      font-size: 1.3rem;
+      line-height: 1.1;
+    }
+    .resource-stat span {
+      display: block;
+      margin-top: 0.28rem;
+      color: var(--resource-muted);
+      font-size: 0.78rem;
+    }
+    .resource-toolbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 5;
+      margin: 1.2rem 0 1.5rem;
+      padding: 1rem;
+      border: 1px solid var(--resource-line);
+      border-radius: 1rem;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 14px 36px rgba(55, 45, 60, 0.08);
+    }
+    .resource-search {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      padding: 0.78rem 1rem;
+      border: 1px solid var(--resource-line);
+      border-radius: 0.85rem;
+      background: rgba(255,255,255,0.75);
+    }
+    .resource-search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--resource-text);
+      font: inherit;
+    }
+    .resource-search input::placeholder {
+      color: rgba(46, 41, 48, 0.38);
+    }
+    .resource-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 0.85rem;
+    }
+    .resource-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-height: 2.35rem;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid var(--resource-line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      color: var(--resource-muted);
+      font-size: 0.84rem;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .resource-tab:hover {
+      transform: translateY(-1px);
+      border-color: rgba(232,93,136,0.35);
+      color: var(--resource-primary);
+    }
+    .resource-tab.is-active {
+      border-color: var(--resource-primary);
+      background: var(--resource-primary);
+      color: #fff;
+    }
+    .resource-count {
+      opacity: 0.72;
+      font-size: 0.76rem;
+    }
+    .resource-section {
+      margin-top: 2rem;
+    }
+    .resource-section[hidden] {
+      display: none;
+    }
+    .resource-section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+    }
+    .resource-section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .resource-section-icon {
+      width: 2.35rem;
+      height: 2.35rem;
+      display: grid;
+      place-items: center;
+      border-radius: 0.75rem;
+      background: var(--resource-primary-soft);
+      color: var(--resource-primary);
+      font-size: 1.25rem;
+    }
+    .resource-section h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: 0;
+    }
+    .resource-section-desc {
+      margin: 0.18rem 0 0;
+      color: var(--resource-muted);
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+    .resource-card {
+      position: relative;
+      min-height: 9.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      padding: 1rem;
+      border: 1px solid var(--resource-line);
+      border-radius: 0.95rem;
+      background: var(--resource-card);
+      color: var(--resource-text);
+      box-shadow: 0 10px 28px rgba(55, 45, 60, 0.06);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+    }
+    .resource-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(232,93,136,0.36);
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 18px 44px rgba(55, 45, 60, 0.12);
+    }
+    .resource-card.is-hidden {
+      display: none;
+    }
+    .resource-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+    .resource-card strong {
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+    .resource-card p {
+      margin: 0;
+      color: var(--resource-muted);
+      font-size: 0.83rem;
+      line-height: 1.65;
+    }
+    .resource-card-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: auto;
+      color: var(--resource-primary);
+      font-family: var(--font-ui);
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .resource-kind {
+      color: var(--resource-muted);
+      font-weight: 700;
+      text-transform: none;
+    }
+    .resource-empty {
+      display: none;
+      padding: 2rem;
+      border: 1px dashed rgba(232,93,136,0.32);
+      border-radius: 1rem;
+      background: rgba(255,255,255,0.62);
+      color: var(--resource-muted);
+      text-align: center;
+    }
+    .resource-empty.is-visible {
+      display: block;
+    }
+    @media (max-width: 1080px) {
+      .resource-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .resource-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1180px) {
+      body.resource-page .resource-toolbar {
+        position: fixed;
+        left: 1.15rem;
+        top: 5.25rem;
+        z-index: 120;
+        width: clamp(13.5rem, 15vw, 16rem);
+        max-height: min(34rem, calc(100vh - 24rem));
+        padding: 0.9rem;
+        overflow-y: auto;
+        scrollbar-width: thin;
+      }
+      body.resource-page .resource-search {
+        padding: 0.68rem 0.78rem;
+      }
+      body.resource-page .resource-tabs {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.45rem;
+      }
+      body.resource-page .resource-tab {
+        width: 100%;
+        justify-content: space-between;
+        min-height: 2.2rem;
+        padding: 0.48rem 0.72rem;
+        border-radius: 0.8rem;
+      }
+      body.resource-page .resource-shell.site-wrapper {
+        max-width: 1120px;
+        margin-left: max(18rem, calc((100vw - 1120px) / 2 + 16rem));
+        margin-right: max(2rem, calc((100vw - 1120px) / 2));
+      }
+    }
+    @media (max-width: 680px) {
+      .resource-toolbar { position: static; padding: 0.8rem; }
+      .resource-grid { grid-template-columns: 1fr; }
+      .resource-section-head { align-items: flex-start; flex-direction: column; }
+      .resource-stats { grid-template-columns: 1fr 1fr; }
+      .resource-card { min-height: 8.4rem; }
+    }
+  </style>
+</head>
+<body class="resource-page" data-root-prefix="../" data-active-nav="home" data-loader-text="整理资源索引中...">
+  <div id="site-shell-top"></div>
+
+  <main class="site-wrapper resource-shell" id="main-content" tabindex="-1">
+    <section class="resource-hero reveal">
+      <div class="resource-label">Bookmarks / Resources</div>
+      <h1>超级小识的创作资源索引</h1>
+      <p>从参考页整理出一份干净版资源目录，偏游戏开发、素材、美术、音乐、AI 和学习，也把咱们博客自己的公开入口放在最前面。</p>
+      <div class="resource-stats" aria-label="资源统计">
+        <div class="resource-stat"><strong id="resource-total">0</strong><span>公开资源</span></div>
+        <div class="resource-stat"><strong id="resource-category-total">0</strong><span>分类</span></div>
+        <div class="resource-stat"><strong>15</strong><span>RSS 条目</span></div>
+        <div class="resource-stat"><strong>2026</strong><span>持续维护</span></div>
+      </div>
+    </section>
+
+    <section class="resource-toolbar reveal" aria-label="资源筛选">
+      <label class="resource-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="resource-search" type="search" placeholder="搜索资源名、分类或用途..." autocomplete="off" />
+      </label>
+      <div class="resource-tabs" id="resource-tabs"></div>
+    </section>
+
+    <div id="resource-sections"></div>
+    <div class="resource-empty" id="resource-empty">没有匹配的资源，换个关键词试试。</div>
+  </main>
+
+  <div id="site-shell-bottom"></div>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script>
+    const RESOURCE_GROUPS = [
+      {
+        id: 'site',
+        icon: '⌂',
+        title: '站内入口',
+        desc: '咱们博客自己的公开页面和服务。',
+        items: [
+          ['博客首页', '../pages/blog.html', '文章、项目复盘和 ACG 记录的主入口。', '站内'],
+          ['文章归档', '../pages/posts.html', '按时间阅读全部文章。', '站内'],
+          ['项目列表', '../pages/projects.html', '查看项目、技术栈和成果记录。', '站内'],
+          ['RSS 订阅', '../rss.xml', '文章和项目更新的订阅源。', '订阅'],
+          ['实验聊天页', '../games/chat.html', '公开实验入口，先接到聊天小工具。', '实验'],
+          ['GitHub', 'https://github.com/youzenghe/', '代码仓库和之后可能公开的演示工程。', '外链']
+        ]
+      },
+      {
+        id: 'music',
+        icon: '♪',
+        title: '音乐与音效',
+        desc: 'BGM、音效、游戏音乐学习和生成工具。',
+        items: [
+          ['PeriTune', 'https://peritune.com/', '可商用音乐素材，适合游戏与视频。', '音乐'],
+          ['GD音乐台', 'https://music.gdstudio.xyz/', '面向游戏开发的音乐资源整理。', '音乐'],
+          ['Freesound', 'https://freesound.org/', '大型开放音效社区。', '音效'],
+          ['Pixabay Sound Effects', 'https://pixabay.com/sound-effects/', '免费音效素材库。', '音效'],
+          ['南森津音乐室', 'https://nagumorizu.com/', '日系风格音乐素材。', '音乐'],
+          ['黑耀耀的素材小屋', 'https://www.heiyaoyao.cn/', '中文素材站，包含音效与创作资源。', '素材'],
+          ['FreePD', 'https://freepd.com/', '公共领域音乐素材。', '音乐'],
+          ['Clement Panchout 免费音乐包', 'https://clement-panchout.itch.io/yet-another-free-music-pack', 'itch.io 上的免费音乐包。', '音乐包'],
+          ['ChipTone', 'https://sfbgames.itch.io/chiptone', '像素/复古风格音效生成器。', '工具'],
+          ['jsfxr', 'https://sfxr.me/', '经典游戏音效生成器。', '工具'],
+          ['SONNISS GameAudioGDC', 'https://sonniss.com/gameaudiogdc/', 'GDC 游戏音频资源合集。', '合集'],
+          ['Minecraft Sounds', 'https://o.xbottle.top/mcsounds/', 'Minecraft 音效索引。', '音效'],
+          ['Composing Process/Tutorials', 'https://www.youtube.com/playlist?list=PLr5xOMhVWITk0emmQlfEppVr6TXIHgw4W', '作曲流程和教程播放列表。', '教程'],
+          ['自学游戏向音乐制作的心得', 'https://indienova.com/indie-game-development/thoughts-on-self-learning-music-production-for-games/', '独立游戏音乐学习经验。', '文章'],
+          ['Suno', 'https://suno.com/', 'AI 音乐生成工具。', 'AI']
+        ]
+      },
+      {
+        id: 'assets',
+        icon: '◇',
+        title: '游戏素材与资源',
+        desc: 'Godot、2D/3D、图标、像素素材和 shader 资源。',
+        items: [
+          ['Godot Shaders', 'https://godotshaders.com/', 'Godot shader 示例与资源。', 'Godot'],
+          ['Godot Asset Store', 'https://store.godotengine.org/', 'Godot 资源商店。', 'Godot'],
+          ['Godot Asset Library', 'https://godotengine.org/asset-library/asset?filter=&category=&support%5Bfeatured%5D=1&godot_version=4.3&cost=&sort=updated', '官方资源库筛选入口。', 'Godot'],
+          ['Godot 2D 搜索', 'https://store-beta.godotengine.org/search?q=%232d', 'Godot 2D 资源搜索。', 'Godot'],
+          ['Kenney Assets', 'https://www.kenney.nl/assets/', '高质量免费游戏素材。', '素材'],
+          ['OpenGameArt', 'https://opengameart.org/', '开放游戏美术与音频社区。', '素材'],
+          ['The Spriters Resource', 'https://www.spriters-resource.com/', '精灵图资源索引。', '像素'],
+          ['Game-icons.net', 'https://game-icons.net/', '大量 SVG 游戏图标。', '图标'],
+          ['SVG Repo', 'https://www.svgrepo.com/', 'SVG 图标素材库。', '图标'],
+          ['CraftPix Pixel Assets', 'https://craftpix.net/tags/pixel-art-game-assets-download/', '像素游戏素材下载。', '像素'],
+          ['free-game-assets.itch.io', 'https://free-game-assets.itch.io/', 'itch.io 免费游戏素材集合。', '素材'],
+          ['Antipixel Games', 'https://antipixel-games.itch.io/', '独立游戏素材发布页。', '素材'],
+          ['BOOTH', 'https://booth.pm/zh-cn', '创作者素材商店。', '商店'],
+          ['Eagle 免费游戏素材整理', 'https://cn.eagle.cool/blog/post/free-game-assets', 'Eagle 整理的免费素材文章。', '合集'],
+          ['3D Resources', 'https://3d.devanshutak.xyz/', '3D 资源导航。', '3D'],
+          ['Universal LPC Spritesheet Generator', 'https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/#?body=Body_color_light&head=Human_male_light&sex=female', 'LPC 角色精灵生成器。', '角色'],
+          ['Laigter', 'https://azagaya.itch.io/laigter', '2D 贴图法线/光照辅助工具。', '工具'],
+          ['Shadertoy 中文教程', 'https://shadertoy.peakcoder.com/', 'ShaderToy 中文学习资料。', '教程'],
+          ['Inigo Quilez 2D SDF', 'https://iquilezles.org/articles/distfunctions2d/', '2D SDF 距离函数资料。', 'Shader'],
+          ['Godot Demo Projects', 'https://github.com/godotengine/godot-demo-projects', 'Godot 官方演示项目。', '示例'],
+          ['Godot C/C++ 扩展调试文章', 'https://godot.atomgit.com/explore/journalism/detail/401311954326654976', 'Godot 扩展调试资料。', '文章']
+        ]
+      },
+      {
+        id: 'art',
+        icon: '✎',
+        title: '美术与动画',
+        desc: '像素画、姿势参考、动效、CSS loader 和美术学习。',
+        items: [
+          ['Lospec Pixel Art: Where to Start', 'https://lospec.com/articles/pixel-art-where-to-start/', '像素画入门文章。', '像素画'],
+          ['PoseMy.Art', 'https://posemy.art/app/?lang=zhHans', '在线姿势参考工具。', '参考'],
+          ['Jitter', 'https://jitter.video/', '动效设计工具。', '动效'],
+          ['PerfectPixel Processor', 'https://theamusing.github.io/perfectPixel_webdemo/', '像素图处理工具。', '像素画'],
+          ['PixelGif', 'http://pixelgif.cn/#/saint11/12-', '像素 GIF 资源/教程。', '像素画'],
+          ['Pixel Art Run Animation Tutorial', 'https://www.youtube.com/watch?v=LPBvrdJ_1a8&list=PLBarSI1L3htlNR8oYQyKJ-1wBfSlocsCB&index=8', '像素奔跑动画教程。', '教程'],
+          ['Pixel Art Boss Attack Tutorial', 'https://www.youtube.com/watch?v=r5VIb2wLww4&list=PLHuVBjokeuXFO_0FzN0kiPRyB83QaKeyS&index=2', 'Boss 攻击动画教程。', '教程'],
+          ['Pixel Art Generator', 'https://pixelartgenerator.app/zh', '在线像素图生成。', 'AI'],
+          ['Pixel Nova', 'https://pixelnova.app/', '像素图生成与辅助工具。', 'AI'],
+          ['白枭课堂', 'http://www.pixpolly.com/', '美术学习内容。', '学习'],
+          ['The Dots CSS Loaders Collection', 'https://css-loaders.com/dots/', 'CSS 点状 loading 动画集合。', 'CSS']
+        ]
+      },
+      {
+        id: 'learning',
+        icon: '▣',
+        title: '学习与开发',
+        desc: '计算机基础、游戏开发路线、算法、英语和身体训练资料。',
+        items: [
+          ['CS50x 2025', 'https://cs50.harvard.edu/x/weeks/0/', '哈佛 CS50 课程。', 'CS'],
+          ['Game Developer Roadmap', 'https://roadmap.sh/game-developer', '游戏开发路线图。', '路线'],
+          ['LearnOpenGL', 'https://learnopengl.com/Introduction', 'OpenGL 系统教程。', '图形学'],
+          ['CS 自学指南', 'https://csdiy.wiki/', '中文 CS 自学路线。', 'CS'],
+          ['freeCodeCamp 中文', 'https://www.freecodecamp.org/chinese/', '编程学习资源。', '编程'],
+          ['labuladong 算法', 'https://github.com/labuladong/fucking-algorithm', '算法学习资料。', '算法'],
+          ['The Art of Command Line', 'https://github.com/jlevy/the-art-of-command-line/tree/master', '命令行技巧集合。', '命令行'],
+          ['IndieGameHub', 'https://game.indiehubs.org/', '独立游戏资源站。', '游戏开发'],
+          ['Indieloop', 'https://www.indieloop.com/#/home', '独立游戏开发社区/导航。', '游戏开发'],
+          ['软件开发学习笔记', 'https://gamedevfan.cn/', '软件和游戏开发学习笔记。', '学习'],
+          ['Paper2Galgame', 'https://paper2gal.com/', 'Galgame 相关工具/资料。', 'Galgame'],
+          ['大学资源网', 'https://www.dxzy163.com/', '课程与学习资源。', '学习'],
+          ['终身教育平台', 'https://le.ouchn.cn/home', '开放学习平台。', '学习'],
+          ['英语学习资源导航', 'https://en.knowledgefxg.com/', '英语学习导航。', '英语'],
+          ['MuscleWiki 中文', 'https://musclewiki.cn/', '训练动作和肌肉百科。', '健康']
+        ]
+      },
+      {
+        id: 'ai',
+        icon: '✦',
+        title: 'AI 与效率',
+        desc: 'AI 对话、图像、语音、提示词、Agent 和工具导航。',
+        items: [
+          ['Google AI Studio', 'https://aistudio.google.com/prompts/new_chat?model=gemini-3.1-flash-image-preview', 'Google AI 模型调试入口。', 'AI'],
+          ['Google Gemini', 'https://gemini.google.com/', 'Gemini 对话入口。', 'AI'],
+          ['Grok', 'https://grok.com/?referrer=website', 'Grok 对话入口。', 'AI'],
+          ['Flowith', 'https://flowith.net/blank?inv=QGXZYY', 'AI 工作流与画布工具。', 'AI'],
+          ['ClawHub', 'https://clawhub.ai/', 'AI 工具平台。', 'AI'],
+          ['skill0', 'https://skill0.io/', 'AI 技能和工具资源。', 'AI'],
+          ['Civitai', 'https://civitaicn.com/?source=knowledge.raodaor.com', 'AI 图像模型社区。', '图像'],
+          ['ElevenLabs / 11labs', 'https://11labs.us/', 'AI 语音工具。', '语音'],
+          ['Awesome ChatGPT Prompts', 'https://github.com/f/prompts.chat', '提示词集合。', 'Prompt'],
+          ['system-prompts-and-models-of-ai-tools', 'https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools', 'AI 工具系统提示词整理。', 'Prompt'],
+          ['awesome-openclaw-skills', 'https://github.com/VoltAgent/awesome-openclaw-skills', 'OpenClaw 技能集合。', 'Agent'],
+          ['agency-agents', 'https://github.com/msitarzewski/agency-agents?tab=readme-ov-file#-multi-tool-integrations', '多工具 Agent 资源。', 'Agent'],
+          ['claude-desktop-app', 'https://github.com/pretend1111/claude-desktop-app', 'Claude 桌面客户端项目。', '工具'],
+          ['free-llm-api-resources', 'https://github.com/cheahjs/free-llm-api-resources', '免费 LLM API 资源整理。', 'API'],
+          ['HuntScreens', 'https://huntscreens.com/zh', '产品截图/灵感工具。', '灵感'],
+          ['Inferri', 'https://inferri.com/zh-CN', 'AI 工具导航。', '导航'],
+          ['AIHOT', 'https://aihot.virxact.com/', 'AI 热门工具集合。', '导航'],
+          ['AIPlus', 'https://aiplus.lra.cn/chat', 'AI 对话入口。', 'AI']
+        ]
+      },
+      {
+        id: 'tools',
+        icon: '◈',
+        title: '实用工具',
+        desc: '绘图、下载、拼图、隐私、安全、简历和行业资料。',
+        items: [
+          ['draw.io', 'https://www.drawio.com/', '流程图和架构图工具。', '绘图'],
+          ['DownGit', 'https://minhaskamal.github.io/DownGit/#/home', '下载 GitHub 子目录。', '下载'],
+          ['FrameRonin', 'https://frameronin.com/', '动画帧预览工具。', '动画'],
+          ['FrameRonin GitHub 版', 'https://systemchester.github.io/FrameRonin/', 'FrameRonin 在线版本。', '动画'],
+          ['好拼', 'https://img.ops-coffee.com/', '在线拼图工具。', '图片'],
+          ['Firefox Relay', 'https://relay.firefox.com/accounts/profile/', '邮箱别名与隐私保护。', '隐私'],
+          ['2FA 验证码生成', 'https://2fa.show/', '两步验证码工具。', '安全'],
+          ['keybr', 'https://www.keybr.com/profile', '打字练习工具。', '效率'],
+          ['摸鱼工具库', 'https://moyugongju.com/', '实用小工具集合。', '工具'],
+          ['油小猴', 'https://www.youxiaohou.com/', '浏览器脚本和效率工具。', '脚本'],
+          ['大学生活质量指北', 'https://colleges.chat/', '高校生活信息参考。', '校园'],
+          ['Resumeily', 'https://resumeily.com/zh-cn', '在线简历工具。', '简历'],
+          ['WonderCV', 'https://www.wondercv.com/', '简历制作工具。', '简历'],
+          ['游鲨游戏行业资料共享文档', 'https://www.kdocs.cn/l/ct4bcS9xHD3K', '游戏行业资料共享文档。', '行业'],
+          ['TapTapSDK 文档', 'https://www.yuque.com/hongliqidechazi/dfyagr/kne46dd14blprhol?singleDoc##', 'TapTap SDK 文档。', '文档']
+        ]
+      },
+      {
+        id: 'nav',
+        icon: '⌘',
+        title: '导航与合集',
+        desc: '资源导航站、ACG 导航、网盘搜索和开发者工具合集。',
+        items: [
+          ['Moshangzhu 收集的资源网站', 'https://www.moshangzhu.com.cn/indiegame/收集的资源网站.html', '独立游戏相关资源整理。', '合集'],
+          ['FreeDw 资源库', 'https://freedw.com/archives/category/精品实用网站', '精品实用网站分类。', '合集'],
+          ['军大君独立开发工具站', 'https://jundagame.top/', '独立开发工具导航。', '开发'],
+          ['山海之花', 'https://cbge.top/', '资源导航站。', '导航'],
+          ['木晞i 资源汇总导航', 'https://yftdtddh.pages.dev/', '资源汇总导航。', '导航'],
+          ['ACG 导航站', 'https://www.acgdhz.com/', 'ACG 资源导航。', 'ACG'],
+          ['ACGN 导航', 'https://acg.cloudns.org/', 'ACGN 资源导航。', 'ACG'],
+          ['PanHunt', 'https://panhunt.com/', '网盘资源搜索。', '搜索'],
+          ['船长资源', 'https://makecc.top/', '资源导航/合集。', '合集']
+        ]
+      },
+      {
+        id: 'community',
+        icon: '◎',
+        title: '社区与文章',
+        desc: '社区、文章和可继续补充的维护入口。',
+        items: [
+          ['LINUX DO', 'https://linux.do/', '技术社区。', '社区'],
+          ['indienova 独立游戏', 'https://indienova.com/indie-game-development/thoughts-on-self-learning-music-production-for-games/', '独立游戏开发文章入口。', '文章'],
+          ['CC BY-NC-SA 4.0', 'https://creativecommons.org/licenses/by-nc-sa/4.0/', '资源整理可参考的署名协议。', '协议'],
+          ['异次元之旅', 'https://travel.moe/go.html', '站点互访入口。', '导航']
+        ]
+      }
+    ];
+
+    const sectionsEl = document.getElementById('resource-sections');
+    const tabsEl = document.getElementById('resource-tabs');
+    const searchEl = document.getElementById('resource-search');
+    const emptyEl = document.getElementById('resource-empty');
+    const totalEl = document.getElementById('resource-total');
+    const categoryTotalEl = document.getElementById('resource-category-total');
+    let activeGroup = 'all';
+
+    const esc = (value) => String(value).replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[ch]);
+
+    function render() {
+      const total = RESOURCE_GROUPS.reduce((sum, group) => sum + group.items.length, 0);
+      totalEl.textContent = total;
+      categoryTotalEl.textContent = RESOURCE_GROUPS.length;
+      tabsEl.innerHTML = [
+        `<button class="resource-tab is-active" type="button" data-group="all">全部 <span class="resource-count">${total}</span></button>`,
+        ...RESOURCE_GROUPS.map((group) => (
+          `<button class="resource-tab" type="button" data-group="${group.id}">${esc(group.title)} <span class="resource-count">${group.items.length}</span></button>`
+        ))
+      ].join('');
+      sectionsEl.innerHTML = RESOURCE_GROUPS.map((group) => `
+        <section class="resource-section" data-section="${group.id}">
+          <header class="resource-section-head">
+            <div class="resource-section-title">
+              <span class="resource-section-icon" aria-hidden="true">${group.icon}</span>
+              <div>
+                <h2>${esc(group.title)}</h2>
+                <p class="resource-section-desc">${esc(group.desc)}</p>
+              </div>
+            </div>
+            <span class="resource-count">${group.items.length} items</span>
+          </header>
+          <div class="resource-grid">
+            ${group.items.map((item) => resourceCard(group, item)).join('')}
+          </div>
+        </section>
+      `).join('');
+    }
+
+    function resourceCard(group, item) {
+      const [title, href, desc, kind] = item;
+      const external = /^https?:\/\//i.test(href);
+      const haystack = `${group.title} ${title} ${desc} ${kind}`.toLowerCase();
+      return `
+        <a class="resource-card" href="${esc(href)}" ${external ? 'target="_blank" rel="noreferrer noopener"' : ''} data-group="${group.id}" data-search="${esc(haystack)}">
+          <div class="resource-card-top">
+            <strong>${esc(title)}</strong>
+            <span aria-hidden="true">↗</span>
+          </div>
+          <p>${esc(desc)}</p>
+          <div class="resource-card-foot">
+            <span>${external ? 'OPEN RESOURCE' : 'OPEN PAGE'}</span>
+            <span class="resource-kind">${esc(kind)}</span>
+          </div>
+        </a>
+      `;
+    }
+
+    function applyFilter() {
+      const query = searchEl.value.trim().toLowerCase();
+      let visible = 0;
+      document.querySelectorAll('.resource-tab').forEach((tab) => {
+        tab.classList.toggle('is-active', tab.dataset.group === activeGroup);
+      });
+      document.querySelectorAll('.resource-section').forEach((section) => {
+        let sectionVisible = 0;
+        const inActiveGroup = activeGroup === 'all' || section.dataset.section === activeGroup;
+        section.querySelectorAll('.resource-card').forEach((card) => {
+          const matchGroup = activeGroup === 'all' || card.dataset.group === activeGroup;
+          const matchText = !query || card.dataset.search.includes(query);
+          const show = matchGroup && matchText;
+          card.classList.toggle('is-hidden', !show);
+          if (show) {
+            sectionVisible += 1;
+            visible += 1;
+          }
+        });
+        section.hidden = !inActiveGroup || sectionVisible === 0;
+      });
+      emptyEl.classList.toggle('is-visible', visible === 0);
+    }
+
+    render();
+    tabsEl.addEventListener('click', (event) => {
+      const tab = event.target.closest('.resource-tab');
+      if (!tab) return;
+      activeGroup = tab.dataset.group;
+      applyFilter();
+    });
+    searchEl.addEventListener('input', applyFilter);
+  </script>
+</body>
+</html>

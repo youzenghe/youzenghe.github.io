@@ -18,6 +18,8 @@ const publicRootEntries = new Set([
   'js',
   'pages',
   'robots.txt',
+  'rss.xml',
+  'services',
   'sitemap.xml',
 ]);
 const cleanCss = new CleanCSS({ level: 2 });
