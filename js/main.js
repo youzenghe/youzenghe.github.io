@@ -287,7 +287,8 @@ function getPageKey(url = location.href) {
   if (path.endsWith('/pages/games.html')) return 'games';
   if (path.endsWith('/pages/acg.html')) return 'acg';
   if (path.endsWith('/pages/moments.html')) return 'moments';
-  if (path.endsWith('/pages/message.html')) return 'message';
+  if (path.endsWith('/pages/links.html')) return 'links';
+  if (path.endsWith('/pages/message.html')) return 'links';
   if (path.endsWith('/pages/about.html')) return 'about';
   if (path.endsWith('/404.html')) return '404';
   return '';

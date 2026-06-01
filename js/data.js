@@ -518,7 +518,7 @@ const ACG = {
       "score": "9.5",
       "status": "想看",
       "episodes": "全13话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/image/3b97bfc609e08417eb391ef975a8648c28c55e04.png@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-01.webp",
       "link": "https://www.bilibili.com/bangumi/media/md28229676",
       "description": "恋爱、婚后日常和轻喜剧气质很明显的一作。"
     },
@@ -528,7 +528,7 @@ const ACG = {
       "score": "9.6",
       "status": "想看",
       "episodes": "全11话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/image/dcd8941a27562cc340c64eae53b3bea96792e057.png@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-02.webp",
       "link": "https://www.bilibili.com/bangumi/media/md78512",
       "description": "以职场阿宅恋爱为核心的轻松恋爱喜剧。"
     },
@@ -538,7 +538,7 @@ const ACG = {
       "score": "9.6",
       "status": "想看",
       "episodes": "全13话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/image/b212f52c35a77ad4b751997e320d24d01d9a45ce.png@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-03.webp",
       "link": "https://www.bilibili.com/bangumi/media/md22097455",
       "description": "近未来、海平面上升和机器人少女构成的故事。"
     },
@@ -548,7 +548,7 @@ const ACG = {
       "score": "9.7",
       "status": "想看",
       "episodes": "全26话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/image/2a778c61bcd9321c31f172d48bf100a10386a73b.jpg@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-04.webp",
       "link": "https://www.bilibili.com/bangumi/media/md969",
       "description": "校园恋爱喜剧，女仆咖啡馆设定很有辨识度。"
     },
@@ -558,7 +558,7 @@ const ACG = {
       "score": "9.6",
       "status": "想看",
       "episodes": "全13话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/b69a9fc2ce1c50915b3158c2f6ac51ed64101b23.jpg@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-05.webp",
       "link": "https://www.bilibili.com/bangumi/media/md4349",
       "description": "中二病系列续作，延续勇太与六花的关系推进。"
     },
@@ -568,7 +568,7 @@ const ACG = {
       "score": "9.8",
       "status": "想看",
       "episodes": "全13话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/image/9b2fadeebea37c5da20ec9215fc4056caee69584.jpg@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-06.webp",
       "link": "https://www.bilibili.com/bangumi/media/md4340",
       "description": "青春、中二病和恋爱关系结合得很鲜明的一作。"
     },
@@ -578,7 +578,7 @@ const ACG = {
       "score": "9.5",
       "status": "想看",
       "episodes": "全12话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/92824bc6a8c7aabbf494c0b276d4aa7b70842976.jpg@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-07.webp",
       "link": "https://www.bilibili.com/bangumi/media/md3365",
       "description": "以异界士和妖梦为核心的青春奇幻作品。"
     },
@@ -588,7 +588,7 @@ const ACG = {
       "score": "9.5",
       "status": "想看",
       "episodes": "全14话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/6dccd70827dd5fe30d13bc002ee06b322334c8c0.jpg@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-08.webp",
       "link": "https://www.bilibili.com/bangumi/media/md710",
       "description": "围绕僵尸少女展开的恋爱与奇幻故事。"
     },
@@ -598,7 +598,7 @@ const ACG = {
       "score": "8.3",
       "status": "想看",
       "episodes": "全12话",
-      "cover": "https://i0.hdslb.com/bfs/bangumi/image/a8385749e37068ab8c288dd5e672c15b473deec6.png@220w_280h.webp",
+      "cover": "../assets/acg/bangumi/bangumi-09.webp",
       "link": "https://www.bilibili.com/bangumi/media/md23187923",
       "description": "电波感和搞笑节奏都很强的日常喜剧。"
     }
@@ -611,7 +611,7 @@ const MOMENTS = [
     "date": "2026-06-01",
     "mood": "开发",
     "title": "博客功能扩展计划",
-    "content": "准备把博客从文章和项目展示，扩展成更完整的个人小窝：归档、标签、分类、瞬间、ACG 收藏和留言入口都会慢慢补上。",
+    "content": "准备把博客从文章和项目展示，扩展成更完整的个人小窝：归档、标签、分类、瞬间、ACG 收藏和友链页都会慢慢补上。",
     "tags": [
       "博客",
       "开发记录"

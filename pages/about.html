@@ -117,61 +117,9 @@
     .tl-date { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; font-family: var(--font-ui); font-weight: 700; margin-bottom: 0.25rem; }
     .tl-title { font-family: var(--font-display); font-size: 1rem; margin-bottom: 0.2rem; }
     .tl-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
-    .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem; }
-    .fav-item { padding: 0.9rem 1rem; border-radius: var(--radius-sm); background: var(--glass); border: 1px solid var(--glass-border); transition: background var(--transition); }
-    .fav-item:hover { background: var(--glass-mid); }
-    .fav-name { font-size: 0.82rem; margin-bottom: 0.15rem; }
-    .fav-type { font-size: 0.68rem; color: var(--text-muted); }
-    .friend-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-    .friend-link-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 1rem 1.1rem;
-      border-radius: var(--radius-sm);
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      color: var(--text);
-      transition: transform var(--transition), background var(--transition), border-color var(--transition);
-    }
-    .friend-link-card:hover {
-      transform: translateY(-2px);
-      background: var(--glass-mid);
-      border-color: rgba(91,157,255,0.45);
-    }
-    .friend-link-main { min-width: 0; }
-    .friend-link-name { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 0.2rem; }
-    .friend-link-url { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; word-break: break-word; }
-    .friend-link-badge {
-      flex-shrink: 0;
-      padding: 0.26rem 0.7rem;
-      border-radius: 999px;
-      background: rgba(91,157,255,0.15);
-      border: 1px solid rgba(91,157,255,0.28);
-      color: var(--accent);
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-    }
-    .friend-link-empty {
-      grid-column: 1 / -1;
-      padding: 1rem 1.1rem;
-      border-radius: var(--radius-sm);
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
-      font-size: 0.86rem;
-      line-height: 1.7;
-    }
     @media (max-width: 860px) {
       .about-layout { grid-template-columns: 1fr; }
       .about-card-main { position: static; }
-    }
-    @media (max-width: 560px) {
-      .friend-link-card {
-        align-items: flex-start;
-        flex-direction: column;
-      }
     }
   </style>
 </head>
@@ -222,24 +170,6 @@
             <div class="skill-item"><div class="skill-top"><span>项目文档与复盘</span><span>78%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.78"></div></div></div>
             <div class="skill-item"><div class="skill-top"><span>ACG 内容整理</span><span>75%</span></div><div class="skill-bar"><div class="skill-fill" data-width="0.75"></div></div></div>
           </div>
-        </div>
-
-        <div class="about-content-block reveal">
-          <h2>最喜欢的游戏</h2>
-          <div class="fav-grid">
-            <div class="fav-item"><div class="fav-name">常轨脱离 Creative</div><div class="fav-type">AVG · 10/10</div></div>
-            <div class="fav-item"><div class="fav-name">夏日口袋</div><div class="fav-type">AVG · 10/10</div></div>
-            <div class="fav-item"><div class="fav-name">甜蜜女友 2</div><div class="fav-type">AVG · 10/10</div></div>
-            <div class="fav-item"><div class="fav-name">与你心相连</div><div class="fav-type">AVG · 10/10</div></div>
-            <div class="fav-item"><div class="fav-name">妹相随</div><div class="fav-type">SLG · 10/10</div></div>
-            <div class="fav-item"><div class="fav-name">妹生活</div><div class="fav-type">SLG · 10/10</div></div>
-          </div>
-        </div>
-
-        <div class="about-content-block reveal">
-          <h2>友链交换</h2>
-          <p>如果你也在长期维护技术博客或个人站，可以之后来交换友链。</p>
-          <div class="friend-links" id="friend-links-list"></div>
         </div>
 
         <div class="about-content-block reveal">

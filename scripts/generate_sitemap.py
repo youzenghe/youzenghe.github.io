@@ -38,7 +38,7 @@ def main() -> None:
         "/pages/projects.html",
         "/pages/acg.html",
         "/pages/moments.html",
-        "/pages/message.html",
+        "/pages/links.html",
         "/pages/games.html",
         "/pages/changelog.html",
         "/pages/about.html",

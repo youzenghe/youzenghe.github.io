@@ -1,5 +1,8 @@
 window.SiteApp.registerPage('posts', () => {
   const absoluteBase = 'https://yzh1019.top';
+  const pageSize = 5;
+  let currentPage = 1;
+  let currentCategory = '全部';
 
   function updateStructuredData() {
     const script = document.getElementById('posts-structured-data');
@@ -60,6 +63,29 @@ window.SiteApp.registerPage('posts', () => {
     `;
   }
 
+  function renderPagination(total) {
+    const container = document.getElementById('posts-list');
+    if (!container) return;
+    let pager = document.getElementById('posts-pagination');
+    if (!pager) {
+      pager = document.createElement('div');
+      pager.id = 'posts-pagination';
+      pager.className = 'pagination';
+      container.after(pager);
+    }
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (totalPages <= 1) {
+      pager.innerHTML = '';
+      return;
+    }
+    const buttons = Array.from({ length: totalPages }, (_, index) => index + 1);
+    pager.innerHTML = `
+      <button class="page-btn" type="button" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+      ${buttons.map((page) => `<button class="page-btn${page === currentPage ? ' active' : ''}" type="button" data-page="${page}">${page}</button>`).join('')}
+      <button class="page-btn" type="button" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+    `;
+  }
+
   function mountPosts(list, simple = false) {
     const container = document.getElementById('posts-list');
     if (!container) return;
@@ -67,10 +93,15 @@ window.SiteApp.registerPage('posts', () => {
 
     if (!list.length) {
       container.innerHTML = '<div class="no-results"><span>🔍</span>该分类下暂时没有文章</div>';
+      renderPagination(0);
       return;
     }
 
-    list.forEach((post, index) => {
+    const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+    currentPage = Math.min(currentPage, totalPages);
+    const pageItems = list.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    pageItems.forEach((post, index) => {
       const el = document.createElement('a');
       el.className = 'post-list-card reveal';
       el.style.transitionDelay = `${index * 0.07}s`;
@@ -78,6 +109,7 @@ window.SiteApp.registerPage('posts', () => {
       el.innerHTML = renderCard(post, simple, index);
       container.appendChild(el);
     });
+    renderPagination(list.length);
 
     initReveal();
   }
@@ -87,6 +119,7 @@ window.SiteApp.registerPage('posts', () => {
   }
 
   function renderPosts(category) {
+    currentCategory = category;
     const params = new URLSearchParams(location.search);
     const tag = params.get('tag');
     const byCategory = category === '全部' ? POSTS : POSTS.filter((post) => post.cat === category);
@@ -126,9 +159,20 @@ window.SiteApp.registerPage('posts', () => {
 
       clearFilterState();
       btn.classList.add('active');
+      currentPage = 1;
       renderPosts(btn.dataset.cat);
     });
   }
+
+  const onPaginationClick = (event) => {
+    const btn = event.target.closest('#posts-pagination .page-btn');
+    if (!btn || btn.disabled) return;
+    currentPage = Number(btn.dataset.page) || 1;
+    renderPosts(currentCategory);
+    document.getElementById('posts-list')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+
+  document.addEventListener('click', onPaginationClick);
 
   const activeTag = new URLSearchParams(location.search).get('tag');
   if (activeTag && filterBar) {
@@ -142,4 +186,8 @@ window.SiteApp.registerPage('posts', () => {
   renderPosts('全部');
   updateStructuredData();
   initReveal();
+
+  return () => {
+    document.removeEventListener('click', onPaginationClick);
+  };
 });

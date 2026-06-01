@@ -10,6 +10,9 @@ window.SiteApp.registerPage('projects', () => {
   let currentProjectList = [];
   let projectLightboxIndex = 0;
   let previousActiveElement = null;
+  let currentCategory = '全部';
+  let currentPage = 1;
+  const pageSize = 5;
 
   function toAbsoluteAssetUrl(path) {
     if (!path) return undefined;
@@ -55,6 +58,7 @@ window.SiteApp.registerPage('projects', () => {
       btn.addEventListener('click', () => {
         el.querySelectorAll('.tab-btn').forEach((item) => item.classList.remove('active'));
         btn.classList.add('active');
+        currentPage = 1;
         renderProjectGrid(btn.dataset.cat);
       });
     });
@@ -77,7 +81,33 @@ window.SiteApp.registerPage('projects', () => {
     `;
   }
 
+  function renderProjectPagination(total) {
+    let pager = document.getElementById('project-pagination');
+    const grid = document.getElementById('project-grid');
+    if (!grid) return;
+    if (!pager) {
+      pager = document.createElement('div');
+      pager.id = 'project-pagination';
+      pager.className = 'pagination';
+      grid.after(pager);
+    }
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (totalPages <= 1) {
+      pager.innerHTML = '';
+      return;
+    }
+    pager.innerHTML = `
+      <button class="page-btn" type="button" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+      ${Array.from({ length: totalPages }, (_, index) => {
+        const page = index + 1;
+        return `<button class="page-btn${page === currentPage ? ' active' : ''}" type="button" data-page="${page}">${page}</button>`;
+      }).join('')}
+      <button class="page-btn" type="button" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+    `;
+  }
+
   function renderProjectGrid(cat) {
+    currentCategory = cat;
     currentProjectList = cat === '全部' ? [...PROJECTS] : PROJECTS.filter((project) => project.cat === cat);
     const grid = document.getElementById('project-grid');
     if (!grid) return;
@@ -85,10 +115,17 @@ window.SiteApp.registerPage('projects', () => {
 
     if (!currentProjectList.length) {
       grid.innerHTML = '<div class="no-results" style="grid-column:1/-1"><span>🔍</span>该分类暂时没有项目</div>';
+      renderProjectPagination(0);
       return;
     }
 
-    currentProjectList.forEach((project, index) => {
+    const totalPages = Math.max(1, Math.ceil(currentProjectList.length / pageSize));
+    currentPage = Math.min(currentPage, totalPages);
+    const start = (currentPage - 1) * pageSize;
+    const pageItems = currentProjectList.slice(start, start + pageSize);
+
+    pageItems.forEach((project, index) => {
+      const absoluteIndex = start + index;
       const eagerImage = index < 2;
       const projectImage = escapeHtml(resolveAssetUrl(project.img));
       const projectThumb = escapeHtml(resolveAssetUrl(project.img));
@@ -98,7 +135,7 @@ window.SiteApp.registerPage('projects', () => {
       card.className = 'proj-card reveal';
       card.style.transitionDelay = `${index * 0.07}s`;
       card.innerHTML = `
-        <div class="proj-preview" data-idx="${index}" role="button" tabindex="0" aria-label="放大查看 ${projectTitle}">
+        <div class="proj-preview" data-idx="${absoluteIndex}" role="button" tabindex="0" aria-label="放大查看 ${projectTitle}">
           ${project.img
             ? `<img src="${projectThumb}" data-full-src="${projectImage}" alt="${projectTitle}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
             : `<div class="proj-preview-placeholder"><span class="p-emoji">${escapeHtml(project.emoji)}</span><span class="p-hint">暂无预览图</span></div>`}
@@ -118,14 +155,15 @@ window.SiteApp.registerPage('projects', () => {
         <div class="proj-footer"><span class="proj-date">📅 ${escapeHtml(project.date)}</span><a class="proj-detail-link" href="project.html?id=${project.id}">查看复盘 →</a></div>
       `;
       const preview = card.querySelector('.proj-preview');
-      preview?.addEventListener('click', () => openProjectLightbox(index));
+      preview?.addEventListener('click', () => openProjectLightbox(absoluteIndex));
       preview?.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
         event.preventDefault();
-        openProjectLightbox(index);
+        openProjectLightbox(absoluteIndex);
       });
       grid.appendChild(card);
     });
+    renderProjectPagination(currentProjectList.length);
 
     initReveal();
   }
@@ -194,6 +232,15 @@ window.SiteApp.registerPage('projects', () => {
     projectLightboxIndex = (projectLightboxIndex + 1) % currentProjectList.length;
     renderProjectLightbox();
   });
+  const onPaginationClick = (event) => {
+    const btn = event.target.closest('#project-pagination .page-btn');
+    if (!btn || btn.disabled) return;
+    currentPage = Number(btn.dataset.page) || 1;
+    renderProjectGrid(currentCategory);
+    document.getElementById('project-grid')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+
+  document.addEventListener('click', onPaginationClick);
   document.addEventListener('keydown', onKeyDown);
 
   renderProjectStats();
@@ -203,6 +250,7 @@ window.SiteApp.registerPage('projects', () => {
 
   return () => {
     closeProjectLightbox();
+    document.removeEventListener('click', onPaginationClick);
     document.removeEventListener('keydown', onKeyDown);
   };
 });

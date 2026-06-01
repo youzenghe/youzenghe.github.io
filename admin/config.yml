@@ -226,3 +226,5 @@ collections:
               - { label: "链接", name: "url", widget: "string" }
               - { label: "展示链接", name: "displayUrl", widget: "string" }
               - { label: "徽章", name: "badge", widget: "string" }
+              - { label: "头像路径", name: "avatar", widget: "string", required: false }
+              - { label: "简介", name: "description", widget: "text", required: false }

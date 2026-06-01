@@ -6,7 +6,7 @@
     { key: 'projects', label: '项目', href: 'pages/projects.html' },
     { key: 'acg', label: 'ACG', href: 'pages/acg.html' },
     { key: 'moments', label: '瞬间', href: 'pages/moments.html' },
-    { key: 'message', label: '留言', href: 'pages/message.html' },
+    { key: 'links', label: '友链', href: 'pages/links.html' },
     { key: 'about', label: '关于', href: 'pages/about.html' },
   ];
 
