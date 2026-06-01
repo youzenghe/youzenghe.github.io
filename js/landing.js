@@ -703,8 +703,7 @@ function handleCommand(raw) {
     terminalOutput.innerHTML = '';
   } else if (cmd === 'glitch') {
     appendOutput(cmdData?.responses?.glitch_msg || 'glitch.', 'system');
-    spawnGlitchBits(60, 650);
-    playGlitchSfx(700);
+    triggerManualGlitch();
   } else if (cmd === 'matrix') {
     appendOutput(cmdData?.responses?.matrix_msg || 'matrix.', 'system');
     startMatrix();
@@ -766,6 +765,16 @@ function spawnSecondShake() {
   if (currentLayer !== 'transition') return;
   body.classList.add('is-shaking');
   setTimeout(() => body.classList.remove('is-shaking'), 360);
+}
+
+function triggerManualGlitch() {
+  const durMs = 700;
+  body.classList.remove('is-manual-glitch');
+  void body.offsetWidth;
+  body.classList.add('is-manual-glitch');
+  spawnGlitchBits(prefersReducedMotion() ? 0 : 60, 650);
+  playGlitchSfx(durMs);
+  setTimeout(() => body.classList.remove('is-manual-glitch'), durMs);
 }
 
 function spawnGlitchBits(count, totalMs) {

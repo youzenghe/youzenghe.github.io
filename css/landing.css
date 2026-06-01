@@ -1234,6 +1234,24 @@ body.theme-pink { --terminal-text: #ffd6e3; --cyan: #ff79a8; --green: #ff9eb6; }
 body.theme-green { --terminal-text: #c4ffd6; --cyan: #6affb0; --green: #9affbb; }
 body.theme-amber { --terminal-text: #ffe4b3; --cyan: #ffc870; --green: #ffd278; }
 
+body.is-manual-glitch .terminal-window {
+  animation: manualGlitch 600ms steps(8, end);
+}
+body.is-manual-glitch .noise-overlay {
+  opacity: 0.64;
+  animation: noiseFlicker 0.12s steps(3) infinite;
+}
+body.is-manual-glitch .glitch-field {
+  z-index: 104;
+}
+@keyframes manualGlitch {
+  0%, 100% { transform: translate(0, 0); filter: none; }
+  14% { transform: translate(-8px, 2px); filter: hue-rotate(80deg); }
+  28% { transform: translate(6px, -3px); filter: hue-rotate(-60deg) saturate(1.6); }
+  42% { transform: translate(-4px, 1px); filter: invert(0.18); }
+  56% { transform: translate(2px, -1px); filter: hue-rotate(180deg); }
+}
+
 @media (max-width: 900px) {
   .notebook-page {
     width: 96vw;
