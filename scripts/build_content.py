@@ -230,12 +230,14 @@ def normalize_image_item(item) -> dict:
             "alt": str(item.get("alt") or ""),
             "caption": str(item.get("caption") or ""),
             "isCover": normalize_bool(item.get("isCover"), False),
+            "animated": is_animated_asset(src),
         }
     return {
         "src": str(item),
         "alt": "",
         "caption": "",
         "isCover": False,
+        "animated": is_animated_asset(str(item)),
     }
 
 
@@ -303,20 +305,31 @@ def load_projects() -> list[dict]:
         item = dict(project)
         original_img = str(item.get("img", ""))
         motion_img = MOTION_PROJECT_IMAGES.get(int(item["id"]), original_img)
-        item["status"] = str(item.get("status", "已完成"))
-        item["role"] = str(item.get("role", ""))
-        item["links"] = item.get("links", [])
-        item["highlights"] = item.get("highlights", [])
-        item["challenges"] = item.get("challenges", [])
-        item["result"] = str(item.get("result", ""))
-        item["images"] = normalize_images(item.get("images", []))
-        item["img"] = motion_img
-        item["originalImg"] = original_img
-        item["imgAnimated"] = is_animated_asset(motion_img)
-        item.setdefault("detail", "")
-        if item["detail"]:
-            item["detail"] = markdown_to_html(str(item["detail"]))
-        projects.append(item)
+        detail = str(item.get("detail", ""))
+        if detail:
+            detail = markdown_to_html(detail)
+        projects.append({
+            "id": int(item["id"]),
+            "title": str(item.get("title", "")),
+            "desc": str(item.get("desc", "")),
+            "cat": str(item.get("cat", "")),
+            "tech": list(item.get("tech", [])),
+            "date": str(item.get("date", "")),
+            "award": str(item.get("award", "none")),
+            "awardText": str(item.get("awardText", "")),
+            "emoji": str(item.get("emoji", "🧩")),
+            "img": motion_img,
+            "status": str(item.get("status", "已完成")),
+            "role": str(item.get("role", "")),
+            "links": item.get("links", []),
+            "highlights": item.get("highlights", []),
+            "challenges": item.get("challenges", []),
+            "result": str(item.get("result", "")),
+            "images": normalize_images(item.get("images", [])),
+            "detail": detail,
+            "originalImg": original_img,
+            "imgAnimated": is_animated_asset(motion_img),
+        })
     return projects
 
 

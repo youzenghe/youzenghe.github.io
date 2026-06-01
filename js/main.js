@@ -721,6 +721,11 @@ function initSearch() {
       close();
     }
   });
+  results.addEventListener('click', (event) => {
+    if (event.target.closest('.search-result-item')) {
+      close();
+    }
+  });
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {

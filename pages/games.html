@@ -206,8 +206,16 @@
       box-shadow: 0 8px 28px rgba(91,157,255,0.5);
     }
     @media (max-width: 680px) {
-      .games-grid { grid-template-columns: 1fr; }
-      .modal-content { width: 95vw; margin: 2rem; }
+      .games-grid { grid-template-columns: minmax(0, 1fr); }
+      .modal {
+        padding: 1rem;
+        align-items: flex-start;
+      }
+      .modal-content {
+        width: 100%;
+        max-height: calc(100dvh - 2rem);
+        margin: 0;
+      }
     }
   </style>
 </head>
@@ -249,7 +257,7 @@
           <div class="detail-item"><span class="detail-label">发布时间</span><span class="detail-value" id="modal-game-date">发布日期</span></div>
           <div class="detail-item"><span class="detail-label">状态</span><span class="detail-value" id="modal-game-status">开发状态</span></div>
         </div>
-        <a href="#" class="modal-download-btn" id="modal-download-link" target="_blank" rel="noreferrer">百度网盘下载</a>
+        <a href="https://pan.baidu.com/s/1X_q_1Y1g5zo2IXcbc9LNjQ?pwd=sbkk" class="modal-download-btn" id="modal-download-link" target="_blank" rel="noreferrer noopener">百度网盘下载</a>
       </div>
     </div>
   </div>

@@ -12,6 +12,10 @@ window.SiteApp.registerPage('project-detail', () => {
     return typeof image === 'string' ? fallback : image?.alt || fallback;
   }
 
+  function imageIsAnimated(image) {
+    return typeof image === 'object' && Boolean(image?.animated);
+  }
+
   function escapeHtml(text) {
     return String(text ?? '').replace(/[&<>"']/g, (char) => ({
       '&': '&amp;',
@@ -168,7 +172,10 @@ window.SiteApp.registerPage('project-detail', () => {
       ? `<div class="project-gallery">${project.images.map((image) => {
           const src = imageSrc(image);
           const caption = typeof image === 'object' && image?.caption ? `<figcaption>${escapeHtml(image.caption)}</figcaption>` : '';
-          return `<figure><img src="${escapeHtml(resolveThumbnailUrl(src))}" data-full-src="${escapeHtml(resolveAssetUrl(src))}" alt="${escapeHtml(imageAlt(image, `${project.title} 截图`))}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">${caption}</figure>`;
+          const animated = imageIsAnimated(image);
+          const previewSrc = animated ? resolveAssetUrl(src) : resolveThumbnailUrl(src);
+          const fullSrc = resolveAssetUrl(src);
+          return `<figure><img src="${escapeHtml(previewSrc)}" data-full-src="${escapeHtml(fullSrc)}" alt="${escapeHtml(imageAlt(image, `${project.title} 截图`))}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">${caption}</figure>`;
         }).join('')}</div>`
       : '';
     const role = project.role ? `<h2>我的职责</h2><p>${escapeHtml(project.role)}</p>` : '';

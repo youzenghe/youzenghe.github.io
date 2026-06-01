@@ -10,7 +10,7 @@ window.SiteApp.registerPage('about', () => {
       return;
     }
     friendLinksContainer.innerHTML = friendLinks.map((item) => `
-      <a class="friend-link-card" href="${escapeHtml(safeExternalUrl(item.url))}" target="_blank" rel="noreferrer">
+      <a class="friend-link-card" href="${escapeHtml(safeExternalUrl(item.url))}" target="_blank" rel="noreferrer noopener">
         <div class="friend-link-main">
           <div class="friend-link-name">${escapeHtml(item.name)}</div>
           <div class="friend-link-url">${escapeHtml(item.displayUrl || String(item.url || '').replace(/^https?:\/\//, ''))}</div>

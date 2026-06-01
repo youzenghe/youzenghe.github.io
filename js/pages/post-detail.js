@@ -26,6 +26,10 @@ window.SiteApp.registerPage('post-detail', () => {
     return typeof image === 'string' ? fallback : image?.alt || fallback;
   }
 
+  function imageIsAnimated(image) {
+    return typeof image === 'object' && Boolean(image?.animated);
+  }
+
   function stripHtml(html) {
     const temp = document.createElement('div');
     temp.innerHTML = html;
@@ -210,9 +214,11 @@ window.SiteApp.registerPage('post-detail', () => {
     const images = Array.isArray(post.images) ? post.images : [];
     gallery.replaceChildren(...images.map((image) => {
       const src = imageSrc(image);
+      const animated = imageIsAnimated(image);
+      const previewSrc = animated ? resolveAssetUrl(src) : resolveThumbnailUrl(src);
       const figure = document.createElement('figure');
       const img = document.createElement('img');
-      img.src = resolveThumbnailUrl(src);
+      img.src = previewSrc;
       img.dataset.fullSrc = resolveAssetUrl(src);
       img.alt = imageAlt(image, `${post.title} 图片`);
       img.loading = 'lazy';
