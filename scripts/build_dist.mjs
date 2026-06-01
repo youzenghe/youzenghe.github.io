@@ -6,7 +6,20 @@ import { minify as minifyJs } from 'terser';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
-const excludedRoots = new Set(['.git', '.github', '.idea', '.npm-cache', 'dist', 'node_modules']);
+const publicRootEntries = new Set([
+  '.nojekyll',
+  '404.html',
+  'CNAME',
+  'admin',
+  'assets',
+  'css',
+  'games',
+  'index.html',
+  'js',
+  'pages',
+  'robots.txt',
+  'sitemap.xml',
+]);
 const cleanCss = new CleanCSS({ level: 2 });
 const assetVersion = (process.env.GITHUB_SHA || String(Date.now())).slice(0, 12);
 
@@ -14,7 +27,8 @@ function shouldSkip(relativePath) {
   const parts = relativePath.split(path.sep);
   const first = parts[0];
   if (parts.some((part) => part.startsWith('__'))) return true;
-  return excludedRoots.has(first);
+  if (path.basename(relativePath).toLowerCase() === 'readme.md') return true;
+  return !publicRootEntries.has(first);
 }
 
 async function ensureDir(filePath) {

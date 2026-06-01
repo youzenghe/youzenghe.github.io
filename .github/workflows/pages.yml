@@ -32,33 +32,13 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install image tools
-        run: python -m pip install Pillow
-
-      - name: Optimize uploaded images
-        run: python scripts/optimize_upload_images.py
-
-      - name: Generate thumbnails
-        run: python scripts/generate_thumbnails.py
-
-      - name: Validate content
-        run: python scripts/validate_content.py
-
-      - name: Build content bundle
-        run: python scripts/build_content.py
-
-      - name: Generate sitemap
-        run: python scripts/generate_sitemap.py
-
-      - name: Subset self-hosted fonts
-        run: |
-          python -m pip install fonttools brotli
-          python scripts/build_fonts.py
+      - name: Install Python build tools
+        run: python -m pip install -r requirements.txt
 
       - name: Install frontend build tools
         run: npm ci
 
-      - name: Build compressed site
+      - name: Build site
         run: npm run build:dist
 
       - name: Upload artifact
