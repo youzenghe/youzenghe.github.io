@@ -104,10 +104,10 @@
     }
     .post-list-card:hover .plc-thumb { opacity: 0.78; }
     .plc-thumb.is-animated-cover {
-      opacity: 1;
-      -webkit-mask-image: none;
-      mask-image: none;
+      opacity: 0.52;
       background: transparent;
+      -webkit-mask-image: linear-gradient(to right, transparent 8%, rgba(0,0,0,0.4) 45%, #000 82%);
+      mask-image: linear-gradient(to right, transparent 8%, rgba(0,0,0,0.4) 45%, #000 82%);
     }
     .plc-thumb.is-animated-cover::before {
       content: "";
@@ -121,15 +121,12 @@
       mask-image: linear-gradient(to right, #000 0%, #000 30%, rgba(0,0,0,0.55) 48%, transparent 70%);
       background: linear-gradient(
         to right,
-        var(--card-bg) 0%,
-        rgba(28, 25, 30, 0.92) 14%,
-        rgba(28, 25, 30, 0.58) 34%,
+        rgba(18, 19, 22, 0.98) 0%,
+        rgba(28, 25, 30, 0.88) 14%,
+        rgba(28, 25, 30, 0.56) 34%,
         rgba(28, 25, 30, 0.12) 58%,
         transparent 82%
       );
-    }
-    .plc-thumb.is-animated-cover .img-bg {
-      display: none;
     }
     .plc-thumb .img-bg {
       position: absolute;
