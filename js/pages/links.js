@@ -2,9 +2,6 @@ window.SiteApp.registerPage('links', () => {
   const friendLinksContainer = document.getElementById('friend-links-list');
   const contactList = document.getElementById('contact-list');
   const contactActions = document.getElementById('contact-actions');
-  const form = document.getElementById('friend-message-form');
-  const copyButton = document.getElementById('copy-message');
-  const formNote = document.getElementById('message-form-note');
   const pageSize = 4;
   let currentPage = 1;
   const contacts = [
@@ -32,10 +29,6 @@ window.SiteApp.registerPage('links', () => {
   function webMailUrl(email, subject = '友链交换 / 站点留言', body = '') {
     if (email.toLowerCase().endsWith('@163.com')) return neteaseMailUrl();
     return email.toLowerCase().endsWith('@gmail.com') ? gmailUrl(email, subject, body) : qqMailUrl(email);
-  }
-
-  function formSubmitEndpoint(email) {
-    return `https://formsubmit.co/${email}`;
   }
 
   function renderPagination(total) {
@@ -114,30 +107,8 @@ window.SiteApp.registerPage('links', () => {
     }
   }
 
-  function messageText() {
-    const data = new FormData(form);
-    return [
-      `称呼：${String(data.get('name') || '').trim()}`,
-      `联系方式：${String(data.get('contact') || '').trim()}`,
-      `网址：${String(data.get('site') || '').trim()}`,
-      '',
-      '留言内容：',
-      String(data.get('message') || '').trim(),
-    ].join('\n');
-  }
-
-  function setNote(text) {
-    if (formNote) formNote.textContent = text;
-  }
-
   renderFriendLinks();
   renderContacts();
-
-  if (form) {
-    form.method = 'POST';
-    form.action = formSubmitEndpoint(emailOf(contacts[0]));
-    form.target = '_blank';
-  }
 
   const onPaginationClick = (event) => {
     const btn = event.target.closest('#friend-links-pagination .page-btn');
@@ -148,26 +119,6 @@ window.SiteApp.registerPage('links', () => {
   };
 
   document.addEventListener('click', onPaginationClick);
-
-  form?.addEventListener('submit', (event) => {
-    if (!form.reportValidity()) return;
-    const subject = form.querySelector('input[name="_subject"]');
-    const cc = form.querySelector('input[name="_cc"]');
-    if (subject) subject.value = '友链交换 / 站点留言';
-    if (cc) cc.value = contacts.slice(1).map(emailOf).join(',');
-    setNote('已经提交到静态表单服务。首次使用可能需要站长邮箱确认启用。');
-  });
-
-  copyButton?.addEventListener('click', async () => {
-    if (!form?.reportValidity()) return;
-    const text = messageText();
-    try {
-      await navigator.clipboard.writeText(text);
-      setNote('留言内容已复制，可以粘贴到任意邮箱发送。');
-    } catch (error) {
-      setNote('浏览器不允许自动复制，可以手动选中文本后发送。');
-    }
-  });
 
   return () => {
     document.removeEventListener('click', onPaginationClick);
