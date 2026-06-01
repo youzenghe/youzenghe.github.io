@@ -278,10 +278,16 @@ function getPageKey(url = location.href) {
   if (path === '' || path === '/' || path.endsWith('/index.html')) return 'home';
   if (path.endsWith('/pages/posts.html')) return 'posts';
   if (path.endsWith('/pages/post.html')) return 'post-detail';
+  if (path.endsWith('/pages/archive.html')) return 'archive';
+  if (path.endsWith('/pages/tags.html')) return 'tags';
+  if (path.endsWith('/pages/categories.html')) return 'categories';
   if (path.endsWith('/pages/projects.html')) return 'projects';
   if (path.endsWith('/pages/project.html')) return 'project-detail';
   if (path.endsWith('/pages/changelog.html')) return 'changelog';
   if (path.endsWith('/pages/games.html')) return 'games';
+  if (path.endsWith('/pages/acg.html')) return 'acg';
+  if (path.endsWith('/pages/moments.html')) return 'moments';
+  if (path.endsWith('/pages/message.html')) return 'message';
   if (path.endsWith('/pages/about.html')) return 'about';
   if (path.endsWith('/404.html')) return '404';
   return '';

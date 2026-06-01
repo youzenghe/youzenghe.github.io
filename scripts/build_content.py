@@ -337,6 +337,8 @@ def write_data_js(
     posts: list[dict],
     projects: list[dict],
     games: list[dict],
+    acg: dict,
+    moments: list[dict],
     friend_links: list[dict],
     changelog: list[dict],
 ) -> None:
@@ -347,6 +349,10 @@ def write_data_js(
         + json.dumps(projects, ensure_ascii=False, indent=2)
         + ";\n\nconst GAMES = "
         + json.dumps(games, ensure_ascii=False, indent=2)
+        + ";\n\nconst ACG = "
+        + json.dumps(acg, ensure_ascii=False, indent=2)
+        + ";\n\nconst MOMENTS = "
+        + json.dumps(moments, ensure_ascii=False, indent=2)
         + ";\n\nconst FRIEND_LINKS = "
         + json.dumps(friend_links, ensure_ascii=False, indent=2)
         + ";\n\nconst CHANGELOG = "
@@ -355,6 +361,8 @@ def write_data_js(
         + "  posts: POSTS,\n"
         + "  projects: PROJECTS,\n"
         + "  games: GAMES,\n"
+        + "  acg: ACG,\n"
+        + "  moments: MOMENTS,\n"
         + "  friendLinks: FRIEND_LINKS,\n"
         + "  changelog: CHANGELOG,\n"
         + "});\n\nwindow.SITE_DATA = SITE_DATA;\n"
@@ -367,6 +375,8 @@ def main() -> None:
         load_posts(),
         load_projects(),
         read_json("games.json")["games"],
+        read_json("acg.json"),
+        read_json("moments.json")["moments"],
         read_json("friend-links.json")["friendLinks"],
         read_json("changelog.json")["changelog"],
     )

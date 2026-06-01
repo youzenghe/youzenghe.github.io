@@ -4,7 +4,9 @@
     "name": "Mako",
     "url": "https://blog.hitachi-mako.com",
     "displayUrl": "blog.hitachi-mako.com",
-    "badge": "Friend Link"
+    "badge": "Friend Link",
+    "avatar": "../assets/friends/mako.webp",
+    "description": "朋友的个人博客，记录技术与生活。"
   }
   ]
 }

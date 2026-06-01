@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>文章归档 · 次元日记</title>
+  <meta name="description" content="按年份整理文章、分类和标签，快速回看博客内容。" />
+  <meta name="theme-color" content="#120b18" />
+  <link rel="canonical" href="https://yzh1019.top/pages/archive.html" />
+  <meta property="og:url" content="https://yzh1019.top/pages/archive.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="次元日记" />
+  <meta property="og:title" content="文章归档 · 次元日记" />
+  <meta property="og:description" content="按年份整理文章、分类和标签，快速回看博客内容。" />
+  <meta property="og:image" content="https://yzh1019.top/assets/avatar.webp" />
+  <meta property="og:locale" content="zh_CN" />
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="../js/site-shell.js" defer></script>
+</head>
+<body data-root-prefix="../" data-active-nav="archive" data-loader-text="整理归档中...">
+  <div id="site-shell-top"></div>
+  <main class="site-wrapper" id="main-content" tabindex="-1">
+    <section class="page-hero reveal">
+      <div class="section-label">Archive</div>
+      <h1>文章归档</h1>
+      <p>把文章按时间、分类和标签重新整理，方便以后像查笔记一样翻回来。</p>
+      <div class="content-actions">
+        <a class="btn btn-ghost" href="tags.html">标签云</a>
+        <a class="btn btn-ghost" href="categories.html">分类</a>
+      </div>
+    </section>
+    <section class="archive-layout">
+      <div id="archive-list"></div>
+      <aside>
+        <div class="feature-card">
+          <div class="feature-card-title">站点统计</div>
+          <div class="mini-stat-grid" id="archive-stats"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <div id="site-shell-bottom"></div>
+  <script src="../js/data.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/pages/archive.js" defer></script>
+</body>
+</html>

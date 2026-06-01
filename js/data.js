@@ -460,12 +460,205 @@ const GAMES = [
   }
 ];
 
+const ACG = {
+  "galgames": [
+    {
+      "title": "常轨脱离 Creative",
+      "type": "AVG",
+      "score": "10/10",
+      "status": "已通关",
+      "cover": "",
+      "description": "喜欢的 GalGame 之一，后续可以补充游玩记录、角色印象和推荐理由。"
+    },
+    {
+      "title": "夏日口袋",
+      "type": "AVG",
+      "score": "10/10",
+      "status": "已通关",
+      "cover": "",
+      "description": "夏日、岛屿和回忆感很强的一作，适合放进个人 Gal 收藏页长期留存。"
+    },
+    {
+      "title": "甜蜜女友 2",
+      "type": "AVG",
+      "score": "10/10",
+      "status": "已通关",
+      "cover": "",
+      "description": "偏日常恋爱向的收藏项，后续可以补女主和路线评价。"
+    },
+    {
+      "title": "与你心相连",
+      "type": "AVG",
+      "score": "10/10",
+      "status": "已通关",
+      "cover": "",
+      "description": "先记录在收藏列表里，封面和详细评价等确认图源后再补。"
+    },
+    {
+      "title": "妹相随",
+      "type": "SLG",
+      "score": "10/10",
+      "status": "已通关",
+      "cover": "",
+      "description": "SLG 收藏项，适合之后补充游玩体验和注意事项。"
+    },
+    {
+      "title": "妹生活",
+      "type": "SLG",
+      "score": "10/10",
+      "status": "已通关",
+      "cover": "",
+      "description": "SLG 收藏项，先保留基础信息，后续再补封面。"
+    }
+  ],
+  "bangumi": [
+    {
+      "title": "总之就是非常可爱",
+      "type": "番剧",
+      "score": "9.5",
+      "status": "想看",
+      "episodes": "全13话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/image/3b97bfc609e08417eb391ef975a8648c28c55e04.png@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md28229676",
+      "description": "恋爱、婚后日常和轻喜剧气质很明显的一作。"
+    },
+    {
+      "title": "阿宅的恋爱真难",
+      "type": "番剧",
+      "score": "9.6",
+      "status": "想看",
+      "episodes": "全11话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/image/dcd8941a27562cc340c64eae53b3bea96792e057.png@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md78512",
+      "description": "以职场阿宅恋爱为核心的轻松恋爱喜剧。"
+    },
+    {
+      "title": "亚托莉 -我挚爱的时光-",
+      "type": "番剧",
+      "score": "9.6",
+      "status": "想看",
+      "episodes": "全13话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/image/b212f52c35a77ad4b751997e320d24d01d9a45ce.png@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md22097455",
+      "description": "近未来、海平面上升和机器人少女构成的故事。"
+    },
+    {
+      "title": "会长是女仆大人！",
+      "type": "番剧",
+      "score": "9.7",
+      "status": "想看",
+      "episodes": "全26话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/image/2a778c61bcd9321c31f172d48bf100a10386a73b.jpg@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md969",
+      "description": "校园恋爱喜剧，女仆咖啡馆设定很有辨识度。"
+    },
+    {
+      "title": "中二病也要谈恋爱！恋",
+      "type": "番剧",
+      "score": "9.6",
+      "status": "想看",
+      "episodes": "全13话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/b69a9fc2ce1c50915b3158c2f6ac51ed64101b23.jpg@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md4349",
+      "description": "中二病系列续作，延续勇太与六花的关系推进。"
+    },
+    {
+      "title": "中二病也要谈恋爱！",
+      "type": "番剧",
+      "score": "9.8",
+      "status": "想看",
+      "episodes": "全13话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/image/9b2fadeebea37c5da20ec9215fc4056caee69584.jpg@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md4340",
+      "description": "青春、中二病和恋爱关系结合得很鲜明的一作。"
+    },
+    {
+      "title": "境界的彼方",
+      "type": "番剧",
+      "score": "9.5",
+      "status": "想看",
+      "episodes": "全12话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/92824bc6a8c7aabbf494c0b276d4aa7b70842976.jpg@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md3365",
+      "description": "以异界士和妖梦为核心的青春奇幻作品。"
+    },
+    {
+      "title": "散华礼弥",
+      "type": "番剧",
+      "score": "9.5",
+      "status": "想看",
+      "episodes": "全14话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/6dccd70827dd5fe30d13bc002ee06b322334c8c0.jpg@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md710",
+      "description": "围绕僵尸少女展开的恋爱与奇幻故事。"
+    },
+    {
+      "title": "鹿乃子乃子乃子虎视眈眈",
+      "type": "番剧",
+      "score": "8.3",
+      "status": "想看",
+      "episodes": "全12话",
+      "cover": "https://i0.hdslb.com/bfs/bangumi/image/a8385749e37068ab8c288dd5e672c15b473deec6.png@220w_280h.webp",
+      "link": "https://www.bilibili.com/bangumi/media/md23187923",
+      "description": "电波感和搞笑节奏都很强的日常喜剧。"
+    }
+  ]
+};
+
+const MOMENTS = [
+  {
+    "id": 1,
+    "date": "2026-06-01",
+    "mood": "开发",
+    "title": "博客功能扩展计划",
+    "content": "准备把博客从文章和项目展示，扩展成更完整的个人小窝：归档、标签、分类、瞬间、ACG 收藏和留言入口都会慢慢补上。",
+    "tags": [
+      "博客",
+      "开发记录"
+    ]
+  },
+  {
+    "id": 2,
+    "date": "2026-05-30",
+    "mood": "ACG",
+    "title": "GalGame 坑位预定",
+    "content": "把喜欢的 Gal 和正在做的 GalGame 计划单独放出来，之后可以补封面、评分、游玩记录和剧本进度。",
+    "tags": [
+      "GalGame",
+      "ACG"
+    ]
+  },
+  {
+    "id": 3,
+    "date": "2026-05-29",
+    "mood": "优化",
+    "title": "图片和构建链整理",
+    "content": "上传图片开始压缩，构建时会生成缩略图，发布产物也改成只包含公开站点资源。",
+    "tags": [
+      "性能",
+      "构建"
+    ]
+  },
+  {
+    "id": 4,
+    "date": "2026-05-28",
+    "mood": "日常",
+    "title": "先让这里热闹起来",
+    "content": "不是每次都要写成长文。短记录可以留下开发时的想法、当天看的番、踩过的小坑和临时灵感。",
+    "tags": [
+      "碎碎念"
+    ]
+  }
+];
+
 const FRIEND_LINKS = [
   {
     "name": "Mako",
     "url": "https://blog.hitachi-mako.com",
     "displayUrl": "blog.hitachi-mako.com",
-    "badge": "Friend Link"
+    "badge": "Friend Link",
+    "avatar": "../assets/friends/mako.webp",
+    "description": "朋友的个人博客，记录技术与生活。"
   }
 ];
 
@@ -516,6 +709,8 @@ const SITE_DATA = Object.freeze({
   posts: POSTS,
   projects: PROJECTS,
   games: GAMES,
+  acg: ACG,
+  moments: MOMENTS,
   friendLinks: FRIEND_LINKS,
   changelog: CHANGELOG,
 });

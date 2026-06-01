@@ -122,6 +122,8 @@ def main() -> None:
     errors: list[str] = []
     validate_json_file("projects.json", errors)
     validate_json_file("games.json", errors)
+    validate_json_file("acg.json", errors)
+    validate_json_file("moments.json", errors)
     validate_json_file("friend-links.json", errors)
     validate_json_file("changelog.json", errors)
     validate_posts(errors)

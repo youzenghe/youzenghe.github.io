@@ -87,7 +87,10 @@ window.SiteApp.registerPage('posts', () => {
   }
 
   function renderPosts(category) {
-    const list = category === '全部' ? POSTS : POSTS.filter((post) => post.cat === category);
+    const params = new URLSearchParams(location.search);
+    const tag = params.get('tag');
+    const byCategory = category === '全部' ? POSTS : POSTS.filter((post) => post.cat === category);
+    const list = tag ? byCategory.filter((post) => (post.tags || []).includes(tag)) : byCategory;
     mountPosts(list);
   }
 
@@ -125,6 +128,15 @@ window.SiteApp.registerPage('posts', () => {
       btn.classList.add('active');
       renderPosts(btn.dataset.cat);
     });
+  }
+
+  const activeTag = new URLSearchParams(location.search).get('tag');
+  if (activeTag && filterBar) {
+    const note = document.createElement('a');
+    note.className = 'filter-btn active';
+    note.href = 'posts.html';
+    note.textContent = `#${activeTag} ×`;
+    filterBar.prepend(note);
   }
 
   renderPosts('全部');
