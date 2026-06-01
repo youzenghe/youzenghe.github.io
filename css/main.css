@@ -1275,6 +1275,46 @@ footer a { color: var(--sakura); }
   min-height: 180px;
   margin-top: 1rem;
 }
+.message-form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+.message-form label {
+  display: grid;
+  gap: 0.38rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+.message-form input,
+.message-form textarea {
+  width: 100%;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: rgba(12,14,18,0.72);
+  color: var(--text);
+  padding: 0.75rem 0.85rem;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.message-form input:focus,
+.message-form textarea:focus {
+  border-color: rgba(91,157,255,0.55);
+  background: rgba(16,20,28,0.86);
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+.form-note {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
 @media (max-width: 640px) {
   .acg-card.is-row {
     grid-template-columns: 1fr;

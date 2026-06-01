@@ -4,6 +4,14 @@ window.SiteApp.registerPage('acg', () => {
   if (!tabs || !grid) return null;
 
   const acg = window.SITE_DATA?.acg || { galgames: [], bangumi: [] };
+  const galgameCoverMap = {
+    '常轨脱离 Creative': '../assets/acg/galgames/galgame-01.webp',
+    '夏日口袋': '../assets/acg/galgames/galgame-02.webp',
+    '甜蜜女友 2': '../assets/acg/galgames/galgame-03.webp',
+    '与你心相连': '../assets/acg/galgames/galgame-04.webp',
+    '妹相随': '../assets/acg/galgames/galgame-05.webp',
+    '妹生活': '../assets/acg/galgames/galgame-06.webp',
+  };
   const works = (window.SITE_DATA?.games || []).map((game) => ({
     title: game.title,
     type: game.category || game.type || 'Game',
@@ -15,8 +23,9 @@ window.SiteApp.registerPage('acg', () => {
   }));
 
   function itemUrl(item) {
-    if (!item.cover) return '';
-    return /^https?:\/\//i.test(item.cover) ? item.cover : resolveAssetUrl(item.cover);
+    const cover = item.cover || galgameCoverMap[item.title] || '';
+    if (!cover) return '';
+    return /^https?:\/\//i.test(cover) ? cover : resolveAssetUrl(cover);
   }
 
   function renderBangumiCard(item, index) {

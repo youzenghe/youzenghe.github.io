@@ -1,6 +1,23 @@
 window.SiteApp.registerPage('links', () => {
   const friendLinksContainer = document.getElementById('friend-links-list');
-  const commentsHost = document.getElementById('friend-comments');
+  const contactList = document.getElementById('contact-list');
+  const contactActions = document.getElementById('contact-actions');
+  const form = document.getElementById('friend-message-form');
+  const copyButton = document.getElementById('copy-message');
+  const formNote = document.getElementById('message-form-note');
+  const contacts = [
+    { label: '主邮箱', user: '2442616509', domain: 'qq.com', primary: true },
+    { label: '备用邮箱', user: 'A507507334', domain: 'qq.com' },
+    { label: '备用邮箱', user: 'skyberggrenzmb3391', domain: 'gmail.com' },
+  ];
+
+  function emailOf(contact) {
+    return `${contact.user}@${contact.domain}`;
+  }
+
+  function mailtoUrl(email, subject = '友链交换 / 站点留言', body = '') {
+    return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
 
   function renderFriendLinks() {
     const friendLinks = window.SITE_DATA?.friendLinks || [];
@@ -27,22 +44,59 @@ window.SiteApp.registerPage('links', () => {
     }).join('');
   }
 
-  function mountComments() {
-    if (!commentsHost || commentsHost.dataset.mounted === 'true') return;
-    commentsHost.dataset.mounted = 'true';
-    const script = document.createElement('script');
-    script.src = 'https://utteranc.es/client.js';
-    script.async = true;
-    script.crossOrigin = 'anonymous';
-    script.setAttribute('repo', 'youzenghe/youzenghe.github.io');
-    script.setAttribute('issue-term', 'pathname');
-    script.setAttribute('label', '留言');
-    script.setAttribute('theme', 'github-dark');
-    commentsHost.appendChild(script);
+  function renderContacts() {
+    if (contactList) {
+      contactList.innerHTML = contacts.map((contact) => {
+        const email = emailOf(contact);
+        return `<a href="${escapeHtml(mailtoUrl(email))}">${escapeHtml(contact.label)}：${escapeHtml(email)}</a>`;
+      }).join('');
+    }
+    if (contactActions) {
+      const primary = emailOf(contacts[0]);
+      contactActions.innerHTML = `
+        <a class="btn btn-primary" href="${escapeHtml(mailtoUrl(primary))}">邮箱联系</a>
+        <a class="btn btn-ghost" href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=${encodeURIComponent(primary)}" target="_blank" rel="noreferrer noopener">QQ 邮箱网页版</a>
+        <a class="btn btn-ghost" href="https://github.com/youzenghe/youzenghe.github.io/issues" target="_blank" rel="noreferrer noopener">GitHub 留言</a>
+      `;
+    }
+  }
+
+  function messageText() {
+    const data = new FormData(form);
+    return [
+      `称呼：${String(data.get('name') || '').trim()}`,
+      `联系方式：${String(data.get('contact') || '').trim()}`,
+      '',
+      '留言内容：',
+      String(data.get('message') || '').trim(),
+    ].join('\n');
+  }
+
+  function setNote(text) {
+    if (formNote) formNote.textContent = text;
   }
 
   renderFriendLinks();
-  mountComments();
+  renderContacts();
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    location.href = mailtoUrl(emailOf(contacts[0]), '友链交换 / 站点留言', messageText());
+    setNote('已经打开邮箱发送窗口。如果浏览器没有配置邮箱应用，可以复制内容后手动发送。');
+  });
+
+  copyButton?.addEventListener('click', async () => {
+    if (!form?.reportValidity()) return;
+    const text = messageText();
+    try {
+      await navigator.clipboard.writeText(text);
+      setNote('留言内容已复制，可以粘贴到任意邮箱发送。');
+    } catch (error) {
+      setNote('浏览器不允许自动复制，可以手动选中文本后发送。');
+    }
+  });
+
   initReveal();
   return null;
 });

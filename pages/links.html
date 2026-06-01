@@ -40,29 +40,40 @@
           <div class="section-label">Exchange</div>
           <h2>交换友链</h2>
           <p>申请友链时建议带上站点名称、主页地址、头像、简介和 RSS 地址。</p>
-          <div class="contact-list">
-            <a href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=2442616509@qq.com" target="_blank" rel="noreferrer noopener">QQ 邮箱：2442616509@qq.com</a>
-            <a href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=A507507334@qq.com" target="_blank" rel="noreferrer noopener">备用邮箱：A507507334@qq.com</a>
-            <a href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=skyberggrenzmb3391@gmail.com" target="_blank" rel="noreferrer noopener">备用邮箱：skyberggrenzmb3391@gmail.com</a>
-          </div>
-          <div class="content-actions" style="justify-content:flex-start">
-            <a class="btn btn-primary" href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=2442616509@qq.com" target="_blank" rel="noreferrer noopener">QQ 邮件联系</a>
-            <a class="btn btn-ghost" href="https://github.com/youzenghe/youzenghe.github.io/issues" target="_blank" rel="noreferrer noopener">GitHub 留言</a>
-          </div>
+          <div class="contact-list" id="contact-list"></div>
+          <div class="content-actions" id="contact-actions" style="justify-content:flex-start"></div>
         </section>
       </aside>
     </section>
 
     <section class="message-panel comment-box reveal">
       <div class="section-label">Comments</div>
-      <h2>留言板</h2>
-      <p>留言会同步到 GitHub Issues，适合站点反馈、友链交换和长期讨论。</p>
-      <div id="friend-comments" class="comments-host"></div>
+      <h2>免登录留言</h2>
+      <p>这里不要求登录账号。填写后会调用本机邮箱应用发送给站长，适合友链申请和站点反馈。</p>
+      <form class="message-form" id="friend-message-form">
+        <label>
+          <span>称呼</span>
+          <input name="name" type="text" autocomplete="name" placeholder="你的昵称或站点名" required>
+        </label>
+        <label>
+          <span>联系方式</span>
+          <input name="contact" type="text" autocomplete="email" placeholder="邮箱、主页或其他联系方式">
+        </label>
+        <label>
+          <span>留言内容</span>
+          <textarea name="message" rows="6" placeholder="友链信息、站点反馈或想说的话" required></textarea>
+        </label>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">发送邮件</button>
+          <button class="btn btn-ghost" type="button" id="copy-message">复制内容</button>
+        </div>
+        <p class="form-note" id="message-form-note">没有后端时，公开评论无法可靠保存；邮箱会把留言直接留在收件箱里。</p>
+      </form>
     </section>
   </main>
   <div id="site-shell-bottom"></div>
-  <script src="../js/data.js" defer></script>
+  <script src="../js/data.js?v=20260601-4" defer></script>
   <script src="../js/main.js" defer></script>
-  <script src="../js/pages/links.js" defer></script>
+  <script src="../js/pages/links.js?v=20260601-4" defer></script>
 </body>
 </html>
