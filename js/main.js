@@ -20,7 +20,8 @@ const BG_POOL_SIZE_MOBILE = 154; // 移动端图片数量
 const PAGE_MODULES = new Map();
 const LOADED_PAGE_SCRIPTS = new Set();
 const PAGE_CACHE = new Map();
-const PAGE_CACHE_TTL = 120000; // 2分钟缓存，减少重复请求
+const PAGE_CACHE_TTL = 600000; // 10分钟内复用已预取页面，减少导航等待。
+const PAGE_CACHE_MAX_ENTRIES = 24;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 let currentPageCleanup = null;
@@ -1298,6 +1299,37 @@ async function ensurePageScripts(doc) {
   }
 }
 
+function rememberPageCache(cacheKey, task) {
+  PAGE_CACHE.set(cacheKey, {
+    promise: task,
+    expiresAt: Date.now() + PAGE_CACHE_TTL,
+  });
+
+  if (PAGE_CACHE.size <= PAGE_CACHE_MAX_ENTRIES) return;
+  const oldestKey = PAGE_CACHE.keys().next().value;
+  if (oldestKey) PAGE_CACHE.delete(oldestKey);
+}
+
+function prefetchPageScripts(doc) {
+  Array.from(doc.querySelectorAll('script[src]'))
+    .map((script) => new URL(script.getAttribute('src'), doc.URL).href)
+    .filter((src) => PAGE_SCRIPT_RE.test(src))
+    .forEach((src) => {
+      const alreadyPrefetched = Array.from(document.head.querySelectorAll('link[data-page-prefetch]'))
+        .some((link) => link.dataset.pagePrefetch === src);
+      if (LOADED_PAGE_SCRIPTS.has(src) || alreadyPrefetched) {
+        return;
+      }
+
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.as = 'script';
+      link.href = src;
+      link.dataset.pagePrefetch = src;
+      document.head.appendChild(link);
+    });
+}
+
 function scrollToNavigationTarget(hash) {
   if (hash) {
     const target = document.getElementById(hash.slice(1)) || document.querySelector(hash);
@@ -1353,29 +1385,23 @@ async function fetchPageDocument(url) {
     PAGE_CACHE.delete(cacheKey);
   }
 
-  const task = fetch(cacheKey, {
-    cache: 'no-store',
-    headers: {
-      'X-Requested-With': 'site-shell',
-    },
-  })
+  const task = fetch(cacheKey, { cache: 'default' })
     .then(async (response) => {
       const html = await response.text();
       if (!response.ok && !html) {
         throw new Error(`Navigation failed: ${response.status}`);
       }
 
-      return new DOMParser().parseFromString(html, 'text/html');
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      prefetchPageScripts(doc);
+      return doc;
     })
     .catch((error) => {
       PAGE_CACHE.delete(cacheKey);
       throw error;
     });
 
-  PAGE_CACHE.set(cacheKey, {
-    promise: task,
-    expiresAt: Date.now() + PAGE_CACHE_TTL,
-  });
+  rememberPageCache(cacheKey, task);
   return task;
 }
 
@@ -1504,7 +1530,7 @@ function initRouter() {
       navLinks.add(link.href);
     });
     navLinks.forEach((href) => prefetchPage(href));
-  }, 1000);
+  }, 300);
 }
 
 window.SiteApp = {
