@@ -11,8 +11,9 @@ const POSTS = [
     "pinned": false,
     "readTime": 4,
     "emoji": "🎮",
-    "cover": "../assets/posts/我深思熟虑，准备做一个由乔瓮执笔的GalGame.webp",
-    "coverAnimated": false,
+    "cover": "../assets/motion/posts/post-galgame.webp",
+    "originalCover": "../assets/posts/我深思熟虑，准备做一个由乔瓮执笔的GalGame.webp",
+    "coverAnimated": true,
     "images": [],
     "series": "趣味生活",
     "excerpt": "准备做一款 GalGame，先把动机、剧本分工和当前进度记下来，免得这个坑开了就忘。",
@@ -42,8 +43,9 @@ const POSTS = [
     "pinned": false,
     "readTime": 2,
     "emoji": "📋",
-    "cover": "../assets/posts/软件引入证明.webp",
-    "coverAnimated": false,
+    "cover": "../assets/motion/posts/post-adoption.webp",
+    "originalCover": "../assets/posts/软件引入证明.webp",
+    "coverAnimated": true,
     "images": [],
     "series": "荣誉证明",
     "excerpt": "软件引入证明说明项目离开了演示环境，开始进入真实使用场景。这里记录它对项目验收的意义。",
@@ -74,6 +76,7 @@ const POSTS = [
     "readTime": 3,
     "emoji": "📜",
     "cover": "../assets/uploads/流萤1.webp",
+    "originalCover": "../assets/uploads/流萤1.webp",
     "coverAnimated": true,
     "images": [],
     "series": "荣誉证明",
@@ -104,8 +107,9 @@ const POSTS = [
     "pinned": false,
     "readTime": 2,
     "emoji": "👤",
-    "cover": "../assets/posts/神本无相.webp",
-    "coverAnimated": false,
+    "cover": "../assets/motion/posts/post-face.webp",
+    "originalCover": "../assets/posts/神本无相.webp",
+    "coverAnimated": true,
     "images": [],
     "series": "趣味生活",
     "excerpt": "一次拿 AI 识图开玩笑的记录。结论很简单：模型没识别出人脸，但这事挺有节目效果。",
@@ -135,8 +139,9 @@ const POSTS = [
     "pinned": false,
     "readTime": 3,
     "emoji": "🏢",
-    "cover": "../assets/posts/实习证明.webp",
-    "coverAnimated": false,
+    "cover": "../assets/motion/posts/post-internship.webp",
+    "originalCover": "../assets/posts/实习证明.webp",
+    "coverAnimated": true,
     "images": [],
     "series": "荣誉证明",
     "excerpt": "第一次进入真实团队开发环境，最大的差异不是代码本身，而是需求沟通、协作节奏和交付标准。",
@@ -166,8 +171,9 @@ const POSTS = [
     "pinned": false,
     "readTime": 4,
     "emoji": "🏆",
-    "cover": "../assets/posts/人工智能大赛国一.webp",
-    "coverAnimated": false,
+    "cover": "../assets/motion/posts/post-ai-contest.webp",
+    "originalCover": "../assets/posts/人工智能大赛国一.webp",
+    "coverAnimated": true,
     "images": [],
     "series": "荣誉证明",
     "excerpt": "这篇记录一次 AI 竞赛项目从立项、调参到答辩的过程，重点放在系统设计、数据问题和现场答辩。",
@@ -197,8 +203,9 @@ const POSTS = [
     "pinned": false,
     "readTime": 3,
     "emoji": "🥉",
-    "cover": "../assets/posts/校园算法精英大赛省三.webp",
-    "coverAnimated": false,
+    "cover": "../assets/motion/posts/post-algorithm.webp",
+    "originalCover": "../assets/posts/校园算法精英大赛省三.webp",
+    "coverAnimated": true,
     "images": [],
     "series": "荣誉证明",
     "excerpt": "省三不是很高的名次，但它暴露了我当时在图论和动态规划上的短板。",
@@ -234,22 +241,17 @@ const PROJECTS = [
     "award": "gold",
     "awardText": "🥇 省级一等奖",
     "emoji": "⚖️",
-    "img": "../assets/projects/legalmind.webp",
+    "img": "../assets/motion/projects/project-legalmind.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/legalmind.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/legalmind.webp",
+    "imgAnimated": true
   },
   {
     "id": 2,
@@ -266,22 +268,17 @@ const PROJECTS = [
     "award": "silver",
     "awardText": "🥈 河南省二等奖",
     "emoji": "🏛️",
-    "img": "../assets/projects/moment-henan.webp",
+    "img": "../assets/motion/projects/project-moment-henan.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/moment-henan.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/moment-henan.webp",
+    "imgAnimated": true
   },
   {
     "id": 3,
@@ -298,22 +295,17 @@ const PROJECTS = [
     "award": "none",
     "awardText": "合作项目",
     "emoji": "☁️",
-    "img": "../assets/projects/fuguang-cloud-classroom.webp",
+    "img": "../assets/motion/projects/project-fuguang.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/fuguang-cloud-classroom.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/fuguang-cloud-classroom.webp",
+    "imgAnimated": true
   },
   {
     "id": 4,
@@ -330,22 +322,17 @@ const PROJECTS = [
     "award": "bronze",
     "awardText": "🥉 赛区三等奖",
     "emoji": "📑",
-    "img": "../assets/projects/law-contract-assistant.webp",
+    "img": "../assets/motion/projects/project-law-contract.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/law-contract-assistant.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/law-contract-assistant.webp",
+    "imgAnimated": true
   },
   {
     "id": 5,
@@ -362,22 +349,17 @@ const PROJECTS = [
     "award": "none",
     "awardText": "已上线",
     "emoji": "🌿",
-    "img": "../assets/projects/green-credit.webp",
+    "img": "../assets/motion/projects/project-green-credit.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/green-credit.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/green-credit.webp",
+    "imgAnimated": true
   },
   {
     "id": 6,
@@ -394,22 +376,17 @@ const PROJECTS = [
     "award": "silver",
     "awardText": "📝 软著申请中",
     "emoji": "🥋",
-    "img": "../assets/projects/quanyi-zhongyuan.webp",
+    "img": "../assets/motion/projects/project-quanyi.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/quanyi-zhongyuan.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/quanyi-zhongyuan.webp",
+    "imgAnimated": true
   },
   {
     "id": 7,
@@ -426,22 +403,17 @@ const PROJECTS = [
     "award": "gold",
     "awardText": "🥇 全国一等奖",
     "emoji": "📚",
-    "img": "../assets/projects/literary-knowledge-map.webp",
+    "img": "../assets/motion/projects/project-literary-map.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/literary-knowledge-map.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/literary-knowledge-map.webp",
+    "imgAnimated": true
   },
   {
     "id": 8,
@@ -458,22 +430,17 @@ const PROJECTS = [
     "award": "silver",
     "awardText": "🛡️ 已获软著",
     "emoji": "🪶",
-    "img": "../assets/projects/poem-project.webp",
+    "img": "../assets/motion/projects/project-poem.webp",
     "status": "已完成",
     "role": "",
     "links": [],
     "highlights": [],
     "challenges": [],
     "result": "",
-    "images": [
-      {
-        "src": "../assets/projects/poem-project.webp",
-        "alt": "",
-        "caption": "",
-        "isCover": false
-      }
-    ],
-    "detail": ""
+    "images": [],
+    "detail": "",
+    "originalImg": "../assets/projects/poem-project.webp",
+    "imgAnimated": true
   }
 ];
 

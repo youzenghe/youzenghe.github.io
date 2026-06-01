@@ -41,6 +41,16 @@ window.SiteApp.registerPage('project-detail', () => {
     return temp.textContent?.replace(/\s+/g, ' ').trim() || '';
   }
 
+  function originalProjectFigure(project) {
+    if (!project.originalImg || project.originalImg === project.img) return '';
+    const src = resolveAssetUrl(project.originalImg);
+    return `
+      <figure class="md-image original-project-image">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(`${project.title} 原始封面`)}" loading="lazy" decoding="async">
+      </figure>
+    `;
+  }
+
   function renderMissingProject() {
     document.title = '项目未找到 · 次元日记';
     setMeta('meta[name="description"]', 'content', '这个项目不存在或已经被移除。');
@@ -170,6 +180,7 @@ window.SiteApp.registerPage('project-detail', () => {
       : '';
     const result = project.result ? `<h2>结果复盘</h2><p>${escapeHtml(project.result)}</p>` : '';
     body.innerHTML = `
+      ${originalProjectFigure(project)}
       ${project.detail || `<p>${escapeHtml(project.desc)}</p>`}
       ${role}
       ${highlights}

@@ -12,6 +12,25 @@ CONTENT_DIR = ROOT / "content"
 POSTS_DIR = CONTENT_DIR / "posts"
 DATA_JS = ROOT / "js" / "data.js"
 IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
+MOTION_POST_COVERS = {
+    "001": "../assets/motion/posts/post-ai-contest.webp",
+    "002": "../assets/uploads/流萤1.webp",
+    "003": "../assets/motion/posts/post-algorithm.webp",
+    "004": "../assets/motion/posts/post-internship.webp",
+    "005": "../assets/motion/posts/post-adoption.webp",
+    "006": "../assets/motion/posts/post-face.webp",
+    "007": "../assets/motion/posts/post-galgame.webp",
+}
+MOTION_PROJECT_IMAGES = {
+    1: "../assets/motion/projects/project-legalmind.webp",
+    2: "../assets/motion/projects/project-moment-henan.webp",
+    3: "../assets/motion/projects/project-fuguang.webp",
+    4: "../assets/motion/projects/project-law-contract.webp",
+    5: "../assets/motion/projects/project-green-credit.webp",
+    6: "../assets/motion/projects/project-quanyi.webp",
+    7: "../assets/motion/projects/project-literary-map.webp",
+    8: "../assets/motion/projects/project-poem.webp",
+}
 
 
 def is_animated_asset(src: str) -> bool:
@@ -226,6 +245,10 @@ def normalize_images(items) -> list[dict]:
     return [image for image in (normalize_image_item(item) for item in items) if image["src"]]
 
 
+def select_motion_cover(post_id: int, original_cover: str) -> str:
+    return MOTION_POST_COVERS.get(str(post_id).zfill(3), original_cover)
+
+
 def load_posts() -> list[dict]:
     posts = []
     for path in sorted(POSTS_DIR.glob("*.md")):
@@ -234,8 +257,13 @@ def load_posts() -> list[dict]:
         if status == "draft":
             continue
         images = normalize_images(meta.get("images", []))
+        post_id = int(meta["id"])
+        original_cover = str(meta.get("cover", ""))
+        motion_cover = select_motion_cover(post_id, original_cover)
+        if original_cover and motion_cover != original_cover:
+            body = body.replace(original_cover, motion_cover)
         post = {
-            "id": int(meta["id"]),
+            "id": post_id,
             "title": str(meta["title"]),
             "cat": str(meta["cat"]),
             "catColor": str(meta.get("catColor", "#52e0e0")),
@@ -246,8 +274,9 @@ def load_posts() -> list[dict]:
             "pinned": normalize_bool(meta.get("pinned"), False),
             "readTime": int(meta.get("readTime", 3)),
             "emoji": str(meta.get("emoji", "📝")),
-            "cover": str(meta.get("cover", "")),
-            "coverAnimated": is_animated_asset(str(meta.get("cover", ""))),
+            "cover": motion_cover,
+            "originalCover": original_cover,
+            "coverAnimated": is_animated_asset(motion_cover),
             "images": images,
             "series": str(meta.get("series", meta.get("cat", ""))),
             "excerpt": str(meta.get("excerpt", "")),
@@ -274,6 +303,8 @@ def load_projects() -> list[dict]:
     projects = []
     for project in read_json("projects.json")["projects"]:
         item = dict(project)
+        original_img = str(item.get("img", ""))
+        motion_img = MOTION_PROJECT_IMAGES.get(int(item["id"]), original_img)
         item["status"] = str(item.get("status", "已完成"))
         item["role"] = str(item.get("role", ""))
         item["links"] = item.get("links", [])
@@ -281,9 +312,12 @@ def load_projects() -> list[dict]:
         item["challenges"] = item.get("challenges", [])
         item["result"] = str(item.get("result", ""))
         item["images"] = normalize_images(item.get("images", []))
+        item["img"] = motion_img
+        item["originalImg"] = original_img
+        item["imgAnimated"] = is_animated_asset(motion_img)
         item.setdefault("detail", "")
-        if not item["images"] and item.get("img"):
-            item["images"] = [normalize_image_item(item["img"])]
+        if original_img and motion_img != original_img and item["detail"]:
+            item["detail"] = str(item["detail"]).replace(original_img, motion_img)
         if item["detail"]:
             item["detail"] = markdown_to_html(str(item["detail"]))
         projects.append(item)

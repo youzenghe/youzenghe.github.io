@@ -116,6 +116,25 @@
       transition: opacity 0.4s ease;
     }
     .proj-card:hover .proj-preview { opacity: 0.75; }
+    .proj-preview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      -webkit-mask-image: linear-gradient(to right, #000 0%, #000 30%, rgba(0,0,0,0.55) 48%, transparent 70%);
+      mask-image: linear-gradient(to right, #000 0%, #000 30%, rgba(0,0,0,0.55) 48%, transparent 70%);
+      background: linear-gradient(
+        to right,
+        var(--card-bg) 0%,
+        rgba(28, 25, 30, 0.9) 14%,
+        rgba(28, 25, 30, 0.56) 34%,
+        rgba(28, 25, 30, 0.12) 58%,
+        transparent 82%
+      );
+    }
     .proj-preview img {
       position: absolute;
       inset: 0;

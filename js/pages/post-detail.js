@@ -42,6 +42,16 @@ window.SiteApp.registerPage('post-detail', () => {
     })[char]);
   }
 
+  function originalCoverFigure(post) {
+    if (!post.originalCover || post.originalCover === post.cover) return '';
+    const src = resolveAssetUrl(post.originalCover);
+    return `
+      <figure class="md-image original-cover-image">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(`${post.title} 原始封面`)}" loading="lazy" decoding="async">
+      </figure>
+    `;
+  }
+
   function highlightCode(code) {
     const raw = code.textContent || '';
     const highlighted = escapeHtml(raw)
@@ -176,7 +186,7 @@ window.SiteApp.registerPage('post-detail', () => {
 
   const body = document.getElementById('post-body');
   if (body) {
-    body.innerHTML = post.content;
+    body.innerHTML = `${originalCoverFigure(post)}${post.content}`;
   }
 
   document.querySelectorAll('.code-block code').forEach(highlightCode);
