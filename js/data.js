@@ -661,84 +661,84 @@ const FRIEND_LINKS = [
     "description": "朋友的个人博客，记录技术与生活。"
   },
   {
-    "name": "cowpe.cn",
-    "url": "https://cowpe.cn/",
-    "displayUrl": "cowpe.cn",
+    "name": "三叶の小窝",
+    "url": "https://blog.mitsuha.space/",
+    "displayUrl": "blog.mitsuha.space",
     "badge": "Blogroll",
-    "avatar": "https://cowpe.cn/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=blog.mitsuha.space&sz=64",
+    "description": "安静写生活、技术和日常折腾的小窝。"
   },
   {
     "name": "cosine = 余弦の博客",
     "url": "https://ysx.cosine.ren/",
     "displayUrl": "ysx.cosine.ren",
     "badge": "Blogroll",
-    "avatar": "https://ysx.cosine.ren/img/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=ysx.cosine.ren&sz=64",
+    "description": "记录算法、开发和一点点生活碎片。"
   },
   {
     "name": "悠见YUFM",
     "url": "https://yufm.com/",
     "displayUrl": "yufm.com",
     "badge": "Blogroll",
-    "avatar": "https://img.yufm.com/wp-content/uploads/2026/01/2026011203330175.png",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=yufm.com&sz=64",
+    "description": "快工具与慢笔墨并存的个人站。"
   },
   {
     "name": "mxd's Blog",
     "url": "https://blog.mxdyeah.com/",
     "displayUrl": "blog.mxdyeah.com",
     "badge": "Blogroll",
-    "avatar": "https://res.mxdyeah.com/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=blog.mxdyeah.com&sz=64",
+    "description": "偏技术向的个人博客，内容干净利落。"
   },
   {
     "name": "fddm.pages.dev",
     "url": "https://fddm.pages.dev/",
     "displayUrl": "fddm.pages.dev",
     "badge": "Blogroll",
-    "avatar": "https://fddm.pages.dev/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=fddm.pages.dev&sz=64",
+    "description": "轻量、简洁，适合偶尔翻翻的个人页面。"
   },
   {
     "name": "若志 · 随笔",
     "url": "https://www.rz.sb/",
     "displayUrl": "www.rz.sb",
     "badge": "Blogroll",
-    "avatar": "https://q1.qlogo.cn/g?b=qq&nk=80360650&s=100",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=www.rz.sb&sz=64",
+    "description": "写随笔、经验和个人想法的站点。"
   },
   {
     "name": "理论派",
     "url": "https://sliun.com/",
     "displayUrl": "sliun.com",
     "badge": "Blogroll",
-    "avatar": "https://bear-images.sfo2.cdn.digitaloceanspaces.com/lilun/vue-color-avatar.webp",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=sliun.com&sz=64",
+    "description": "关注效率、工具和知识整理的博客。"
   },
   {
     "name": "lhz07's blog",
     "url": "https://lhz07.com/",
     "displayUrl": "lhz07.com",
     "badge": "Blogroll",
-    "avatar": "https://lhz07.com/static/img/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=lhz07.com&sz=64",
+    "description": "技术记录和日常观察都挺清爽的个人博客。"
   },
   {
     "name": "oines — 手記",
     "url": "https://oines.dev/",
     "displayUrl": "oines.dev",
     "badge": "Blogroll",
-    "avatar": "https://oines.dev/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=oines.dev&sz=64",
+    "description": "以手记形式保存开发、阅读和生活片段。"
   },
   {
     "name": "Layer 1",
     "url": "https://sunnkynews.icu/",
     "displayUrl": "sunnkynews.icu",
     "badge": "Blogroll",
-    "avatar": "https://sunnkynews.icu/favicon.ico",
-    "description": "来自 HeyBlog 随机发现的个人博客。"
+    "avatar": "https://www.google.com/s2/favicons?domain=sunnkynews.icu&sz=64",
+    "description": "从底层开始记录技术和个人探索。"
   }
 ];
 

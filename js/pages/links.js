@@ -5,11 +5,11 @@ window.SiteApp.registerPage('links', () => {
   const form = document.getElementById('friend-message-form');
   const copyButton = document.getElementById('copy-message');
   const formNote = document.getElementById('message-form-note');
-  const pageSize = 3;
+  const pageSize = 4;
   let currentPage = 1;
   const contacts = [
     { label: '主邮箱', user: '2442616509', domain: 'qq.com', primary: true },
-    { label: '备用邮箱', user: 'A507507334', domain: 'qq.com' },
+    { label: '备用邮箱', user: 'A5075073344', domain: '163.com' },
     { label: '备用邮箱', user: 'skyberggrenzmb3391', domain: 'gmail.com' },
   ];
 
@@ -25,7 +25,12 @@ window.SiteApp.registerPage('links', () => {
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
+  function neteaseMailUrl() {
+    return 'https://mail.163.com/';
+  }
+
   function webMailUrl(email, subject = '友链交换 / 站点留言', body = '') {
+    if (email.toLowerCase().endsWith('@163.com')) return neteaseMailUrl();
     return email.toLowerCase().endsWith('@gmail.com') ? gmailUrl(email, subject, body) : qqMailUrl(email);
   }
 
@@ -87,6 +92,7 @@ window.SiteApp.registerPage('links', () => {
       `;
     }).join('');
     renderPagination(friendLinks.length);
+    initReveal();
   }
 
   function renderContacts() {
@@ -98,9 +104,11 @@ window.SiteApp.registerPage('links', () => {
     }
     if (contactActions) {
       const primary = emailOf(contacts[0]);
+      const gmail = emailOf(contacts[2]);
       contactActions.innerHTML = `
         <a class="btn btn-primary" href="${escapeHtml(qqMailUrl(primary))}" target="_blank" rel="noreferrer noopener">QQ 邮箱网页版</a>
-        <a class="btn btn-ghost" href="${escapeHtml(gmailUrl(primary))}" target="_blank" rel="noreferrer noopener">Gmail 编写</a>
+        <a class="btn btn-ghost" href="${escapeHtml(neteaseMailUrl())}" target="_blank" rel="noreferrer noopener">163 邮箱</a>
+        <a class="btn btn-ghost" href="${escapeHtml(gmailUrl(gmail))}" target="_blank" rel="noreferrer noopener">Gmail 编写</a>
         <a class="btn btn-ghost" href="https://github.com/youzenghe/youzenghe.github.io/issues" target="_blank" rel="noreferrer noopener">GitHub 留言</a>
       `;
     }
@@ -111,6 +119,7 @@ window.SiteApp.registerPage('links', () => {
     return [
       `称呼：${String(data.get('name') || '').trim()}`,
       `联系方式：${String(data.get('contact') || '').trim()}`,
+      `网址：${String(data.get('site') || '').trim()}`,
       '',
       '留言内容：',
       String(data.get('message') || '').trim(),
@@ -160,7 +169,6 @@ window.SiteApp.registerPage('links', () => {
     }
   });
 
-  initReveal();
   return () => {
     document.removeEventListener('click', onPaginationClick);
   };
