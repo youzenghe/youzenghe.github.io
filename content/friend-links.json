@@ -1,12 +1,92 @@
 {
   "friendLinks": [
-  {
-    "name": "Mako",
-    "url": "https://blog.hitachi-mako.com",
-    "displayUrl": "blog.hitachi-mako.com",
-    "badge": "Friend Link",
-    "avatar": "../assets/friends/mako.webp",
-    "description": "朋友的个人博客，记录技术与生活。"
-  }
+    {
+      "name": "Mako",
+      "url": "https://blog.hitachi-mako.com",
+      "displayUrl": "blog.hitachi-mako.com",
+      "badge": "Friend Link",
+      "avatar": "../assets/friends/mako.webp",
+      "description": "朋友的个人博客，记录技术与生活。"
+    },
+    {
+      "name": "cowpe.cn",
+      "url": "https://cowpe.cn/",
+      "displayUrl": "cowpe.cn",
+      "badge": "Blogroll",
+      "avatar": "https://cowpe.cn/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "cosine = 余弦の博客",
+      "url": "https://ysx.cosine.ren/",
+      "displayUrl": "ysx.cosine.ren",
+      "badge": "Blogroll",
+      "avatar": "https://ysx.cosine.ren/img/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "悠见YUFM",
+      "url": "https://yufm.com/",
+      "displayUrl": "yufm.com",
+      "badge": "Blogroll",
+      "avatar": "https://img.yufm.com/wp-content/uploads/2026/01/2026011203330175.png",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "mxd's Blog",
+      "url": "https://blog.mxdyeah.com/",
+      "displayUrl": "blog.mxdyeah.com",
+      "badge": "Blogroll",
+      "avatar": "https://res.mxdyeah.com/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "fddm.pages.dev",
+      "url": "https://fddm.pages.dev/",
+      "displayUrl": "fddm.pages.dev",
+      "badge": "Blogroll",
+      "avatar": "https://fddm.pages.dev/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "若志 · 随笔",
+      "url": "https://www.rz.sb/",
+      "displayUrl": "www.rz.sb",
+      "badge": "Blogroll",
+      "avatar": "https://q1.qlogo.cn/g?b=qq&nk=80360650&s=100",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "理论派",
+      "url": "https://sliun.com/",
+      "displayUrl": "sliun.com",
+      "badge": "Blogroll",
+      "avatar": "https://bear-images.sfo2.cdn.digitaloceanspaces.com/lilun/vue-color-avatar.webp",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "lhz07's blog",
+      "url": "https://lhz07.com/",
+      "displayUrl": "lhz07.com",
+      "badge": "Blogroll",
+      "avatar": "https://lhz07.com/static/img/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "oines — 手記",
+      "url": "https://oines.dev/",
+      "displayUrl": "oines.dev",
+      "badge": "Blogroll",
+      "avatar": "https://oines.dev/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    },
+    {
+      "name": "Layer 1",
+      "url": "https://sunnkynews.icu/",
+      "displayUrl": "sunnkynews.icu",
+      "badge": "Blogroll",
+      "avatar": "https://sunnkynews.icu/favicon.ico",
+      "description": "来自 HeyBlog 随机发现的个人博客。"
+    }
   ]
 }

@@ -3,6 +3,9 @@ window.SiteApp.registerPage('acg', () => {
   const grid = document.getElementById('acg-grid');
   if (!tabs || !grid) return null;
 
+  const bangumiPageSize = 3;
+  let currentKind = 'galgames';
+  let currentBangumiPage = 1;
   const acg = window.SITE_DATA?.acg || { galgames: [], bangumi: [] };
   const galgameCoverMap = {
     '常轨脱离 Creative': '../assets/acg/galgames/galgame-01.webp',
@@ -66,23 +69,75 @@ window.SiteApp.registerPage('acg', () => {
     return item.link ? `<a class="acg-link-card" href="${escapeHtml(safeExternalUrl(item.link))}" target="_blank" rel="noreferrer noopener">${body}</a>` : body;
   }
 
+  function renderPagination(total) {
+    let pager = document.getElementById('acg-pagination');
+    if (!pager) {
+      pager = document.createElement('div');
+      pager.id = 'acg-pagination';
+      pager.className = 'pagination';
+      grid.after(pager);
+    }
+    if (currentKind !== 'bangumi') {
+      pager.innerHTML = '';
+      return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(total / bangumiPageSize));
+    currentBangumiPage = Math.min(currentBangumiPage, totalPages);
+    if (totalPages <= 1) {
+      pager.innerHTML = '';
+      return;
+    }
+
+    pager.innerHTML = `
+      <button class="page-btn" type="button" data-page="${currentBangumiPage - 1}" ${currentBangumiPage === 1 ? 'disabled' : ''}>上一页</button>
+      ${Array.from({ length: totalPages }, (_, index) => {
+        const page = index + 1;
+        return `<button class="page-btn${page === currentBangumiPage ? ' active' : ''}" type="button" data-page="${page}">${page}</button>`;
+      }).join('')}
+      <button class="page-btn" type="button" data-page="${currentBangumiPage + 1}" ${currentBangumiPage === totalPages ? 'disabled' : ''}>下一页</button>
+    `;
+  }
+
   function render(kind) {
+    currentKind = kind;
     const list = kind === 'works' ? works : (acg[kind] || []);
+    const pageItems = kind === 'bangumi'
+      ? list.slice((currentBangumiPage - 1) * bangumiPageSize, currentBangumiPage * bangumiPageSize)
+      : list;
     grid.classList.toggle('is-list', kind === 'bangumi');
-    grid.innerHTML = list.map((item, index) => (
+    grid.innerHTML = pageItems.map((item, index) => (
       kind === 'bangumi' ? renderBangumiCard(item, index) : renderGridCard(item, index)
     )).join('');
+    renderPagination(list.length);
     initReveal();
   }
 
-  tabs.addEventListener('click', (event) => {
+  const onTabClick = (event) => {
     const btn = event.target.closest('.acg-tab');
     if (!btn) return;
     tabs.querySelectorAll('.acg-tab').forEach((item) => item.classList.remove('active'));
     btn.classList.add('active');
+    if (btn.dataset.kind === 'bangumi') {
+      currentBangumiPage = 1;
+    }
     render(btn.dataset.kind);
-  });
+  };
+
+  const onPaginationClick = (event) => {
+    const btn = event.target.closest('#acg-pagination .page-btn');
+    if (!btn || btn.disabled) return;
+    currentBangumiPage = Number(btn.dataset.page) || 1;
+    render('bangumi');
+    grid.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+
+  tabs.addEventListener('click', onTabClick);
+  document.addEventListener('click', onPaginationClick);
 
   render('galgames');
-  return null;
+  return () => {
+    tabs.removeEventListener('click', onTabClick);
+    document.removeEventListener('click', onPaginationClick);
+  };
 });

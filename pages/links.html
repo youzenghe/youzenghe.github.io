@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -49,8 +49,12 @@
     <section class="message-panel comment-box reveal">
       <div class="section-label">Comments</div>
       <h2>免登录留言</h2>
-      <p>这里不要求登录账号。填写后会调用本机邮箱应用发送给站长，适合友链申请和站点反馈。</p>
+      <p>这里不要求登录账号。填写后会通过静态表单服务发送给站长，适合友链申请和站点反馈。</p>
       <form class="message-form" id="friend-message-form">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="box">
+        <input type="hidden" name="_subject" value="友链交换 / 站点留言">
+        <input type="hidden" name="_cc" value="">
         <label>
           <span>称呼</span>
           <input name="name" type="text" autocomplete="name" placeholder="你的昵称或站点名" required>
@@ -64,16 +68,16 @@
           <textarea name="message" rows="6" placeholder="友链信息、站点反馈或想说的话" required></textarea>
         </label>
         <div class="form-actions">
-          <button class="btn btn-primary" type="submit">发送邮件</button>
+          <button class="btn btn-primary" type="submit">提交留言</button>
           <button class="btn btn-ghost" type="button" id="copy-message">复制内容</button>
         </div>
-        <p class="form-note" id="message-form-note">没有后端时，公开评论无法可靠保存；邮箱会把留言直接留在收件箱里。</p>
+        <p class="form-note" id="message-form-note">没有自建后端时，公开评论无法可靠保存；这里会把留言发送到站长邮箱。</p>
       </form>
     </section>
   </main>
   <div id="site-shell-bottom"></div>
-  <script src="../js/data.js?v=20260601-4" defer></script>
+  <script src="../js/data.js?v=20260601-5" defer></script>
   <script src="../js/main.js" defer></script>
-  <script src="../js/pages/links.js?v=20260601-4" defer></script>
+  <script src="../js/pages/links.js?v=20260601-5" defer></script>
 </body>
 </html>
