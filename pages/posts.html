@@ -103,6 +103,15 @@
       transition: opacity 0.4s ease;
     }
     .post-list-card:hover .plc-thumb { opacity: 0.78; }
+    .plc-thumb.is-animated-cover {
+      opacity: 1;
+      -webkit-mask-image: none;
+      mask-image: none;
+      background: transparent;
+    }
+    .plc-thumb.is-animated-cover .img-bg {
+      display: none;
+    }
     .plc-thumb .img-bg {
       position: absolute;
       inset: 0;
