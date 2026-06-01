@@ -211,6 +211,62 @@ collections:
               - { label: "状态", name: "status", widget: "string" }
               - { label: "下载链接", name: "downloadLink", widget: "string" }
 
+  - name: "acg"
+    label: "ACG 收藏"
+    files:
+      - name: "acg"
+        label: "GalGame 与追番"
+        file: "content/acg.json"
+        fields:
+          - label: "GalGame"
+            name: "galgames"
+            widget: "list"
+            summary: "{{fields.title}} · {{fields.status}}"
+            fields:
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "类型", name: "type", widget: "string", default: "AVG" }
+              - { label: "评分", name: "score", widget: "string", required: false }
+              - { label: "状态", name: "status", widget: "string", default: "已通关" }
+              - { label: "封面路径", name: "cover", widget: "string", required: false, hint: "可以填 ../assets/acg/galgames/xxx.webp，也可以填外部图片 URL。" }
+              - { label: "链接", name: "link", widget: "string", required: false }
+              - { label: "简介", name: "description", widget: "text", required: false }
+          - label: "追番"
+            name: "bangumi"
+            widget: "list"
+            summary: "{{fields.title}} · {{fields.status}}"
+            fields:
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "类型", name: "type", widget: "string", default: "番剧" }
+              - { label: "评分", name: "score", widget: "string", required: false }
+              - { label: "状态", name: "status", widget: "string", default: "想看" }
+              - { label: "集数", name: "episodes", widget: "string", required: false }
+              - { label: "封面路径", name: "cover", widget: "string", required: false, hint: "可以填 ../assets/acg/bangumi/xxx.webp，也可以填外部图片 URL。" }
+              - { label: "链接", name: "link", widget: "string", required: false }
+              - { label: "简介", name: "description", widget: "text", required: false }
+
+  - name: "moments"
+    label: "瞬间"
+    files:
+      - name: "moments"
+        label: "瞬间列表"
+        file: "content/moments.json"
+        fields:
+          - label: "瞬间"
+            name: "moments"
+            widget: "list"
+            summary: "{{fields.date}} · {{fields.title}}"
+            fields:
+              - { label: "ID", name: "id", widget: "number" }
+              - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+              - { label: "心情/类型", name: "mood", widget: "string", required: false }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "内容", name: "content", widget: "text" }
+              - label: "标签"
+                name: "tags"
+                widget: "list"
+                required: false
+                field: { label: "标签项", name: "tag", widget: "string" }
+
   - name: "friend-links"
     label: "友链"
     files:

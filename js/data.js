@@ -467,7 +467,7 @@ const ACG = {
       "type": "AVG",
       "score": "10/10",
       "status": "已通关",
-      "cover": "",
+      "cover": "../assets/acg/galgames/galgame-01.webp",
       "description": "喜欢的 GalGame 之一，后续可以补充游玩记录、角色印象和推荐理由。"
     },
     {
@@ -475,7 +475,7 @@ const ACG = {
       "type": "AVG",
       "score": "10/10",
       "status": "已通关",
-      "cover": "",
+      "cover": "../assets/acg/galgames/galgame-02.webp",
       "description": "夏日、岛屿和回忆感很强的一作，适合放进个人 Gal 收藏页长期留存。"
     },
     {
@@ -483,7 +483,7 @@ const ACG = {
       "type": "AVG",
       "score": "10/10",
       "status": "已通关",
-      "cover": "",
+      "cover": "../assets/acg/galgames/galgame-03.webp",
       "description": "偏日常恋爱向的收藏项，后续可以补女主和路线评价。"
     },
     {
@@ -491,7 +491,7 @@ const ACG = {
       "type": "AVG",
       "score": "10/10",
       "status": "已通关",
-      "cover": "",
+      "cover": "../assets/acg/galgames/galgame-04.webp",
       "description": "先记录在收藏列表里，封面和详细评价等确认图源后再补。"
     },
     {
@@ -499,7 +499,7 @@ const ACG = {
       "type": "SLG",
       "score": "10/10",
       "status": "已通关",
-      "cover": "",
+      "cover": "../assets/acg/galgames/galgame-05.webp",
       "description": "SLG 收藏项，适合之后补充游玩体验和注意事项。"
     },
     {
@@ -507,7 +507,7 @@ const ACG = {
       "type": "SLG",
       "score": "10/10",
       "status": "已通关",
-      "cover": "",
+      "cover": "../assets/acg/galgames/galgame-06.webp",
       "description": "SLG 收藏项，先保留基础信息，后续再补封面。"
     }
   ],
