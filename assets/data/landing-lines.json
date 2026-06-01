@@ -66,6 +66,32 @@
     "rabbitmq": "消息已入队。别担心，消费者正在慢慢处理。",
     "neo4j": "MATCH (you)-[:BUILD]->(blog) RETURN passion;",
     "spring": "ApplicationContext 已启动，Bean 都坐好了。",
-    "galgame": "选项 A：继续写博客。选项 B：继续写博客。"
+    "galgame": "选项 A：继续写博客。选项 B：继续写博客。",
+    "妈的，我要把你网站偷了": [
+      "xiaoshi.exe: 啊？你这人怎么一进终端就说这种话。",
+      "站点防盗模块正在假装很凶：不许偷，不许镜像，不许把妹妹辛苦搭的桌子打包带走。",
+      "……但是它只是静态站，真要备份其实也不是不行。输入 /别偷了 可以体面离开；输入 /强制突破 就继续往下走。"
+    ],
+    "别偷了": [
+      "很好，理智占领高地。",
+      "妹妹把爬虫挡在门口了，博客继续安静营业。"
+    ],
+    "强制突破": [
+      "xiaoshi.exe: 你还真要来啊。行吧，妹妹不情不愿地把门缝掀开一点点。",
+      "第一步，在 PowerShell 里安装 Wget2：",
+      "winget install GNU.Wget2",
+      "第二步，镜像本站到 backup 目录：",
+      "wget2 --mirror --page-requisites --adjust-extension --convert-links --no-parent --directory-prefix=backup https://yzh1019.top/",
+      "参数含义：--mirror 递归镜像，--page-requisites 拉取页面依赖，--adjust-extension 修正扩展名，--convert-links 转成本地链接，--no-parent 不爬父级路径。",
+      "哼，只许拿来学习和备份。要是把它改得比原站还好看，记得回来交作业。"
+    ],
+    "继续偷": [
+      "防盗模块开始抱头蹲防。",
+      "如果你已经装好 Wget2，就直接运行：wget2 --mirror --page-requisites --adjust-extension --convert-links --no-parent --directory-prefix=backup https://yzh1019.top/"
+    ],
+    "放弃偷站": [
+      "终端松了一口气。",
+      "你可以输入 /blog 正常进站，至少这次不用被妹妹记小本本。"
+    ]
   }
 }
