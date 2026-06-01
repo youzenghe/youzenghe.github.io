@@ -46,7 +46,7 @@ window.SiteApp.registerPage('project-detail', () => {
     const src = resolveAssetUrl(project.originalImg);
     return `
       <figure class="md-image original-project-image">
-        <img src="${escapeHtml(src)}" alt="${escapeHtml(`${project.title} 原始封面`)}" loading="lazy" decoding="async">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(`${project.title} 原始封面`)}" loading="eager" decoding="async">
       </figure>
     `;
   }
@@ -148,7 +148,7 @@ window.SiteApp.registerPage('project-detail', () => {
   if (cover) {
     if (project.img) {
       const fullUrl = resolveAssetUrl(project.img);
-      const thumbUrl = resolveThumbnailUrl(project.img);
+      const thumbUrl = project.imgAnimated ? fullUrl : resolveThumbnailUrl(project.img);
       // 先用列表页已缓存的缩略图即时显示，再后台加载大图无缝替换。
       cover.innerHTML = `<img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(project.title)}" decoding="async">`;
       const coverImg = cover.querySelector('img');

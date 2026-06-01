@@ -260,8 +260,6 @@ def load_posts() -> list[dict]:
         post_id = int(meta["id"])
         original_cover = str(meta.get("cover", ""))
         motion_cover = select_motion_cover(post_id, original_cover)
-        if original_cover and motion_cover != original_cover:
-            body = body.replace(original_cover, motion_cover)
         post = {
             "id": post_id,
             "title": str(meta["title"]),
@@ -316,8 +314,6 @@ def load_projects() -> list[dict]:
         item["originalImg"] = original_img
         item["imgAnimated"] = is_animated_asset(motion_img)
         item.setdefault("detail", "")
-        if original_img and motion_img != original_img and item["detail"]:
-            item["detail"] = str(item["detail"]).replace(original_img, motion_img)
         if item["detail"]:
             item["detail"] = markdown_to_html(str(item["detail"]))
         projects.append(item)

@@ -47,7 +47,7 @@ window.SiteApp.registerPage('post-detail', () => {
     const src = resolveAssetUrl(post.originalCover);
     return `
       <figure class="md-image original-cover-image">
-        <img src="${escapeHtml(src)}" alt="${escapeHtml(`${post.title} 原始封面`)}" loading="lazy" decoding="async">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(`${post.title} 原始封面`)}" loading="eager" decoding="async">
       </figure>
     `;
   }

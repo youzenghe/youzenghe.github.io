@@ -98,7 +98,7 @@ window.SiteApp.registerPage('projects', () => {
       card.className = 'proj-card reveal';
       card.style.transitionDelay = `${index * 0.07}s`;
       card.innerHTML = `
-        <div class="proj-preview" data-idx="${index}">
+        <div class="proj-preview" data-idx="${index}" role="button" tabindex="0" aria-label="放大查看 ${projectTitle}">
           ${project.img
             ? `<img src="${projectThumb}" data-full-src="${projectImage}" alt="${projectTitle}" loading="${eagerImage ? 'eager' : 'lazy'}" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc"${index === 0 ? ' fetchpriority="high"' : ''} />`
             : `<div class="proj-preview-placeholder"><span class="p-emoji">${escapeHtml(project.emoji)}</span><span class="p-hint">暂无预览图</span></div>`}
@@ -117,7 +117,13 @@ window.SiteApp.registerPage('projects', () => {
         </div>
         <div class="proj-footer"><span class="proj-date">📅 ${escapeHtml(project.date)}</span><a class="proj-detail-link" href="project.html?id=${project.id}">查看复盘 →</a></div>
       `;
-      card.querySelector('.proj-preview')?.addEventListener('click', () => openProjectLightbox(index));
+      const preview = card.querySelector('.proj-preview');
+      preview?.addEventListener('click', () => openProjectLightbox(index));
+      preview?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        openProjectLightbox(index);
+      });
       grid.appendChild(card);
     });
 
