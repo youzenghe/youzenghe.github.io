@@ -36,6 +36,7 @@ def main() -> None:
         "/services/index.html",
         "/pages/blog.html",
         "/pages/posts.html",
+        "/pages/learning.html",
         "/pages/archive.html",
         "/pages/tags.html",
         "/pages/categories.html",
@@ -60,6 +61,9 @@ def main() -> None:
 
     for post in posts:
         add_url(urlset, f"{SITE_URL}/pages/post.html?id={post['id']}")
+
+    for plan in sorted(read_json("learning-plans.json").get("plans", []), key=lambda item: item["id"]):
+        add_url(urlset, f"{SITE_URL}/pages/learning.html?id={plan['id']}")
 
     for project in sorted(read_json("projects.json")["projects"], key=lambda item: item["id"]):
         add_url(urlset, f"{SITE_URL}/pages/project.html?id={project['id']}")

@@ -2,6 +2,7 @@
   const NAV_ITEMS = [
     { key: 'home', label: '首页', href: 'pages/blog.html' },
     { key: 'posts', label: '文章', href: 'pages/posts.html' },
+    { key: 'learning', label: '学习计划', href: 'pages/learning.html' },
     { key: 'archive', label: '归档', href: 'pages/archive.html' },
     { key: 'projects', label: '项目', href: 'pages/projects.html' },
     { key: 'acg', label: 'ACG', href: 'pages/acg.html' },

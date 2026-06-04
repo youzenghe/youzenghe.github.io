@@ -203,7 +203,7 @@ body.light #bg-layer::after {
 }
 
 /* ----- NAV ----- */
-nav {
+nav[aria-label="主导航"] {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
   height: 64px;
   display: flex; align-items: center; justify-content: space-between;
@@ -459,7 +459,7 @@ nav {
    字面大小、行高不一致（如 #GalGame 比中文标签明显偏大）。 */
 .tag, .post-cat, .sri-cat, .plc-tag, .plc-cat, .plc-flag,
 .proj-tech-tag, .proj-cat, .post-tag, .post-header-cat,
-.sw-tag, .game-category, .change-type {
+.sw-tag, .game-category, .change-type, .study-cat, .study-status, .study-tag {
   font-family: "Noto Sans SC Local", "Microsoft YaHei", sans-serif;
   line-height: 1.5;
 }
@@ -1312,7 +1312,7 @@ footer a { color: var(--sakura); }
 
 /* ----- RESPONSIVE ----- */
 @media (max-width: 860px) {
-  nav { padding: 0 1.2rem; }
+  nav[aria-label="主导航"] { padding: 0 1.2rem; }
   .nav-center { display: none; }
   .nav-toggle { display: block; }
   .footer-changelog-link { display: none; }
@@ -1322,7 +1322,7 @@ footer a { color: var(--sakura); }
 }
 @media (max-width: 480px) {
   .site-wrapper { padding: 0 1rem; }
-  nav { padding: 0 1rem; }
+  nav[aria-label="主导航"] { padding: 0 1rem; }
   .skip-link {
     left: 0.75rem;
     right: 0.75rem;
@@ -1403,12 +1403,12 @@ body.live2d-ready #live2dcanvas {
    以维持桌面与移动端一致的质感。
    ============================================================ */
 @media (max-width: 768px) {
-  nav {
+  nav[aria-label="主导航"] {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: rgba(18, 19, 22, 0.9);
   }
-  body.light nav { background: rgba(245, 238, 254, 0.95); }
+  body.light nav[aria-label="主导航"] { background: rgba(245, 238, 254, 0.95); }
   .mobile-menu {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;

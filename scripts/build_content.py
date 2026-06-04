@@ -4,6 +4,7 @@ import json
 import re
 from html import escape
 from pathlib import Path
+from urllib.parse import unquote
 
 from PIL import Image
 
@@ -12,6 +13,7 @@ CONTENT_DIR = ROOT / "content"
 POSTS_DIR = CONTENT_DIR / "posts"
 DATA_JS = ROOT / "js" / "data.js"
 IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
+LINK_MARKDOWN_RE = re.compile(r'(?<!!)\[(?P<label>[^\]]+)\]\((?P<href>[^)\s]+)\)')
 MOTION_POST_COVERS = {
     "001": "../assets/motion/posts/post-ai-contest.webp",
     "002": "../assets/uploads/流萤1.webp",
@@ -65,6 +67,7 @@ def parse_scalar(value: str):
 
 
 def parse_front_matter(text: str) -> tuple[dict, str]:
+    text = text.lstrip("\ufeff").replace("\r\n", "\n")
     if not text.startswith("---\n"):
         return {}, text
 
@@ -137,20 +140,83 @@ def render_inline_markdown(text: str) -> str:
     out: list[str] = []
     last = 0
     for match in IMAGE_MARKDOWN_RE.finditer(text):
-        out.append(escape(text[last:match.start()]))
+        out.append(render_inline_text(text[last:match.start()]))
         out.append(render_markdown_image(match, block=False))
         last = match.end()
-    out.append(escape(text[last:]))
+    out.append(render_inline_text(text[last:]))
     return "".join(out)
+
+
+def render_inline_text(text: str) -> str:
+    rendered = escape(text)
+
+    def render_link(match: re.Match[str]) -> str:
+        label = match.group("label")
+        href = match.group("href")
+        safe_href = escape(href, quote=True)
+        return f'<a href="{safe_href}">{label}</a>'
+
+    rendered = LINK_MARKDOWN_RE.sub(render_link, rendered)
+    rendered = re.sub(r"`([^`]+)`", r"<code>\1</code>", rendered)
+    rendered = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", rendered)
+    rendered = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", rendered)
+    return rendered
+
+
+def flush_list(list_type: str, items: list[str], out: list[str]) -> str:
+    if not items:
+        return ""
+    rendered_items = "".join(f"<li>{render_inline_markdown(item)}</li>" for item in items)
+    out.append(f"<{list_type}>{rendered_items}</{list_type}>")
+    items.clear()
+    return ""
+
+
+def is_table_separator(row: str) -> bool:
+    cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
+
+
+def split_table_row(row: str) -> list[str]:
+    return [cell.strip() for cell in row.strip().strip("|").split("|")]
+
+
+def flush_table(rows: list[str], out: list[str]) -> None:
+    if not rows:
+        return
+    if len(rows) < 2 or not is_table_separator(rows[1]):
+        for row in rows:
+            out.append(f"<p>{render_inline_markdown(row)}</p>")
+        rows.clear()
+        return
+
+    headers = split_table_row(rows[0])
+    body_rows = [split_table_row(row) for row in rows[2:]]
+    head = "".join(f"<th>{render_inline_markdown(cell)}</th>" for cell in headers)
+    body = "".join(
+        "<tr>" + "".join(f"<td>{render_inline_markdown(cell)}</td>" for cell in row) + "</tr>"
+        for row in body_rows
+    )
+    out.append(f'<div class="md-table"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+    rows.clear()
 
 
 def markdown_to_html(markdown: str) -> str:
     out: list[str] = []
     paragraph: list[str] = []
+    list_items: list[str] = []
+    table_rows: list[str] = []
     code_lines: list[str] = []
     code_lang = ""
     code_file = ""
+    list_type = ""
     in_code = False
+
+    def flush_open_blocks() -> None:
+        nonlocal list_type
+        flush_paragraph(paragraph, out)
+        list_type = flush_list(list_type, list_items, out)
+        flush_table(table_rows, out)
 
     for raw_line in markdown.splitlines():
         line = raw_line.rstrip()
@@ -173,7 +239,7 @@ def markdown_to_html(markdown: str) -> str:
                 in_code = False
                 continue
 
-            flush_paragraph(paragraph, out)
+            flush_open_blocks()
             info = stripped[3:].strip()
             parts = info.split(maxsplit=1)
             code_lang = parts[0] if parts else ""
@@ -186,31 +252,51 @@ def markdown_to_html(markdown: str) -> str:
             continue
 
         if not stripped:
-            flush_paragraph(paragraph, out)
+            flush_open_blocks()
             continue
         image_match = IMAGE_MARKDOWN_RE.fullmatch(stripped)
         if image_match:
-            flush_paragraph(paragraph, out)
+            flush_open_blocks()
             out.append(render_markdown_image(image_match))
             continue
-        if stripped.startswith("## "):
-            flush_paragraph(paragraph, out)
-            out.append(f"<h2>{escape(stripped[3:].strip())}</h2>")
+        if re.fullmatch(r"-{3,}|\*{3,}|_{3,}", stripped):
+            flush_open_blocks()
+            out.append("<hr>")
             continue
-        if stripped.startswith("### "):
-            flush_paragraph(paragraph, out)
-            out.append(f"<h3>{escape(stripped[4:].strip())}</h3>")
+        heading_match = re.match(r"^(#{1,6})\s+(.+)$", stripped)
+        if heading_match:
+            flush_open_blocks()
+            level = len(heading_match.group(1))
+            out.append(f"<h{level}>{render_inline_markdown(heading_match.group(2).strip())}</h{level}>")
             continue
         if stripped.startswith("> "):
-            flush_paragraph(paragraph, out)
-            out.append(f"<blockquote>{escape(stripped[2:].strip())}</blockquote>")
+            flush_open_blocks()
+            out.append(f"<blockquote>{render_inline_markdown(stripped[2:].strip())}</blockquote>")
             continue
+        list_match = re.match(r"^([-*+])\s+(.+)$", stripped)
+        ordered_match = re.match(r"^\d+\.\s+(.+)$", stripped)
+        if list_match or ordered_match:
+            flush_paragraph(paragraph, out)
+            flush_table(table_rows, out)
+            next_type = "ol" if ordered_match else "ul"
+            if list_type and list_type != next_type:
+                list_type = flush_list(list_type, list_items, out)
+            list_type = next_type
+            list_items.append((ordered_match or list_match).group(1 if ordered_match else 2))
+            continue
+        if stripped.startswith("|") and stripped.endswith("|"):
+            flush_paragraph(paragraph, out)
+            list_type = flush_list(list_type, list_items, out)
+            table_rows.append(stripped)
+            continue
+        flush_table(table_rows, out)
+        list_type = flush_list(list_type, list_items, out)
         paragraph.append(stripped)
 
     if in_code:
         language_attr = f' class="language-{escape(code_lang)}"' if code_lang else ""
         out.append(f"<pre><code{language_attr}>{escape(chr(10).join(code_lines))}</code></pre>")
-    flush_paragraph(paragraph, out)
+    flush_open_blocks()
     return "\n      ".join(out)
 
 
@@ -299,6 +385,26 @@ def read_json(name: str):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def local_content_path(value: str) -> Path | None:
+    if not value or re.match(r"^https?://", value, re.I):
+        return None
+    normalized = unquote(value).replace("\\", "/").lstrip("/")
+    while normalized.startswith("../"):
+        normalized = normalized[3:]
+    return ROOT / normalized
+
+
+def render_learning_content(item: dict) -> str:
+    content_file = str(item.get("contentFile", ""))
+    path = local_content_path(content_file)
+    if path and path.is_file():
+        _, body = parse_front_matter(path.read_text(encoding="utf-8"))
+        return markdown_to_html(body)
+
+    inline_content = str(item.get("content", ""))
+    return markdown_to_html(inline_content) if inline_content else ""
+
+
 def load_projects() -> list[dict]:
     projects = []
     for project in read_json("projects.json")["projects"]:
@@ -333,9 +439,41 @@ def load_projects() -> list[dict]:
     return projects
 
 
+def load_learning_plans() -> list[dict]:
+    path = CONTENT_DIR / "learning-plans.json"
+    if not path.exists():
+        return []
+
+    plans = read_json("learning-plans.json").get("plans", [])
+    normalized = []
+    for item in plans:
+        normalized.append({
+            "id": int(item["id"]),
+            "title": str(item.get("title", "")),
+            "cat": str(item.get("cat", "学习计划")),
+            "catColor": str(item.get("catColor", "#52e0e0")),
+            "subcategory": str(item.get("subcategory", "")),
+            "date": str(item.get("date", "")),
+            "updatedAt": str(item.get("updatedAt", item.get("date", ""))),
+            "status": str(item.get("status", "学习计划")),
+            "readTime": int(item.get("readTime", 3)),
+            "emoji": str(item.get("emoji", "📚")),
+            "cover": str(item.get("cover", "")),
+            "coverAnimated": normalize_bool(item.get("coverAnimated"), False),
+            "contentFile": str(item.get("contentFile", "")),
+            "excerpt": str(item.get("excerpt", "")),
+            "tags": list(item.get("tags", [])),
+            "highlights": list(item.get("highlights", [])),
+            "source": str(item.get("source", "")),
+            "content": render_learning_content(item),
+        })
+    return sorted(normalized, key=lambda item: (item["date"], item["id"]), reverse=True)
+
+
 def write_data_js(
     posts: list[dict],
     projects: list[dict],
+    learning_plans: list[dict],
     games: list[dict],
     acg: dict,
     moments: list[dict],
@@ -347,6 +485,8 @@ def write_data_js(
         + json.dumps(posts, ensure_ascii=False, indent=2)
         + ";\n\nconst PROJECTS = "
         + json.dumps(projects, ensure_ascii=False, indent=2)
+        + ";\n\nconst LEARNING_PLANS = "
+        + json.dumps(learning_plans, ensure_ascii=False, indent=2)
         + ";\n\nconst GAMES = "
         + json.dumps(games, ensure_ascii=False, indent=2)
         + ";\n\nconst ACG = "
@@ -360,6 +500,7 @@ def write_data_js(
         + ";\n\nconst SITE_DATA = Object.freeze({\n"
         + "  posts: POSTS,\n"
         + "  projects: PROJECTS,\n"
+        + "  learningPlans: LEARNING_PLANS,\n"
         + "  games: GAMES,\n"
         + "  acg: ACG,\n"
         + "  moments: MOMENTS,\n"
@@ -374,6 +515,7 @@ def main() -> None:
     write_data_js(
         load_posts(),
         load_projects(),
+        load_learning_plans(),
         read_json("games.json")["games"],
         read_json("acg.json"),
         read_json("moments.json")["moments"],

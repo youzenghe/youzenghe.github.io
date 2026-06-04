@@ -280,6 +280,7 @@ function getPageKey(url = location.href) {
   if (path.endsWith('/pages/blog.html')) return 'home';
   if (path.endsWith('/pages/posts.html')) return 'posts';
   if (path.endsWith('/pages/post.html')) return 'post-detail';
+  if (path.endsWith('/pages/learning.html')) return 'learning';
   if (path.endsWith('/pages/archive.html')) return 'archive';
   if (path.endsWith('/pages/tags.html')) return 'tags';
   if (path.endsWith('/pages/categories.html')) return 'categories';
@@ -1527,7 +1528,7 @@ function initRouter() {
 
   requestIdleWork(() => {
     const navLinks = new Set();
-    document.querySelectorAll('nav a[href], #mobile-menu a[href]').forEach((link) => {
+    document.querySelectorAll('nav[aria-label="主导航"] a[href], #mobile-menu a[href]').forEach((link) => {
       navLinks.add(link.href);
     });
     navLinks.forEach((href) => prefetchPage(href));

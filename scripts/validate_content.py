@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from urllib.parse import unquote
 from urllib.parse import urlparse
 
 from build_content import CONTENT_DIR, POSTS_DIR, ROOT, normalize_images, parse_front_matter
@@ -19,7 +20,7 @@ def fail(message: str, errors: list[str]) -> None:
 def local_asset_exists(path: str) -> bool:
     if not path or re.match(r"^https?://", path):
         return True
-    normalized = path.replace("../", "").lstrip("/")
+    normalized = unquote(path).replace("../", "").lstrip("/")
     return (ROOT / normalized).exists()
 
 
@@ -110,6 +111,35 @@ def validate_projects(errors: list[str]) -> None:
                 fail(f"{label}: invalid link url: {link.get('url', '')}", errors)
 
 
+def validate_learning_plans(errors: list[str]) -> None:
+    path = CONTENT_DIR / "learning-plans.json"
+    if not path.exists():
+        return
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    ids: set[int] = set()
+    for plan in data.get("plans", []):
+        label = f"learning:{plan.get('title', plan.get('id', 'unknown'))}"
+        plan_id = int(plan["id"])
+        if plan_id in ids:
+            fail(f"{label}: duplicate learning plan id {plan_id}", errors)
+        ids.add(plan_id)
+
+        for key in ["title", "cat", "date", "excerpt"]:
+            if not str(plan.get(key, "")).strip():
+                fail(f"{label}: missing required field {key}", errors)
+
+        cover = str(plan.get("cover", ""))
+        if cover and not local_asset_exists(cover):
+            fail(f"{label}: cover does not exist: {cover}", errors)
+
+        content_file = str(plan.get("contentFile", ""))
+        if content_file and Path(content_file).suffix.lower() != ".md":
+            fail(f"{label}: contentFile must be a Markdown file: {content_file}", errors)
+        if content_file and not local_asset_exists(content_file):
+            fail(f"{label}: contentFile does not exist: {content_file}", errors)
+
+
 def validate_json_file(name: str, errors: list[str]) -> None:
     path = CONTENT_DIR / name
     try:
@@ -128,6 +158,7 @@ def main() -> None:
     validate_json_file("changelog.json", errors)
     validate_posts(errors)
     validate_projects(errors)
+    validate_learning_plans(errors)
 
     if errors:
         print("content validation failed:")

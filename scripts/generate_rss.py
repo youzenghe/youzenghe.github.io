@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 from email.utils import format_datetime
 from pathlib import Path
 
-from build_content import load_posts, load_projects
+from build_content import load_learning_plans, load_posts, load_projects
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,6 +67,21 @@ def make_project_item(project: dict) -> dict:
     }
 
 
+def make_learning_plan_item(plan: dict) -> dict:
+    link = f"{SITE_URL}/pages/learning.html?id={plan['id']}"
+    date = parse_date(plan.get("updatedAt") or plan.get("date"))
+    tags = "、".join(str(item) for item in plan.get("tags", [])[:4] if str(item).strip())
+    suffix = f" 标签：{tags}。" if tags else ""
+    return {
+        "title": f"学习计划：{plan.get('title', '')}",
+        "link": link,
+        "guid": link,
+        "date": date,
+        "category": f"学习计划 / {plan.get('cat', '学习计划')}",
+        "description": f"{plan.get('excerpt', '')}{suffix}",
+    }
+
+
 def main() -> None:
     ET.register_namespace("atom", "http://www.w3.org/2005/Atom")
     rss = ET.Element("rss", {"version": "2.0"})
@@ -74,6 +89,7 @@ def main() -> None:
 
     items = [make_post_item(post) for post in load_posts()]
     items.extend(make_project_item(project) for project in load_projects())
+    items.extend(make_learning_plan_item(plan) for plan in load_learning_plans())
     items.sort(key=lambda item: item["date"], reverse=True)
     last_build = items[0]["date"] if items else datetime.now(TZ)
 

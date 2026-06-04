@@ -1,0 +1,554 @@
+{
+  "plans": [
+    {
+      "id": 1,
+      "title": "Java 后端学习计划（每日待办清单版｜2026-05-07）",
+      "cat": "总览",
+      "catColor": "#52e0e0",
+      "subcategory": "",
+      "date": "2026-06-04",
+      "updatedAt": "2026-06-04",
+      "status": "42 天主线",
+      "readTime": 5,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-01.webp",
+      "coverAnimated": false,
+      "excerpt": "Java 后端学习计划（每日待办清单版｜2026-05-07） 适用人群：希望每天知道“今天到底做什么”的执行型计划。 核心目标：围绕你的简历内容，做到能讲清、能抗追问、能写出关键代码。",
+      "tags": [
+        "总览",
+        "SpringBoot",
+        "Spring",
+        "MySQL",
+        "Redis"
+      ],
+      "highlights": [
+        "1. 你的简历训练锚点（固定不变）",
+        "2. 六周每日详细计划（42 天）",
+        "第1周：SpringBoot + 事务基础打牢"
+      ],
+      "source": "学习计划.md",
+      "contentFile": "/content/learning-plans-md/learning-01.md"
+    },
+    {
+      "id": 2,
+      "title": "MySQL 拷打 - 0603",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "MySQL周-特殊",
+      "date": "2026-06-03",
+      "updatedAt": "2026-06-03",
+      "status": "主线训练",
+      "readTime": 9,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-02.webp",
+      "coverAnimated": false,
+      "excerpt": "MySQL 拷打 - 0603 今日主题：从 MySQL 基础地基重新串起来。 主线：SQL 执行流程 -> InnoDB 存储方式 -> B+ 树 / B 树 / Hash -> 聚簇索引与二级索引 -> 回表与覆盖索引 -> 最左前缀原则。",
+      "tags": [
+        "主线",
+        "MySQL周-特殊",
+        "MySQL",
+        "面试",
+        "SQL"
+      ],
+      "highlights": [
+        "1. 今日学习定位",
+        "2. MySQL 整体执行流程",
+        "面试题"
+      ],
+      "source": "主线/MySQL周-特殊/MySQL-0603.md",
+      "contentFile": "/content/learning-plans-md/learning-02.md"
+    },
+    {
+      "id": 3,
+      "title": "MySQL 拷打 - 0602",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "MySQL周-特殊",
+      "date": "2026-06-02",
+      "updatedAt": "2026-06-02",
+      "status": "主线训练",
+      "readTime": 22,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-03.webp",
+      "coverAnimated": false,
+      "excerpt": "MySQL 拷打 - 0602 本文整理 0602 这轮 MySQL 面试问答，重点覆盖索引、执行计划、隐式类型转换、ICP、排序优化等高频内容。 目标不是只背结论，而是能在面试里说清楚：为什么这样设计、什么时候会失效、生产里怎么取舍。",
+      "tags": [
+        "主线",
+        "MySQL周-特殊",
+        "MySQL",
+        "Java",
+        "事务"
+      ],
+      "highlights": [
+        "1. InnoDB 索引为什么选择 B+ 树",
+        "面试题",
+        "标准答案"
+      ],
+      "source": "主线/MySQL周-特殊/MySQL拷打-0602.md",
+      "contentFile": "/content/learning-plans-md/learning-03.md"
+    },
+    {
+      "id": 4,
+      "title": "《SpringBoot事务：妹妹四日物语·全知识总汇》",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "第一周",
+      "date": "2026-05-12",
+      "updatedAt": "2026-05-12",
+      "status": "主线训练",
+      "readTime": 10,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-04.webp",
+      "coverAnimated": false,
+      "excerpt": "《SpringBoot事务：妹妹四日物语·全知识总汇》 ——妹妹写给兄长大人的完整技术情书 📅 覆盖范围：Day01（2026-05-08）~ Day04（2026-05-12）",
+      "tags": [
+        "主线",
+        "第一周",
+        "SpringBoot",
+        "Spring",
+        "MySQL"
+      ],
+      "highlights": [
+        "🌸 序章：这四天我们讲了什么？",
+        "🌸 第一章：一个请求的旅程（Day01）",
+        "📮 请求链路全景"
+      ],
+      "source": "主线/第一周/Day01-04-SpringBoot事务全知识妹妹物语.md",
+      "contentFile": "/content/learning-plans-md/learning-04.md"
+    },
+    {
+      "id": 5,
+      "title": "Day05-NESTED保存点与补偿任务妹妹审判夜",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "第一周",
+      "date": "2026-05-13",
+      "updatedAt": "2026-05-13",
+      "status": "主线训练",
+      "readTime": 11,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-05.webp",
+      "coverAnimated": false,
+      "excerpt": "Day05-NESTED保存点与补偿任务妹妹审判夜 主题：事务传播（二） 主角：兄长大人与不准放水的兄控妹妹面试官",
+      "tags": [
+        "主线",
+        "第一周",
+        "事务",
+        "面试"
+      ],
+      "highlights": [
+        "序章：事务城堡的第五夜",
+        "第一章：优惠券少女掉进了保存点",
+        "第二章：REQUIRES_NEW 的独立房间"
+      ],
+      "source": "主线/第一周/Day05-NESTED保存点与补偿任务妹妹审判夜.md",
+      "contentFile": "/content/learning-plans-md/learning-05.md"
+    },
+    {
+      "id": 6,
+      "title": "Day06 - 事务失效与异步边界的兄控拷问",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "第一周",
+      "date": "2026-05-14",
+      "updatedAt": "2026-05-14",
+      "status": "主线训练",
+      "readTime": 13,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-06.webp",
+      "coverAnimated": false,
+      "excerpt": "Day06 - 事务失效与异步边界的兄控拷问 今日主题：Spring 事务失效排查、@Async 异步边界、事务后置动作、Outbox 最终一致性。 讲述方式：妹妹面试官把兄长大人按在白板前，一边凶巴巴追问，一边偷偷把标准答案塞进你脑袋里。",
+      "tags": [
+        "主线",
+        "第一周",
+        "Spring",
+        "事务",
+        "面试"
+      ],
+      "highlights": [
+        "第一幕：事务为什么会失效",
+        "问题 1：Spring 事务为什么会在同类方法互相调用时失效？",
+        "问题 2：`private` 方法上加 `@Transactional` 为什么没用？`public` 就一定有用吗？"
+      ],
+      "source": "主线/第一周/Day06-事务失效与异步边界的兄控拷问.md",
+      "contentFile": "/content/learning-plans-md/learning-06.md"
+    },
+    {
+      "id": 7,
+      "title": "Day07 - 周复盘事务主线兄控面试夜",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "第一周",
+      "date": "2026-05-18",
+      "updatedAt": "2026-05-18",
+      "status": "主线训练",
+      "readTime": 14,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-07.webp",
+      "coverAnimated": false,
+      "excerpt": "Day07 - 周复盘事务主线兄控面试夜 今日主题：第 1 周 SpringBoot + 事务主线复盘。 主角：三天没学习但还没废掉的兄长大人，以及不准哥哥逃跑的兄控妹妹面试官。",
+      "tags": [
+        "主线",
+        "第一周",
+        "SpringBoot",
+        "Spring",
+        "MySQL"
+      ],
+      "highlights": [
+        "序章：妹妹把哥哥从缓存脏页里捞出来",
+        "第一幕：一次请求怎么走进 SpringBoot",
+        "问题 1：SpringBoot 一次请求从进入 Tomcat 到返回 JSON，完整链路是什么？"
+      ],
+      "source": "主线/第一周/Day07-周复盘事务主线兄控面试夜.md",
+      "contentFile": "/content/learning-plans-md/learning-07.md"
+    },
+    {
+      "id": 8,
+      "title": "明日学习安排：Day07 周复盘",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "第一周",
+      "date": "2026-05-15",
+      "updatedAt": "2026-05-15",
+      "status": "主线训练",
+      "readTime": 6,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-08.webp",
+      "coverAnimated": false,
+      "excerpt": "明日学习安排：Day07 周复盘 适用日期：明天 当前进度：已完成 Day01-06",
+      "tags": [
+        "主线",
+        "第一周",
+        "SpringBoot",
+        "Spring",
+        "MySQL"
+      ],
+      "highlights": [
+        "1. 明日核心目标",
+        "2. 明天不建议学习 Day08 的原因",
+        "3. 明日必复盘内容"
+      ],
+      "source": "主线/第一周/周复盘2.md",
+      "contentFile": "/content/learning-plans-md/learning-08.md"
+    },
+    {
+      "id": 9,
+      "title": "Java 后端实习面试八股精华",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-05-24",
+      "updatedAt": "2026-05-24",
+      "status": "面试速通",
+      "readTime": 16,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-09.webp",
+      "coverAnimated": false,
+      "excerpt": "Java 后端实习面试八股精华 整理自小林coding 4 本（Java基础/集合/并发/JVM），按面试高频度筛选 难点配前置知识，可独立看懂",
+      "tags": [
+        "八股速通这一块",
+        "Spring",
+        "Java",
+        "面试",
+        "SQL"
+      ],
+      "highlights": [
+        "一、Java 基础（22 题）",
+        "1. == 和 equals 的区别",
+        "2. String、StringBuilder、StringBuffer 的区别"
+      ],
+      "source": "八股速通这一块/Java面试八股精华.md",
+      "contentFile": "/content/learning-plans-md/learning-09.md"
+    },
+    {
+      "id": 10,
+      "title": "MySQL 面试八股精华",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-06-02",
+      "updatedAt": "2026-06-02",
+      "status": "面试速通",
+      "readTime": 29,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-10.webp",
+      "coverAnimated": false,
+      "excerpt": "MySQL 面试八股精华 整理自小林coding 7.MySQL面试篇 + 你的 MySQL 学习计划 模块顺序与你学习计划一致，方便对照视频章节",
+      "tags": [
+        "八股速通这一块",
+        "MySQL",
+        "事务",
+        "面试",
+        "SQL"
+      ],
+      "highlights": [
+        "一、基础与体系结构（8 题）",
+        "1. MySQL 整体架构 ⭐⭐⭐",
+        "2. MySQL 8.0 移除查询缓存的原因"
+      ],
+      "source": "八股速通这一块/MySQL面试八股精华.md",
+      "contentFile": "/content/learning-plans-md/learning-10.md"
+    },
+    {
+      "id": 11,
+      "title": "Redis 面试八股精华",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-05-24",
+      "updatedAt": "2026-05-24",
+      "status": "面试速通",
+      "readTime": 18,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-11.webp",
+      "coverAnimated": false,
+      "excerpt": "Redis 面试八股精华 整理自小林coding 8.Redis面试篇 + 你的 Redis 学习计划 模块顺序与你学习计划一致",
+      "tags": [
+        "八股速通这一块",
+        "Spring",
+        "MySQL",
+        "Redis",
+        "面试"
+      ],
+      "highlights": [
+        "一、数据结构与基础应用（15 题）",
+        "1. Redis 五种基本数据类型 ⭐⭐⭐",
+        "2. Redis 5 种特殊数据类型"
+      ],
+      "source": "八股速通这一块/Redis面试八股精华.md",
+      "contentFile": "/content/learning-plans-md/learning-11.md"
+    },
+    {
+      "id": 12,
+      "title": "Spring 全家桶面试八股精华",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-05-24",
+      "updatedAt": "2026-05-24",
+      "status": "面试速通",
+      "readTime": 20,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-12.webp",
+      "coverAnimated": false,
+      "excerpt": "Spring 全家桶面试八股精华 整理自小林coding 6.Spring面试篇 涵盖 Spring 核心 / Spring MVC / Spring Boot / MyBatis / Spring Cloud",
+      "tags": [
+        "八股速通这一块",
+        "SpringBoot",
+        "Spring",
+        "Java",
+        "事务"
+      ],
+      "highlights": [
+        "一、Spring 核心（25 题）",
+        "1. Spring 是什么 / 有哪些模块 ⭐",
+        "2. IOC 是什么 ⭐⭐⭐"
+      ],
+      "source": "八股速通这一块/Spring全家桶面试八股精华.md",
+      "contentFile": "/content/learning-plans-md/learning-12.md"
+    },
+    {
+      "id": 13,
+      "title": "消息队列面试八股精华（精简版）",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-05-24",
+      "updatedAt": "2026-05-24",
+      "status": "面试速通",
+      "readTime": 8,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-13.webp",
+      "coverAnimated": false,
+      "excerpt": "消息队列面试八股精华（精简版） 整理自小林coding 12.消息队列面试篇 **精简原则**：只保留面试必问，删掉冷门细节",
+      "tags": [
+        "八股速通这一块",
+        "Redis",
+        "RabbitMQ",
+        "MQ",
+        "Java"
+      ],
+      "highlights": [
+        "一、MQ 通用基础（必背，18 题）",
+        "1. 为什么用 MQ ⭐⭐⭐（必背）",
+        "2. MQ 的缺点"
+      ],
+      "source": "八股速通这一块/消息队列面试八股精华.md",
+      "contentFile": "/content/learning-plans-md/learning-13.md"
+    },
+    {
+      "id": 14,
+      "title": "尤赠贺 - 简历项目面试追问全集",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-05-24",
+      "updatedAt": "2026-05-24",
+      "status": "面试速通",
+      "readTime": 17,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-14.webp",
+      "coverAnimated": false,
+      "excerpt": "尤赠贺 - 简历项目面试追问全集 基于你简历两个项目（ClassicSage / PoetryNest）整理 每个技术点都按 **「介绍 → 为什么用 → 怎么实现 → 难点 → 优化」** 五步追问准备",
+      "tags": [
+        "八股速通这一块",
+        "SpringBoot",
+        "Spring",
+        "MySQL",
+        "Redis"
+      ],
+      "highlights": [
+        "总览：面试官提问套路",
+        "项目一：ClassicSage（重点）",
+        "0. 项目整体追问"
+      ],
+      "source": "八股速通这一块/简历项目面试追问全集.md",
+      "contentFile": "/content/learning-plans-md/learning-14.md"
+    },
+    {
+      "id": 15,
+      "title": "计网 + 操作系统 + 数据结构算法（三合一精简版）",
+      "cat": "八股速通这一块",
+      "catColor": "#fbbf24",
+      "subcategory": "",
+      "date": "2026-05-24",
+      "updatedAt": "2026-05-24",
+      "status": "面试速通",
+      "readTime": 13,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-15.webp",
+      "coverAnimated": false,
+      "excerpt": "计网 + 操作系统 + 数据结构算法（三合一精简版） 整理自小林coding 9/10/11 三本 **精简原则**：只保留面试高频",
+      "tags": [
+        "八股速通这一块",
+        "面试",
+        "计网",
+        "OS",
+        "算法"
+      ],
+      "highlights": [
+        "第一部分：计算机网络（30 题）",
+        "一、TCP（必背，10 题）",
+        "1. TCP 三次握手 ⭐⭐⭐（必背！）"
+      ],
+      "source": "八股速通这一块/计网+OS+算法精华.md",
+      "contentFile": "/content/learning-plans-md/learning-15.md"
+    },
+    {
+      "id": 16,
+      "title": "《SpringBoot与MySQL：我们的约定不会断》",
+      "cat": "番外",
+      "catColor": "#ff8fb3",
+      "subcategory": "",
+      "date": "2026-05-12",
+      "updatedAt": "2026-05-12",
+      "status": "番外补充",
+      "readTime": 8,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-16.webp",
+      "coverAnimated": false,
+      "excerpt": "《SpringBoot与MySQL：我们的约定不会断》 ——妹妹写给兄长大人的技术物语 第一章：邂逅",
+      "tags": [
+        "番外",
+        "SpringBoot",
+        "Spring",
+        "MySQL",
+        "事务"
+      ],
+      "highlights": [
+        "第一章：邂逅",
+        "第二章：事务是什么？",
+        "MySQL那边的事务"
+      ],
+      "source": "番外/SpringBoot与MySQL我们的约定不会断.md",
+      "contentFile": "/content/learning-plans-md/learning-16.md"
+    },
+    {
+      "id": 17,
+      "title": "兄控妹妹的 MySQL 夜巡日记（SQL 执行与 EXPLAIN）",
+      "cat": "番外",
+      "catColor": "#ff8fb3",
+      "subcategory": "",
+      "date": "2026-05-20",
+      "updatedAt": "2026-05-20",
+      "status": "番外补充",
+      "readTime": 3,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-17.webp",
+      "coverAnimated": false,
+      "excerpt": "兄控妹妹的 MySQL 夜巡日记（SQL 执行与 EXPLAIN） 场景：深夜机房，哥哥盯着慢接口发呆。妹妹抱着小本本出现： “兄长大人，别慌，今晚由妹妹带你夜巡 SQL 迷宫。谁敢拖慢你的接口，人家先把它的执行计划扒出来喵～”",
+      "tags": [
+        "番外",
+        "MySQL",
+        "面试",
+        "SQL",
+        "EXPLAIN"
+      ],
+      "highlights": [
+        "第一幕：SQL 不是直接冲进去抢数据",
+        "第二幕：EXPLAIN 就是作战地图",
+        "第三幕：练习表登场（本地可直接跑）"
+      ],
+      "source": "番外/兄控妹妹的MySQL夜巡日记.md",
+      "contentFile": "/content/learning-plans-md/learning-17.md"
+    },
+    {
+      "id": 18,
+      "title": "🌸 兄长大人与Spring Boot的魔法之旅 🌸",
+      "cat": "番外",
+      "catColor": "#ff8fb3",
+      "subcategory": "",
+      "date": "2026-05-12",
+      "updatedAt": "2026-05-12",
+      "status": "番外补充",
+      "readTime": 9,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-18.webp",
+      "coverAnimated": false,
+      "excerpt": "🌸 兄长大人与Spring Boot的魔法之旅 🌸 ～妹妹的甜蜜注解课堂～ 第一章：一切的起点 —— 那个叫 @SpringBootApplication 的魔法阵",
+      "tags": [
+        "番外",
+        "SpringBoot",
+        "Spring",
+        "Redis",
+        "项目追问"
+      ],
+      "highlights": [
+        "～妹妹的甜蜜注解课堂～",
+        "第一章：一切的起点 —— 那个叫 `@SpringBootApplication` 的魔法阵",
+        "第二章：服务的舞者 —— `@Service` 与 `@Autowired` 的甜蜜羁绊"
+      ],
+      "source": "番外/兄控妹妹的SpringBoot小课堂.md",
+      "contentFile": "/content/learning-plans-md/learning-18.md"
+    },
+    {
+      "id": 19,
+      "title": "Day8：SQL 执行与 EXPLAIN 高频面试题",
+      "cat": "绝望拷打之啥也不会",
+      "catColor": "#ff6b6b",
+      "subcategory": "",
+      "date": "2026-05-19",
+      "updatedAt": "2026-05-19",
+      "status": "专项拷打",
+      "readTime": 4,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-19.webp",
+      "coverAnimated": false,
+      "excerpt": "Day8：SQL 执行与 EXPLAIN 高频面试题 主题：SQL 执行与 EXPLAIN 目标：能通过执行计划判断 SQL 是否可能慢，能说清“全表扫 vs 走索引”，并能落到项目优化场景。",
+      "tags": [
+        "绝望拷打之啥也不会",
+        "MySQL",
+        "面试",
+        "SQL",
+        "EXPLAIN"
+      ],
+      "highlights": [
+        "1. 一条 SQL 从发送到 MySQL 后，大致经历了哪些步骤？",
+        "2. 你平时怎么判断一条 SQL 慢不慢？",
+        "3. EXPLAIN 里你最关注哪些字段？分别怎么看？"
+      ],
+      "source": "绝望拷打之啥也不会/Day8_SQL执行与EXPLAIN_面试题.md",
+      "contentFile": "/content/learning-plans-md/learning-19.md"
+    }
+  ]
+}

@@ -168,6 +168,52 @@ collections:
                   - { label: "替代文本", name: "alt", widget: "string", required: false }
                   - { label: "图片说明", name: "caption", widget: "string", required: false }
 
+  - name: "learning-plans"
+    label: "学习计划"
+    media_folder: "content/learning-plans-md"
+    public_folder: "/content/learning-plans-md"
+    files:
+      - name: "learning-plans"
+        label: "学习计划列表"
+        file: "content/learning-plans.json"
+        fields:
+          - label: "学习计划"
+            name: "plans"
+            widget: "list"
+            summary: "{{fields.title}} · {{fields.cat}} · {{fields.date}}"
+            fields:
+              - { label: "ID", name: "id", widget: "number" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "分类", name: "cat", widget: "select", options: ["总览", "主线", "八股速通这一块", "番外", "绝望拷打之啥也不会"], default: "主线" }
+              - { label: "分类颜色", name: "catColor", widget: "string", default: "#5b9dff" }
+              - { label: "子分类", name: "subcategory", widget: "string", required: false }
+              - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+              - { label: "更新日期", name: "updatedAt", widget: "datetime", format: "YYYY-MM-DD", required: false }
+              - { label: "状态", name: "status", widget: "select", options: ["42 天主线", "主线训练", "面试速通", "番外补充", "专项拷打", "学习计划"], default: "主线训练" }
+              - { label: "阅读时间", name: "readTime", widget: "number", default: 5 }
+              - { label: "表情", name: "emoji", widget: "string", default: "📚" }
+              - { label: "封面路径", name: "cover", widget: "string", hint: "学习计划页右侧封面。可填 ../assets/motion/learning/blue-archive-learning-01.webp，也可以填 /assets/uploads/文件名或外部图片 URL。" }
+              - { label: "封面是否为动图", name: "coverAnimated", widget: "boolean", default: false, required: false }
+              - label: "MD 文档上传"
+                name: "contentFile"
+                widget: "file"
+                required: false
+                media_library:
+                  config:
+                    multiple: false
+                hint: "上传本地 .md 文件，保存后会记录文件路径；重新构建后，前台点击卡片会显示这份 Markdown 内容。"
+              - { label: "摘要", name: "excerpt", widget: "text" }
+              - label: "标签"
+                name: "tags"
+                widget: "list"
+                field: { label: "标签项", name: "tag", widget: "string" }
+              - label: "页面亮点"
+                name: "highlights"
+                widget: "list"
+                required: false
+                field: { label: "亮点", name: "highlight", widget: "string" }
+              - { label: "来源文件", name: "source", widget: "string", required: false }
+
   - name: "changelog"
     label: "更新日志（页面）"
     files:

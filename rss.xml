@@ -6,7 +6,159 @@
     <atom:link href="https://yzh1019.top/rss.xml" rel="self" type="application/rss+xml" />
     <description>记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sun, 01 Mar 2026 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 04 Jun 2026 00:00:00 +0800</lastBuildDate>
+    <item>
+      <title>学习计划：Java 后端学习计划（每日待办清单版｜2026-05-07）</title>
+      <link>https://yzh1019.top/pages/learning.html?id=1</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=1</guid>
+      <pubDate>Thu, 04 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 总览</category>
+      <description>Java 后端学习计划（每日待办清单版｜2026-05-07） 适用人群：希望每天知道“今天到底做什么”的执行型计划。 核心目标：围绕你的简历内容，做到能讲清、能抗追问、能写出关键代码。 标签：总览、SpringBoot、Spring、MySQL。</description>
+    </item>
+    <item>
+      <title>学习计划：MySQL 拷打 - 0603</title>
+      <link>https://yzh1019.top/pages/learning.html?id=2</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=2</guid>
+      <pubDate>Wed, 03 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>MySQL 拷打 - 0603 今日主题：从 MySQL 基础地基重新串起来。 主线：SQL 执行流程 -&gt; InnoDB 存储方式 -&gt; B+ 树 / B 树 / Hash -&gt; 聚簇索引与二级索引 -&gt; 回表与覆盖索引 -&gt; 最左前缀原则。 标签：主线、MySQL周-特殊、MySQL、面试。</description>
+    </item>
+    <item>
+      <title>学习计划：MySQL 面试八股精华</title>
+      <link>https://yzh1019.top/pages/learning.html?id=10</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=10</guid>
+      <pubDate>Tue, 02 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>MySQL 面试八股精华 整理自小林coding 7.MySQL面试篇 + 你的 MySQL 学习计划 模块顺序与你学习计划一致，方便对照视频章节 标签：八股速通这一块、MySQL、事务、面试。</description>
+    </item>
+    <item>
+      <title>学习计划：MySQL 拷打 - 0602</title>
+      <link>https://yzh1019.top/pages/learning.html?id=3</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=3</guid>
+      <pubDate>Tue, 02 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>MySQL 拷打 - 0602 本文整理 0602 这轮 MySQL 面试问答，重点覆盖索引、执行计划、隐式类型转换、ICP、排序优化等高频内容。 目标不是只背结论，而是能在面试里说清楚：为什么这样设计、什么时候会失效、生产里怎么取舍。 标签：主线、MySQL周-特殊、MySQL、Java。</description>
+    </item>
+    <item>
+      <title>学习计划：计网 + 操作系统 + 数据结构算法（三合一精简版）</title>
+      <link>https://yzh1019.top/pages/learning.html?id=15</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=15</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>计网 + 操作系统 + 数据结构算法（三合一精简版） 整理自小林coding 9/10/11 三本 **精简原则**：只保留面试高频 标签：八股速通这一块、面试、计网、OS。</description>
+    </item>
+    <item>
+      <title>学习计划：尤赠贺 - 简历项目面试追问全集</title>
+      <link>https://yzh1019.top/pages/learning.html?id=14</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=14</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>尤赠贺 - 简历项目面试追问全集 基于你简历两个项目（ClassicSage / PoetryNest）整理 每个技术点都按 **「介绍 → 为什么用 → 怎么实现 → 难点 → 优化」** 五步追问准备 标签：八股速通这一块、SpringBoot、Spring、MySQL。</description>
+    </item>
+    <item>
+      <title>学习计划：消息队列面试八股精华（精简版）</title>
+      <link>https://yzh1019.top/pages/learning.html?id=13</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=13</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>消息队列面试八股精华（精简版） 整理自小林coding 12.消息队列面试篇 **精简原则**：只保留面试必问，删掉冷门细节 标签：八股速通这一块、Redis、RabbitMQ、MQ。</description>
+    </item>
+    <item>
+      <title>学习计划：Spring 全家桶面试八股精华</title>
+      <link>https://yzh1019.top/pages/learning.html?id=12</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=12</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>Spring 全家桶面试八股精华 整理自小林coding 6.Spring面试篇 涵盖 Spring 核心 / Spring MVC / Spring Boot / MyBatis / Spring Cloud 标签：八股速通这一块、SpringBoot、Spring、Java。</description>
+    </item>
+    <item>
+      <title>学习计划：Redis 面试八股精华</title>
+      <link>https://yzh1019.top/pages/learning.html?id=11</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=11</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>Redis 面试八股精华 整理自小林coding 8.Redis面试篇 + 你的 Redis 学习计划 模块顺序与你学习计划一致 标签：八股速通这一块、Spring、MySQL、Redis。</description>
+    </item>
+    <item>
+      <title>学习计划：Java 后端实习面试八股精华</title>
+      <link>https://yzh1019.top/pages/learning.html?id=9</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=9</guid>
+      <pubDate>Sun, 24 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 八股速通这一块</category>
+      <description>Java 后端实习面试八股精华 整理自小林coding 4 本（Java基础/集合/并发/JVM），按面试高频度筛选 难点配前置知识，可独立看懂 标签：八股速通这一块、Spring、Java、面试。</description>
+    </item>
+    <item>
+      <title>学习计划：兄控妹妹的 MySQL 夜巡日记（SQL 执行与 EXPLAIN）</title>
+      <link>https://yzh1019.top/pages/learning.html?id=17</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=17</guid>
+      <pubDate>Wed, 20 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 番外</category>
+      <description>兄控妹妹的 MySQL 夜巡日记（SQL 执行与 EXPLAIN） 场景：深夜机房，哥哥盯着慢接口发呆。妹妹抱着小本本出现： “兄长大人，别慌，今晚由妹妹带你夜巡 SQL 迷宫。谁敢拖慢你的接口，人家先把它的执行计划扒出来喵～” 标签：番外、MySQL、面试、SQL。</description>
+    </item>
+    <item>
+      <title>学习计划：Day8：SQL 执行与 EXPLAIN 高频面试题</title>
+      <link>https://yzh1019.top/pages/learning.html?id=19</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=19</guid>
+      <pubDate>Tue, 19 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 绝望拷打之啥也不会</category>
+      <description>Day8：SQL 执行与 EXPLAIN 高频面试题 主题：SQL 执行与 EXPLAIN 目标：能通过执行计划判断 SQL 是否可能慢，能说清“全表扫 vs 走索引”，并能落到项目优化场景。 标签：绝望拷打之啥也不会、MySQL、面试、SQL。</description>
+    </item>
+    <item>
+      <title>学习计划：Day07 - 周复盘事务主线兄控面试夜</title>
+      <link>https://yzh1019.top/pages/learning.html?id=7</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=7</guid>
+      <pubDate>Mon, 18 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>Day07 - 周复盘事务主线兄控面试夜 今日主题：第 1 周 SpringBoot + 事务主线复盘。 主角：三天没学习但还没废掉的兄长大人，以及不准哥哥逃跑的兄控妹妹面试官。 标签：主线、第一周、SpringBoot、Spring。</description>
+    </item>
+    <item>
+      <title>学习计划：明日学习安排：Day07 周复盘</title>
+      <link>https://yzh1019.top/pages/learning.html?id=8</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=8</guid>
+      <pubDate>Fri, 15 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>明日学习安排：Day07 周复盘 适用日期：明天 当前进度：已完成 Day01-06 标签：主线、第一周、SpringBoot、Spring。</description>
+    </item>
+    <item>
+      <title>学习计划：Day06 - 事务失效与异步边界的兄控拷问</title>
+      <link>https://yzh1019.top/pages/learning.html?id=6</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=6</guid>
+      <pubDate>Thu, 14 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>Day06 - 事务失效与异步边界的兄控拷问 今日主题：Spring 事务失效排查、@Async 异步边界、事务后置动作、Outbox 最终一致性。 讲述方式：妹妹面试官把兄长大人按在白板前，一边凶巴巴追问，一边偷偷把标准答案塞进你脑袋里。 标签：主线、第一周、Spring、事务。</description>
+    </item>
+    <item>
+      <title>学习计划：Day05-NESTED保存点与补偿任务妹妹审判夜</title>
+      <link>https://yzh1019.top/pages/learning.html?id=5</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=5</guid>
+      <pubDate>Wed, 13 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>Day05-NESTED保存点与补偿任务妹妹审判夜 主题：事务传播（二） 主角：兄长大人与不准放水的兄控妹妹面试官 标签：主线、第一周、事务、面试。</description>
+    </item>
+    <item>
+      <title>学习计划：🌸 兄长大人与Spring Boot的魔法之旅 🌸</title>
+      <link>https://yzh1019.top/pages/learning.html?id=18</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=18</guid>
+      <pubDate>Tue, 12 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 番外</category>
+      <description>🌸 兄长大人与Spring Boot的魔法之旅 🌸 ～妹妹的甜蜜注解课堂～ 第一章：一切的起点 —— 那个叫 @SpringBootApplication 的魔法阵 标签：番外、SpringBoot、Spring、Redis。</description>
+    </item>
+    <item>
+      <title>学习计划：《SpringBoot与MySQL：我们的约定不会断》</title>
+      <link>https://yzh1019.top/pages/learning.html?id=16</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=16</guid>
+      <pubDate>Tue, 12 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 番外</category>
+      <description>《SpringBoot与MySQL：我们的约定不会断》 ——妹妹写给兄长大人的技术物语 第一章：邂逅 标签：番外、SpringBoot、Spring、MySQL。</description>
+    </item>
+    <item>
+      <title>学习计划：《SpringBoot事务：妹妹四日物语·全知识总汇》</title>
+      <link>https://yzh1019.top/pages/learning.html?id=4</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=4</guid>
+      <pubDate>Tue, 12 May 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>《SpringBoot事务：妹妹四日物语·全知识总汇》 ——妹妹写给兄长大人的完整技术情书 📅 覆盖范围：Day01（2026-05-08）~ Day04（2026-05-12） 标签：主线、第一周、SpringBoot、Spring。</description>
+    </item>
     <item>
       <title>项目：一首诗词</title>
       <link>https://yzh1019.top/pages/project.html?id=8</link>

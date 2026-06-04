@@ -58,10 +58,26 @@ window.SiteApp.registerPage('post-detail', () => {
 
   function highlightCode(code) {
     const raw = code.textContent || '';
-    const highlighted = escapeHtml(raw)
-      .replace(/(\/\/.*)$/gm, '<span class="code-token-comment">$1</span>')
-      .replace(/(&quot;.*?&quot;|&#39;.*?&#39;|`.*?`)/g, '<span class="code-token-string">$1</span>')
-      .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|from|export|async|await|def|try|except|catch|finally)\b/g, '<span class="code-token-keyword">$1</span>');
+    const keywords = 'const|let|var|function|return|if|else|for|while|class|import|from|export|async|await|def|try|except|catch|finally|public|private|protected|void|new|throw|throws|static|final|extends|implements';
+    const tokenRe = new RegExp('//[^\\n]*|"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'|`(?:\\\\.|[^`\\\\])*`|\\b(?:' + keywords + ')\\b', 'g');
+    let highlighted = '';
+    let cursor = 0;
+    let match;
+
+    while ((match = tokenRe.exec(raw)) !== null) {
+      const token = match[0];
+      highlighted += escapeHtml(raw.slice(cursor, match.index));
+      if (token.startsWith('//')) {
+        highlighted += `<span class="code-token-comment">${escapeHtml(token)}</span>`;
+      } else if (/^["'`]/.test(token)) {
+        highlighted += `<span class="code-token-string">${escapeHtml(token)}</span>`;
+      } else {
+        highlighted += `<span class="code-token-keyword">${escapeHtml(token)}</span>`;
+      }
+      cursor = match.index + token.length;
+    }
+
+    highlighted += escapeHtml(raw.slice(cursor));
     code.innerHTML = highlighted;
   }
 
