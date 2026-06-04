@@ -30,6 +30,35 @@
       "contentFile": "/content/learning-plans-md/learning-01.md"
     },
     {
+      "id": 20,
+      "title": "MySQL 拷打 - 0604",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "MySQL周-特殊",
+      "date": "2026-06-04",
+      "updatedAt": "2026-06-04",
+      "status": "主线训练",
+      "readTime": 10,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-20.webp",
+      "coverAnimated": false,
+      "excerpt": "MySQL 拷打 - 0604 今日主题：EXPLAIN 入门、联合索引排序、覆盖索引、回表、ORDER BY + LIMIT 场景判断。 主线：不是只背“是否走索引”，而是学会从执行成本判断 SQL 好不好。",
+      "tags": [
+        "主线",
+        "MySQL周-特殊",
+        "MySQL",
+        "面试",
+        "SQL"
+      ],
+      "highlights": [
+        "1. 今日学习定位",
+        "2. EXPLAIN 到底看什么",
+        "面试速背版"
+      ],
+      "source": "主线/MySQL周-特殊/MySQL拷打-0604.md",
+      "contentFile": "/content/learning-plans-md/learning-20.md"
+    },
+    {
       "id": 2,
       "title": "MySQL 拷打 - 0603",
       "cat": "主线",

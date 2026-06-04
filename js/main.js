@@ -14,7 +14,7 @@ const LOCAL_BG_MOBILE = 'assets/bg-phone.webp';
 
 // 本地背景图片池配置
 const USE_BG_POOL = true; // 是否启用背景图片池（false则使用固定背景）
-const BG_POOL_SIZE_PC = 241; // PC端图片数量
+const BG_POOL_SIZE_PC = 727; // PC端图片数量
 const BG_POOL_SIZE_MOBILE = 154; // 移动端图片数量
 
 const PAGE_MODULES = new Map();

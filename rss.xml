@@ -8,6 +8,14 @@
     <language>zh-CN</language>
     <lastBuildDate>Thu, 04 Jun 2026 00:00:00 +0800</lastBuildDate>
     <item>
+      <title>学习计划：MySQL 拷打 - 0604</title>
+      <link>https://yzh1019.top/pages/learning.html?id=20</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=20</guid>
+      <pubDate>Thu, 04 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>MySQL 拷打 - 0604 今日主题：EXPLAIN 入门、联合索引排序、覆盖索引、回表、ORDER BY + LIMIT 场景判断。 主线：不是只背“是否走索引”，而是学会从执行成本判断 SQL 好不好。 标签：主线、MySQL周-特殊、MySQL、面试。</description>
+    </item>
+    <item>
       <title>学习计划：Java 后端学习计划（每日待办清单版｜2026-05-07）</title>
       <link>https://yzh1019.top/pages/learning.html?id=1</link>
       <guid>https://yzh1019.top/pages/learning.html?id=1</guid>
