@@ -10,7 +10,7 @@
 @font-face {
   font-family: 'Jinnan';
   font-style: normal; font-display: swap;
-  src: url('../assets/fonts/qijie/jinnanbold.ttf') format('truetype');
+  src: url('../assets/fonts/qijie/jinnanbold.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Inter Variable';

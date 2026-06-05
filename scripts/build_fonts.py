@@ -60,6 +60,9 @@ def subset(src: Path, dst: Path, text: str) -> None:
     subsetter = Subsetter(options=options)
     subsetter.populate(text=text)
     subsetter.subset(font)
+    # 关键：必须把 flavor 设到 font 上，font.save() 才会真正输出 woff2（brotli 压缩）。
+    # 只在 options 上设 flavor 不生效，存出来会是未压缩的裸子集 sfnt/TTF（体积大近一倍）。
+    font.flavor = options.flavor
     dst.parent.mkdir(parents=True, exist_ok=True)
     font.save(str(dst))
 
@@ -68,6 +71,7 @@ def main() -> int:
     pairs = [
         (SRC_DIR / "noto-sans-sc-400.ttf", OUT_DIR / "noto-sans-sc-400.woff2"),
         (SRC_DIR / "noto-sans-sc-700.ttf", OUT_DIR / "noto-sans-sc-700.woff2"),
+        (SRC_DIR / "jinnanbold.ttf", OUT_DIR / "qijie" / "jinnanbold.woff2"),
     ]
 
     if not all(src.exists() for src, _ in pairs):
