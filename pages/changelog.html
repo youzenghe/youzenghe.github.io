@@ -102,6 +102,32 @@
       line-height: 1.8;
       font-size: 0.88rem;
     }
+    .health-report-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      width: fit-content;
+      margin-top: 1.25rem;
+      padding: 0.62rem 0.9rem;
+      border: 1px solid rgba(82,224,224,0.28);
+      border-radius: 999px;
+      background: rgba(82,224,224,0.09);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 0.82rem;
+      box-shadow: 0 12px 28px rgba(82,224,224,0.08);
+    }
+    .health-report-link span {
+      color: var(--text-muted);
+    }
+    .health-report-link strong {
+      color: var(--accent);
+      font-weight: 800;
+    }
+    .health-report-link:hover {
+      border-color: rgba(251,191,36,0.42);
+      background: rgba(251,191,36,0.1);
+    }
     @media (max-width: 640px) {
       .changelog-panel {
         padding: 0.4rem;
@@ -125,6 +151,10 @@
       <div class="section-label">Changelog</div>
       <h1>更新日志</h1>
       <p>把站点功能、性能和内容调整留一份清楚记录，方便以后复盘。</p>
+      <a class="health-report-link" href="site-health.html" aria-label="查看站点健康报告">
+        <span>站点健康报告</span>
+        <strong>巡检面板 →</strong>
+      </a>
     </div>
     <section class="changelog-panel reveal" aria-label="更新日志列表">
       <div class="changelog-list" id="changelog-list" tabindex="0" aria-label="更新日志滚动区域"></div>

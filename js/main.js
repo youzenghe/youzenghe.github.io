@@ -2,7 +2,7 @@
    次元日记 · Global JavaScript
    ============================================================ */
 
-const DYNAMIC_SCRIPT_RE = /\/js\/(?:pages\/[^/]+|data-(?:posts|projects|learning))\.js(?:\?.*)?$/i;
+const DYNAMIC_SCRIPT_RE = /\/js\/(?:pages\/[^/]+|data-(?:posts|projects|learning|site-health))\.js(?:\?.*)?$/i;
 const PAGE_STYLE_ATTR = 'data-page-style';
 const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
 const SAKANA_WIDGET_STYLE_ID = 'sakana-widget-style';
@@ -422,6 +422,7 @@ function getPageKey(url = location.href) {
   if (path.endsWith('/pages/projects.html')) return 'projects';
   if (path.endsWith('/pages/project.html')) return 'project-detail';
   if (path.endsWith('/pages/changelog.html')) return 'changelog';
+  if (path.endsWith('/pages/site-health.html')) return 'site-health';
   if (path.endsWith('/pages/games.html')) return 'games';
   if (path.endsWith('/pages/acg.html')) return 'acg';
   if (path.endsWith('/pages/moments.html')) return 'moments';

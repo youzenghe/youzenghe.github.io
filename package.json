@@ -17,6 +17,7 @@
     "build:dist": "node scripts/build_dist.mjs",
     "check:data-split": "node scripts/checks/check_data_split.mjs",
     "check:lazy-card-media": "node scripts/checks/check_lazy_card_media.mjs",
+    "check:site-health": "node scripts/checks/check_site_health.mjs && node scripts/checks/check_site_health_page.mjs",
     "check:site-search": "node scripts/checks/check_site_search.mjs",
     "check:video-background": "node scripts/checks/check_video_background.mjs"
   },
