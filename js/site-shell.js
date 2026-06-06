@@ -17,7 +17,7 @@
       rootPrefix: dataset.rootPrefix || '',
       activeNav: dataset.activeNav || '',
       loaderText: dataset.loaderText || '加载中...',
-      searchPlaceholder: dataset.searchPlaceholder || '搜索文章...',
+      searchPlaceholder: dataset.searchPlaceholder || '搜索文章、学习计划、项目...',
       footerHtml: dataset.footerHtml || '',
     };
   }

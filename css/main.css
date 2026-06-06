@@ -300,7 +300,25 @@ nav[aria-label="主导航"] {
   margin-bottom: 0.4rem; transition: background var(--transition);
 }
 .search-result-item:hover { background: var(--glass); }
-.sri-cat { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 0.2rem; font-family: var(--font-ui); font-weight: 700; }
+.sri-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.2rem;
+}
+.sri-type {
+  flex-shrink: 0;
+  padding: 0.08rem 0.42rem;
+  border-radius: 999px;
+  background: rgba(91,157,255,0.16);
+  border: 1px solid rgba(91,157,255,0.22);
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.sri-cat { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; font-family: var(--font-ui); font-weight: 700; }
 .sri-title { font-size: 0.95rem; margin-bottom: 0.15rem; }
 .sri-excerpt { font-size: 0.78rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .search-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem; }

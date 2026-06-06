@@ -245,7 +245,7 @@ function getSiteConfig() {
     rootPrefix: dataset.rootPrefix || '',
     activeNav: dataset.activeNav || '',
     live2d: dataset.live2d !== 'false',
-    searchPlaceholder: dataset.searchPlaceholder || '搜索文章...',
+    searchPlaceholder: dataset.searchPlaceholder || '搜索文章、学习计划、项目...',
     footerHtml: dataset.footerHtml || '',
     loaderText: dataset.loaderText || '加载中...',
   };
@@ -932,54 +932,170 @@ function initSearch() {
     return safe.replace(new RegExp(escapeRegExp(query), 'gi'), (match) => `<mark>${match}</mark>`);
   }
 
+  function joinSearchText(parts) {
+    return parts.flatMap((part) => Array.isArray(part) ? part : [part])
+      .filter(Boolean)
+      .join(' ');
+  }
+
   function postSearchText(post) {
     const detail = window.SITE_DATA?.postDetails?.[String(post.id)] || {};
-    return [
+    return joinSearchText([
       post.title,
       post.excerpt,
       post.cat,
       post.series,
-      post.tags.join(' '),
+      post.tags,
       stripHtml(detail.content || post.content),
-    ].join(' ');
+    ]);
   }
-  function resultExcerpt(post, query) {
-    const detail = window.SITE_DATA?.postDetails?.[String(post.id)] || {};
-    const body = stripHtml(detail.content || post.content);
-    if (!query) return post.excerpt;
-    const lowerBody = body.toLowerCase();
+
+  function learningSearchText(plan) {
+    return joinSearchText([
+      plan.title,
+      plan.excerpt,
+      plan.cat,
+      plan.subcategory,
+      plan.status,
+      plan.tags,
+      plan.highlights,
+      plan.source,
+    ]);
+  }
+
+  function projectSearchText(project) {
+    return joinSearchText([
+      project.title,
+      project.desc,
+      project.cat,
+      project.tech,
+      project.awardText,
+      project.status,
+      project.date,
+    ]);
+  }
+
+  function excerptFrom(body, fallback, query) {
+    const text = stripHtml(body);
+    if (!query || !text) return fallback || '';
+    const lowerBody = text.toLowerCase();
     const index = lowerBody.indexOf(query.toLowerCase());
-    if (index < 0) return post.excerpt;
+    if (index < 0) return fallback || text;
 
     const start = Math.max(0, index - 32);
-    const end = Math.min(body.length, index + query.length + 72);
-    return `${start > 0 ? '...' : ''}${body.slice(start, end)}${end < body.length ? '...' : ''}`;
+    const end = Math.min(text.length, index + query.length + 72);
+    return `${start > 0 ? '...' : ''}${text.slice(start, end)}${end < text.length ? '...' : ''}`;
+  }
+
+  function postResult(post, query) {
+    const detail = window.SITE_DATA?.postDetails?.[String(post.id)] || {};
+    return {
+      type: 'post',
+      typeLabel: '文章',
+      category: post.cat,
+      title: post.title,
+      excerpt: excerptFrom(detail.content || post.content, post.excerpt, query),
+      href: `${resolvePagePath('pages/post.html')}?id=${post.id}`,
+      searchText: postSearchText(post),
+    };
+  }
+
+  function learningResult(plan, query) {
+    return {
+      type: 'learning',
+      typeLabel: '学习计划',
+      category: plan.subcategory || plan.cat,
+      title: plan.title,
+      excerpt: excerptFrom('', plan.excerpt, query),
+      href: `${resolvePagePath('pages/learning.html')}?id=${plan.id}`,
+      searchText: learningSearchText(plan),
+    };
+  }
+
+  function projectResult(project, query) {
+    return {
+      type: 'project',
+      typeLabel: '项目',
+      category: project.cat,
+      title: project.title,
+      excerpt: excerptFrom('', project.desc, query),
+      href: `${resolvePagePath('pages/project.html')}?id=${project.id}`,
+      searchText: projectSearchText(project),
+    };
+  }
+
+  function allSearchResults(query) {
+    const learningPlans = typeof LEARNING_PLANS !== 'undefined' && Array.isArray(LEARNING_PLANS) ? LEARNING_PLANS : [];
+    const projects = typeof PROJECTS !== 'undefined' && Array.isArray(PROJECTS) ? PROJECTS : [];
+    return [
+      ...POSTS.map((post) => postResult(post, query)),
+      ...learningPlans.map((plan) => learningResult(plan, query)),
+      ...projects.map((project) => projectResult(project, query)),
+    ];
+  }
+
+  function defaultSearchResults(query) {
+    const learningPlans = typeof LEARNING_PLANS !== 'undefined' && Array.isArray(LEARNING_PLANS) ? LEARNING_PLANS : [];
+    const projects = typeof PROJECTS !== 'undefined' && Array.isArray(PROJECTS) ? PROJECTS : [];
+    const recentProjects = [...projects]
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+      .slice(0, 3);
+    return [
+      ...POSTS.slice(0, 3).map((post) => postResult(post, query)),
+      ...learningPlans.slice(0, 3).map((plan) => learningResult(plan, query)),
+      ...recentProjects.map((project) => projectResult(project, query)),
+    ];
+  }
+
+  function renderResultItem(item, query) {
+    return `
+      <a class="search-result-item" href="${item.href}">
+        <div class="sri-meta">
+          <span class="sri-type">${escapeHtml(item.typeLabel)}</span>
+          <span class="sri-cat">${mark(item.category, query)}</span>
+        </div>
+        <div class="sri-title">${mark(item.title, query)}</div>
+        <div class="sri-excerpt">${mark(item.excerpt, query)}</div>
+      </a>
+    `;
+  }
+
+  function searchScore(item, query) {
+    const needle = query.toLowerCase();
+    const title = String(item.title || '').toLowerCase();
+    const category = String(item.category || '').toLowerCase();
+    const excerpt = String(item.excerpt || '').toLowerCase();
+    const searchText = String(item.searchText || '').toLowerCase();
+    let score = 0;
+
+    if (title === needle) score += 100;
+    else if (title.startsWith(needle)) score += 80;
+    else if (title.includes(needle)) score += 60;
+
+    if (category.includes(needle)) score += 24;
+    if (excerpt.includes(needle)) score += 12;
+    if (searchText.includes(needle)) score += 1;
+
+    return score;
   }
 
   function render(query) {
-    const list = query
-      ? POSTS.filter((post) => postSearchText(post).toLowerCase().includes(query.toLowerCase()))
-      : POSTS;
+    const normalizedQuery = query.trim();
+    const list = normalizedQuery
+      ? allSearchResults(normalizedQuery)
+        .map((item, index) => ({ item, index, score: searchScore(item, normalizedQuery) }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score || a.index - b.index)
+        .map((entry) => entry.item)
+      : defaultSearchResults(normalizedQuery);
 
     if (!list.length) {
-      const picks = POSTS.slice(0, 3).map((post) => `
-        <a class="search-result-item" href="${resolvePagePath('pages/post.html')}?id=${post.id}">
-          <div class="sri-cat">${escapeHtml(post.cat)}</div>
-          <div class="sri-title">${escapeHtml(post.title)}</div>
-          <div class="sri-excerpt">${escapeHtml(post.excerpt)}</div>
-        </a>
-      `).join('');
-      results.innerHTML = `<div class="search-empty">没有找到“${escapeHtml(query)}”相关的文章，先看看这些：</div>${picks}`;
+      const picks = defaultSearchResults('').map((item) => renderResultItem(item, '')).join('');
+      results.innerHTML = `<div class="search-empty">没有找到“${escapeHtml(normalizedQuery)}”相关内容，先看看这些：</div>${picks}`;
       return;
     }
 
-    results.innerHTML = list.map((post) => `
-      <a class="search-result-item" href="${resolvePagePath('pages/post.html')}?id=${post.id}">
-        <div class="sri-cat">${mark(post.cat, query)}</div>
-        <div class="sri-title">${mark(post.title, query)}</div>
-        <div class="sri-excerpt">${mark(resultExcerpt(post, query), query)}</div>
-      </a>
-    `).join('');
+    results.innerHTML = list.map((item) => renderResultItem(item, normalizedQuery)).join('');
   }
 
   function ensureSearchDetails() {
