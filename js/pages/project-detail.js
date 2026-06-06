@@ -2,7 +2,9 @@ window.SiteApp.registerPage('project-detail', () => {
   const absoluteBase = 'https://yzh1019.top';
   const params = new URLSearchParams(location.search);
   const id = parseInt(params.get('id'), 10);
-  const project = PROJECTS.find((item) => item.id === id);
+  const projectSummary = PROJECTS.find((item) => item.id === id);
+  const projectDetails = window.SITE_DATA?.projectDetails?.[String(id)] || {};
+  const project = projectSummary ? { ...projectSummary, ...projectDetails } : null;
 
   function imageSrc(image) {
     return typeof image === 'string' ? image : image?.src || image?.image || '';

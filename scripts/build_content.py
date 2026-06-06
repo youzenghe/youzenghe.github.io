@@ -12,6 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT_DIR = ROOT / "content"
 POSTS_DIR = CONTENT_DIR / "posts"
 DATA_JS = ROOT / "js" / "data.js"
+DATA_CORE_JS = ROOT / "js" / "data-core.js"
+DATA_POSTS_JS = ROOT / "js" / "data-posts.js"
+DATA_PROJECTS_JS = ROOT / "js" / "data-projects.js"
+DATA_LEARNING_JS = ROOT / "js" / "data-learning.js"
 IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
 LINK_MARKDOWN_RE = re.compile(r'(?<!!)\[(?P<label>[^\]]+)\]\((?P<href>[^)\s]+)\)')
 MOTION_POST_COVERS = {
@@ -480,6 +484,100 @@ def write_data_js(
     friend_links: list[dict],
     changelog: list[dict],
 ) -> None:
+    core_posts = [
+        {key: value for key, value in post.items() if key not in {"content", "images", "relatedPosts", "seo", "originalCover"}}
+        for post in posts
+    ]
+    post_details = {
+        str(post["id"]): {
+            "content": post.get("content", ""),
+            "images": post.get("images", []),
+            "relatedPosts": post.get("relatedPosts", []),
+            "seo": post.get("seo", {}),
+            "originalCover": post.get("originalCover", ""),
+        }
+        for post in posts
+    }
+    core_projects = [
+        {
+            key: value
+            for key, value in project.items()
+            if key not in {"detail", "role", "links", "highlights", "challenges", "result", "images", "originalImg"}
+        }
+        for project in projects
+    ]
+    project_details = {
+        str(project["id"]): {
+            "detail": project.get("detail", ""),
+            "role": project.get("role", ""),
+            "links": project.get("links", []),
+            "highlights": project.get("highlights", []),
+            "challenges": project.get("challenges", []),
+            "result": project.get("result", ""),
+            "images": project.get("images", []),
+            "originalImg": project.get("originalImg", ""),
+        }
+        for project in projects
+    }
+    core_learning_plans = [
+        {key: value for key, value in plan.items() if key not in {"content", "contentFile"}}
+        for plan in learning_plans
+    ]
+    learning_details = {
+        str(plan["id"]): {
+            "content": plan.get("content", ""),
+            "contentFile": plan.get("contentFile", ""),
+        }
+        for plan in learning_plans
+    }
+    core_payload = (
+        "const POSTS = "
+        + json.dumps(core_posts, ensure_ascii=False, indent=2)
+        + ";\n\nconst PROJECTS = "
+        + json.dumps(core_projects, ensure_ascii=False, indent=2)
+        + ";\n\nconst LEARNING_PLANS = "
+        + json.dumps(core_learning_plans, ensure_ascii=False, indent=2)
+        + ";\n\nconst GAMES = "
+        + json.dumps(games, ensure_ascii=False, indent=2)
+        + ";\n\nconst ACG = "
+        + json.dumps(acg, ensure_ascii=False, indent=2)
+        + ";\n\nconst MOMENTS = "
+        + json.dumps(moments, ensure_ascii=False, indent=2)
+        + ";\n\nconst FRIEND_LINKS = "
+        + json.dumps(friend_links, ensure_ascii=False, indent=2)
+        + ";\n\nconst CHANGELOG = "
+        + json.dumps(changelog, ensure_ascii=False, indent=2)
+        + ";\n\nconst SITE_DATA = Object.freeze({\n"
+        + "  posts: POSTS,\n"
+        + "  projects: PROJECTS,\n"
+        + "  learningPlans: LEARNING_PLANS,\n"
+        + "  games: GAMES,\n"
+        + "  acg: ACG,\n"
+        + "  moments: MOMENTS,\n"
+        + "  friendLinks: FRIEND_LINKS,\n"
+        + "  changelog: CHANGELOG,\n"
+        + "});\n\nwindow.SITE_DATA = SITE_DATA;\n"
+    )
+    DATA_CORE_JS.write_text(core_payload, encoding="utf-8")
+    DATA_POSTS_JS.write_text(
+        "const POST_DETAILS = "
+        + json.dumps(post_details, ensure_ascii=False, indent=2)
+        + ";\n\nwindow.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), postDetails: POST_DETAILS });\n",
+        encoding="utf-8",
+    )
+    DATA_PROJECTS_JS.write_text(
+        "const PROJECT_DETAILS = "
+        + json.dumps(project_details, ensure_ascii=False, indent=2)
+        + ";\n\nwindow.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), projectDetails: PROJECT_DETAILS });\n",
+        encoding="utf-8",
+    )
+    DATA_LEARNING_JS.write_text(
+        "const LEARNING_DETAILS = "
+        + json.dumps(learning_details, ensure_ascii=False, indent=2)
+        + ";\n\nwindow.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), learningDetails: LEARNING_DETAILS });\n",
+        encoding="utf-8",
+    )
+
     payload = (
         "const POSTS = "
         + json.dumps(posts, ensure_ascii=False, indent=2)

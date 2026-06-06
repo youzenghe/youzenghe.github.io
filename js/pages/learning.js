@@ -12,8 +12,8 @@ window.SiteApp.registerPage('learning', () => {
   const categories = ['全部', ...new Set(plans.map((plan) => plan.cat).filter(Boolean))];
   const params = new URLSearchParams(location.search);
   const focusId = Number(params.get('id')) || 0;
-  const focusedPlan = plans.find((plan) => plan.id === focusId);
-  let currentCategory = params.get('cat') || focusedPlan?.cat || '全部';
+  const focusedPlanSummary = plans.find((plan) => plan.id === focusId);
+  let currentCategory = params.get('cat') || focusedPlanSummary?.cat || '全部';
   let currentPage = 1;
   let currentList = [];
 
@@ -46,6 +46,46 @@ window.SiteApp.registerPage('learning', () => {
 
   function planUrl(plan) {
     return `learning.html?id=${plan.id}`;
+  }
+
+  function detailForPlan(plan) {
+    if (!plan) return null;
+    const details = window.SITE_DATA?.learningDetails?.[String(plan.id)] || {};
+    return { ...plan, ...details };
+  }
+
+  function loadLearningDetails() {
+    if (window.SITE_DATA?.learningDetails) return Promise.resolve();
+    const existing = document.getElementById('learning-detail-data-script');
+    if (existing) {
+      return new Promise((resolve, reject) => {
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', reject, { once: true });
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.id = 'learning-detail-data-script';
+      script.src = resolveVersionedDataUrl('js/data-learning.js');
+      script.onload = resolve;
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
+  }
+
+  function renderDetailLoading() {
+    const stats = document.getElementById('learning-stats');
+    const listView = document.getElementById('learning-list-view');
+    const detail = document.getElementById('learning-detail');
+    if (stats) stats.hidden = true;
+    if (listView) listView.hidden = true;
+    if (!detail) return;
+    detail.hidden = false;
+    detail.innerHTML = `
+      <a class="learning-back-link" href="learning.html">← 返回学习计划列表</a>
+      <div class="learning-detail-body learning-detail-empty">正在加载学习计划正文...</div>
+    `;
   }
 
   function updateListStructuredData() {
@@ -461,7 +501,17 @@ window.SiteApp.registerPage('learning', () => {
   };
 
   if (focusId) {
-    renderDetail(focusedPlan);
+    renderDetailLoading();
+    loadLearningDetails()
+      .then(() => {
+        renderDetail(detailForPlan(focusedPlanSummary));
+      })
+      .catch(() => {
+        renderDetail({
+          ...(focusedPlanSummary || {}),
+          content: '<p>学习计划正文加载失败，可以返回列表后稍后再试。</p>',
+        });
+      });
     return () => {
       cleanupFns.forEach((cleanup) => cleanup());
     };

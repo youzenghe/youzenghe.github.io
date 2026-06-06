@@ -2,7 +2,7 @@
    次元日记 · Global JavaScript
    ============================================================ */
 
-const PAGE_SCRIPT_RE = /\/js\/pages\/[^/]+\.js(?:\?.*)?$/i;
+const DYNAMIC_SCRIPT_RE = /\/js\/(?:pages\/[^/]+|data-(?:posts|projects|learning))\.js(?:\?.*)?$/i;
 const PAGE_STYLE_ATTR = 'data-page-style';
 const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
 const SAKANA_WIDGET_STYLE_ID = 'sakana-widget-style';
@@ -217,6 +217,23 @@ function normalizeLocalAssetPath(path) {
 function resolveAssetUrl(path) {
   if (!path || /^https?:\/\//i.test(path)) return path;
   return `${getSiteConfig().rootPrefix}${normalizeLocalAssetPath(path)}`;
+}
+
+function resolveVersionedDataUrl(path) {
+  const url = resolveAssetUrl(path);
+  const coreScript = document.querySelector('script[src*="/js/data-core.js"], script[src*="js/data-core.js"]');
+  if (!coreScript) return url;
+
+  try {
+    const version = new URL(coreScript.src, location.href).search;
+    if (version && !url.includes('?')) {
+      return `${url}${version}`;
+    }
+  } catch (error) {
+    return url;
+  }
+
+  return url;
 }
 
 function resolveThumbnailUrl(path) {
@@ -626,6 +643,7 @@ function initSearch() {
   const openBtns = document.querySelectorAll('.search-trigger');
   const closeBtn = document.getElementById('search-close');
   let previousActiveElement = null;
+  let searchDetailsPromise = null;
 
   if (!overlay || !input || !results || typeof POSTS === 'undefined' || overlay.dataset.inited === 'true') return;
   overlay.dataset.inited = 'true';
@@ -658,18 +676,19 @@ function initSearch() {
   }
 
   function postSearchText(post) {
+    const detail = window.SITE_DATA?.postDetails?.[String(post.id)] || {};
     return [
       post.title,
       post.excerpt,
       post.cat,
       post.series,
       post.tags.join(' '),
-      stripHtml(post.content),
+      stripHtml(detail.content || post.content),
     ].join(' ');
   }
-
   function resultExcerpt(post, query) {
-    const body = stripHtml(post.content);
+    const detail = window.SITE_DATA?.postDetails?.[String(post.id)] || {};
+    const body = stripHtml(detail.content || post.content);
     if (!query) return post.excerpt;
     const lowerBody = body.toLowerCase();
     const index = lowerBody.indexOf(query.toLowerCase());
@@ -706,6 +725,19 @@ function initSearch() {
     `).join('');
   }
 
+  function ensureSearchDetails() {
+    if (window.SITE_DATA?.postDetails) return Promise.resolve();
+    if (searchDetailsPromise) return searchDetailsPromise;
+
+    const src = new URL(resolveVersionedDataUrl('js/data-posts.js'), location.href).href;
+    searchDetailsPromise = loadScript(src)
+      .catch((error) => {
+        searchDetailsPromise = null;
+        throw error;
+      });
+    return searchDetailsPromise;
+  }
+
   function open() {
     if (overlay.classList.contains('open')) return;
     previousActiveElement = document.activeElement;
@@ -714,6 +746,9 @@ function initSearch() {
     lockBodyScroll();
     input.focus();
     render('');
+    ensureSearchDetails()
+      .then(() => render(input.value.trim()))
+      .catch(() => {});
   }
 
   function close() {
@@ -749,7 +784,15 @@ function initSearch() {
   });
 
   input.addEventListener('input', (event) => {
-    render(event.target.value.trim());
+    const query = event.target.value.trim();
+    render(query);
+    if (query && !window.SITE_DATA?.postDetails) {
+      ensureSearchDetails()
+        .then(() => {
+          if (input.value.trim() === query) render(query);
+        })
+        .catch(() => {});
+    }
   });
 }
 
@@ -1109,7 +1152,7 @@ function initSakanaWidget() {
 function registerCurrentScripts() {
   document.querySelectorAll('script[src]').forEach((script) => {
     const src = script.src;
-    if (PAGE_SCRIPT_RE.test(src)) {
+    if (DYNAMIC_SCRIPT_RE.test(src)) {
       LOADED_PAGE_SCRIPTS.add(src);
     }
   });
@@ -1280,10 +1323,17 @@ function resetTransientPageState() {
 }
 
 function loadScript(src) {
+  if (LOADED_PAGE_SCRIPTS.has(src)) return Promise.resolve();
+
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = src;
-    script.onload = resolve;
+    script.onload = () => {
+      if (DYNAMIC_SCRIPT_RE.test(script.src)) {
+        LOADED_PAGE_SCRIPTS.add(script.src);
+      }
+      resolve();
+    };
     script.onerror = reject;
     document.body.appendChild(script);
   });
@@ -1292,7 +1342,7 @@ function loadScript(src) {
 async function ensurePageScripts(doc) {
   const scripts = Array.from(doc.querySelectorAll('script[src]'))
     .map((script) => new URL(script.getAttribute('src'), doc.URL).href)
-    .filter((src) => PAGE_SCRIPT_RE.test(src));
+    .filter((src) => DYNAMIC_SCRIPT_RE.test(src));
 
   for (const src of scripts) {
     if (LOADED_PAGE_SCRIPTS.has(src)) continue;
@@ -1315,7 +1365,7 @@ function rememberPageCache(cacheKey, task) {
 function prefetchPageScripts(doc) {
   Array.from(doc.querySelectorAll('script[src]'))
     .map((script) => new URL(script.getAttribute('src'), doc.URL).href)
-    .filter((src) => PAGE_SCRIPT_RE.test(src))
+    .filter((src) => DYNAMIC_SCRIPT_RE.test(src))
     .forEach((src) => {
       const alreadyPrefetched = Array.from(document.head.querySelectorAll('link[data-page-prefetch]'))
         .some((link) => link.dataset.pagePrefetch === src);

@@ -2,8 +2,10 @@ window.SiteApp.registerPage('post-detail', () => {
   const absoluteBase = 'https://yzh1019.top';
   const params = new URLSearchParams(location.search);
   const id = parseInt(params.get('id'), 10);
-  const post = POSTS.find((item) => item.id === id);
-  const postIndex = POSTS.indexOf(post);
+  const postIndex = POSTS.findIndex((item) => item.id === id);
+  const postSummary = POSTS[postIndex];
+  const postDetails = window.SITE_DATA?.postDetails?.[String(id)] || {};
+  const post = postSummary ? { ...postSummary, ...postDetails } : null;
 
   function setMeta(selector, attr, value) {
     const el = document.querySelector(selector);
