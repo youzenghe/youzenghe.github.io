@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "daily": "node scripts/submit_learning_note.mjs",
     "submit:learning": "node scripts/submit_learning_note.mjs",
     "optimize:uploads": "python scripts/optimize_upload_images.py",
     "build:thumbs": "python scripts/generate_thumbnails.py",

@@ -5,16 +5,19 @@ import path from 'node:path';
 import process from 'node:process';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const DEFAULT_SOURCE_DIR = '/mnt/c/Users/ASUS/Desktop/兄控妹妹Java物语/主线/MySQL周-特殊';
 const DEFAULT_COVER_DIR = '/mnt/c/Users/ASUS/Desktop/图库/blue_archive_wallpapers-webp';
 const IMAGE_EXTENSIONS = new Set(['.webp', '.jpg', '.jpeg', '.png', '.gif']);
 
 function usage() {
   console.log(`
 Usage:
+  npm run daily
   npm run submit:learning -- --file "/path/to/MySQL拷打-0607.md"
 
 Options:
-  --file <path>             Markdown file to publish. Required.
+  --file <path>             Markdown file to publish. Default: newest dated .md in source dir.
+  --source-dir <path>       Directory to pick the newest Markdown from.
   --category <name>         Learning category. Default: 主线
   --subcategory <name>      Learning subcategory. Default: MySQL周-特殊
   --status <name>           Learning status. Default: 主线训练
@@ -31,6 +34,7 @@ Options:
   --help                    Show this help.
 
 Example:
+  npm run daily
   npm run submit:learning -- --file "/mnt/c/Users/ASUS/Desktop/兄控妹妹Java物语/主线/MySQL周-特殊/MySQL拷打-0607.md"
 `);
 }
@@ -41,6 +45,7 @@ function parseArgs(argv) {
     subcategory: 'MySQL周-特殊',
     status: '主线训练',
     catColor: '#5b9dff',
+    sourceDir: DEFAULT_SOURCE_DIR,
     coverDir: DEFAULT_COVER_DIR,
     commit: true,
     push: true,
@@ -64,6 +69,8 @@ function parseArgs(argv) {
       args.help = true;
     } else if (arg === '--file') {
       args.file = readValue();
+    } else if (arg === '--source-dir') {
+      args.sourceDir = readValue();
     } else if (arg === '--category') {
       args.category = readValue();
     } else if (arg === '--subcategory') {
@@ -97,7 +104,6 @@ function parseArgs(argv) {
   }
 
   if (args.help) return args;
-  if (!args.file) throw new Error('--file is required');
   if (args.push && !args.commit) throw new Error('--no-commit cannot be used with push enabled; add --no-push');
   return args;
 }
@@ -248,6 +254,38 @@ function nextCover(coverDir) {
   return path.join(coverDir, entries[0]);
 }
 
+function dateKeyFromFileName(file) {
+  const name = path.basename(file);
+  const full = name.match(/(20\d{2})[-_.年/]?(\d{1,2})[-_.月/]?(\d{1,2})/);
+  if (full) {
+    const [, year, month, day] = full;
+    return `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`;
+  }
+  const short = name.match(/(?:^|[^0-9])(\d{2})(\d{2})(?:[^0-9]|$)/);
+  if (short) {
+    const [, month, day] = short;
+    return `${todayInShanghai().slice(0, 4)}${month}${day}`;
+  }
+  return '';
+}
+
+function newestMarkdown(sourceDir) {
+  if (!fs.existsSync(sourceDir)) throw new Error(`Source directory does not exist: ${sourceDir}`);
+  const entries = fs.readdirSync(sourceDir)
+    .filter((name) => path.extname(name).toLowerCase() === '.md')
+    .map((name) => {
+      const file = path.join(sourceDir, name);
+      return { file, dateKey: dateKeyFromFileName(file), mtimeMs: fs.statSync(file).mtimeMs };
+    })
+    .sort((a, b) => {
+      if (b.dateKey !== a.dateKey) return b.dateKey.localeCompare(a.dateKey);
+      if (b.mtimeMs !== a.mtimeMs) return b.mtimeMs - a.mtimeMs;
+      return path.basename(b.file).localeCompare(path.basename(a.file), 'zh-Hans-CN');
+    });
+  if (!entries.length) throw new Error(`No Markdown files found in ${sourceDir}`);
+  return entries[0].file;
+}
+
 function insertPlanEntry(jsonPath, entry) {
   const source = fs.readFileSync(jsonPath, 'utf8');
   const marker = '"plans": [';
@@ -263,7 +301,7 @@ function insertPlanEntry(jsonPath, entry) {
 }
 
 function makePlan(args) {
-  const sourcePath = path.resolve(args.file);
+  const sourcePath = path.resolve(args.file || newestMarkdown(args.sourceDir));
   if (!fs.existsSync(sourcePath)) throw new Error(`Markdown file does not exist: ${sourcePath}`);
   const markdown = fs.readFileSync(sourcePath, 'utf8');
   const title = inferTitle(markdown, sourcePath);
