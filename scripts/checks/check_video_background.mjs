@@ -82,6 +82,12 @@ function runExpression(expression, options) {
   return vm.runInContext(`${source}\n${expression}`, context, { filename: 'js/main.js' });
 }
 
+function runAsyncExpression(expression, options) {
+  const context = createContext(options);
+  vm.createContext(context);
+  return vm.runInContext(`${source}\n${expression}`, context, { filename: 'js/main.js' });
+}
+
 const desktopBg = runExpression('createBgUrl();');
 if (desktopBg?.type !== 'video') {
   throw new Error('PC background should use video source objects');
@@ -106,6 +112,34 @@ if (reducedMotionBg?.type !== 'video' || reducedMotionBg.loadVideo !== false) {
 const saveDataBg = runExpression('createBgUrl();', { saveData: true });
 if (saveDataBg?.type !== 'video' || saveDataBg.loadVideo !== false) {
   throw new Error(`Save-data PC background should use poster-only video source: ${JSON.stringify(saveDataBg)}`);
+}
+
+const navigationVideoBg = await runAsyncExpression(`
+  (async () => {
+    preloadBg = async () => ({
+      type: 'video',
+      url: '../assets/bg-pool/pc-video/bg2.webm',
+      webm: '../assets/bg-pool/pc-video/bg2.webm',
+      poster: '../assets/bg-pool/pc-video/bg2.webp',
+      videoEl: null,
+      posterImg: null,
+    });
+    swapBgPane = (layer, readyBg) => {
+      layer.dataset.bgUrl = readyBg.url;
+      return readyBg.url;
+    };
+    randomBgReady = null;
+    randomBgPromise = null;
+
+    const bgLayer = {
+      dataset: { bgUrl: '../assets/bg-pool/pc-video/bg1.webm' },
+      querySelectorAll() { return []; },
+    };
+    return loadNavigationBg(bgLayer);
+  })()
+`);
+if (navigationVideoBg !== '../assets/bg-pool/pc-video/bg2.webm') {
+  throw new Error(`PC navigation should switch to a new video background, got ${navigationVideoBg}`);
 }
 
 console.log('video_background_rules_ok');

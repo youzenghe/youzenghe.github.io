@@ -579,14 +579,11 @@ async function loadNavigationBg(bgLayer) {
   const currentRootPrefix = getSiteConfig().rootPrefix;
 
   if (!isMobileViewport() && USE_VIDEO_BG_PC) {
-    if (bgLayer.dataset.bgUrl) {
-      return bgLayer.dataset.bgUrl;
-    }
-
-    const initialVideoBg = await preloadBg(createBgUrl(currentRootPrefix), 'high').catch(() => null);
-    if (initialVideoBg?.url) {
-      swapBgPane(bgLayer, initialVideoBg);
-      return initialVideoBg.url;
+    const nextVideoBg = await preloadBg(createBgUrl(currentRootPrefix), 'high', 0, currentRootPrefix).catch(() => null);
+    if (nextVideoBg?.url) {
+      swapBgPane(bgLayer, nextVideoBg);
+      prefetchRandomBg(currentRootPrefix);
+      return nextVideoBg.url;
     }
   }
 
