@@ -779,6 +779,92 @@ function initReveal() {
   });
 }
 
+function escapeRuntimeCssUrl(url) {
+  return String(url ?? '').replace(/["\\\n\r]/g, (char) => ({
+    '"': '%22',
+    '\\': '%5C',
+    '\n': '%0A',
+    '\r': '%0D',
+  })[char] || '');
+}
+
+function loadLazyMediaItem(el) {
+  if (!el) return;
+
+  const syncBgTarget = () => {
+    const selector = el.dataset.lazyBgTarget;
+    if (!selector) return;
+
+    const bgTarget = el.parentElement?.querySelector(selector);
+    const bgUrl = el.currentSrc || el.src;
+    if (!bgTarget || !bgUrl || bgUrl.startsWith('data:')) return;
+
+    bgTarget.style.backgroundImage = `url("${escapeRuntimeCssUrl(bgUrl)}")`;
+    bgTarget.classList.add('lazy-media-loaded');
+    delete el.dataset.lazyBgTarget;
+  };
+
+  const lazySrc = el.dataset.lazySrc;
+  if (lazySrc) {
+    if (el.tagName === 'IMG' || el.tagName === 'IFRAME' || el.tagName === 'VIDEO') {
+      el.src = lazySrc;
+    } else {
+      el.setAttribute('src', lazySrc);
+    }
+    delete el.dataset.lazySrc;
+  }
+
+  if (el.dataset.lazyBgTarget) {
+    if (el.complete && el.naturalWidth > 0) {
+      syncBgTarget();
+    } else {
+      el.addEventListener('load', syncBgTarget, { once: true });
+    }
+  }
+
+  const lazySrcset = el.dataset.lazySrcset;
+  if (lazySrcset) {
+    el.setAttribute('srcset', lazySrcset);
+    delete el.dataset.lazySrcset;
+  }
+
+  const lazyBg = el.dataset.lazyBg;
+  if (lazyBg) {
+    el.style.backgroundImage = `url("${escapeRuntimeCssUrl(lazyBg)}")`;
+    delete el.dataset.lazyBg;
+  }
+
+  el.classList.add('lazy-media-loaded');
+}
+
+function initLazyMedia(root = document, options = {}) {
+  const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+  const items = Array.from(scope.querySelectorAll('[data-lazy-src], [data-lazy-srcset], [data-lazy-bg], [data-lazy-bg-target]'))
+    .filter((el) => el.dataset.lazyMediaInited !== 'true');
+  if (!items.length) return;
+
+  if (typeof IntersectionObserver !== 'function') {
+    items.forEach(loadLazyMediaItem);
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      loadLazyMediaItem(entry.target);
+      io.unobserve(entry.target);
+    });
+  }, {
+    rootMargin: options.rootMargin || '520px 0px',
+    threshold: options.threshold ?? 0.01,
+  });
+
+  items.forEach((el) => {
+    el.dataset.lazyMediaInited = 'true';
+    io.observe(el);
+  });
+}
+
 function initMobileNav() {
   const toggle = document.getElementById('nav-toggle');
   const menu = document.getElementById('mobile-menu');

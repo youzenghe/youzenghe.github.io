@@ -1,4 +1,5 @@
 window.SiteApp.registerPage('home', () => {
+  const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
   const stopTypewriter = typewriter(
     document.getElementById('typewriter'),
     ['Java 后端开发者', 'AI 应用实践者', '项目复盘记录者', 'ACG 玩家'],
@@ -20,7 +21,7 @@ window.SiteApp.registerPage('home', () => {
     el.innerHTML = `
       <div class="post-card-img">
         ${post.cover
-          ? `<div class="img-bg" style="background-image:url('${thumbCss}')"></div><img src="${thumb}" data-full-src="${cover}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">`
+          ? `<div class="img-bg"></div><img src="${transparentPixel}" data-lazy-src="${thumb}" data-lazy-bg-target=".img-bg" data-full-src="${cover}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc">`
           : escapeHtml(post.emoji)}
       </div>
       <div class="post-card-body">
@@ -50,7 +51,7 @@ window.SiteApp.registerPage('home', () => {
     el.innerHTML = `
       <div class="bm-cover">
         ${project.img
-          ? `<div class="img-bg" style="position:absolute;inset:-4px;background:url('${thumbCss}') center/cover;filter:blur(10px) brightness(0.5);transform:scale(1.05)"></div><img src="${thumb}" data-full-src="${image}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc" style="position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block">`
+          ? `<div class="img-bg" style="position:absolute;inset:-4px;background-position:center;background-size:cover;filter:blur(10px) brightness(0.5);transform:scale(1.05)"></div><img src="${transparentPixel}" data-lazy-src="${thumb}" data-lazy-bg-target=".img-bg" data-full-src="${image}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.fullSrc" style="position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block">`
           : escapeHtml(project.emoji)}
       </div>
       <div class="bm-info">
@@ -139,6 +140,10 @@ window.SiteApp.registerPage('home', () => {
       });
       projectContainer.replaceChildren(projectFragment);
       initReveal();
+    }
+
+    if (typeof initLazyMedia === 'function') {
+      initLazyMedia(secondary, { rootMargin: '320px 0px' });
     }
   }
 

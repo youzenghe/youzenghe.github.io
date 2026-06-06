@@ -16,6 +16,7 @@
     "prebuild:dist": "npm run prepare:site",
     "build:dist": "node scripts/build_dist.mjs",
     "check:data-split": "node scripts/checks/check_data_split.mjs",
+    "check:lazy-card-media": "node scripts/checks/check_lazy_card_media.mjs",
     "check:video-background": "node scripts/checks/check_video_background.mjs"
   },
   "devDependencies": {
