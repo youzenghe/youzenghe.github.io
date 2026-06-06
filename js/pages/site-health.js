@@ -7,9 +7,8 @@ window.SiteApp.registerPage('site-health', () => {
   const checks = document.getElementById('health-check-list');
   const metrics = document.getElementById('health-metrics');
   const recommendations = document.getElementById('health-recommendations');
-  const largestAssets = document.getElementById('health-largest-assets');
 
-  if (!statusOrb || !statusLabel || !statusSubtitle || !meta || !checks || !metrics || !recommendations || !largestAssets) return null;
+  if (!statusOrb || !statusLabel || !statusSubtitle || !meta || !checks || !metrics || !recommendations) return null;
 
   function html(text) {
     return escapeHtml(text ?? '');
@@ -47,7 +46,7 @@ window.SiteApp.registerPage('site-health', () => {
   if (!report) {
     statusOrb.dataset.status = 'error';
     statusLabel.textContent = '无报告';
-    statusSubtitle.textContent = '请运行 npm run check:site-health';
+    statusSubtitle.textContent = '请重新生成站点健康报告';
     checks.innerHTML = '<div class="health-list-item">没有读取到巡检数据。</div>';
     return null;
   }
@@ -93,13 +92,6 @@ window.SiteApp.registerPage('site-health', () => {
 
   recommendations.innerHTML = (report.recommendations || []).map((item) => `
     <div class="health-list-item">${html(item)}</div>
-  `).join('');
-
-  largestAssets.innerHTML = (report.metrics.largestAssets || []).slice(0, 5).map((asset) => `
-    <div class="health-list-item">
-      <strong>${html(formatBytes(asset.bytes))}</strong>
-      ${html(asset.path)}
-    </div>
   `).join('');
 
   initReveal();

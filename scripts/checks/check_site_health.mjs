@@ -115,7 +115,7 @@ function dataAssetCheck(data) {
     id: 'data-assets',
     label: '内容资源引用',
     status: missing.length ? 'fail' : 'pass',
-    detail: missing.length ? `缺失 ${missing.slice(0, 6).join(', ')}` : `${refs.length} 个核心内容资源引用可访问`,
+    detail: missing.length ? `${missing.length} 个核心内容资源引用缺失，请在本地检查生成日志` : `${refs.length} 个核心内容资源引用可访问`,
   };
 }
 
@@ -130,11 +130,10 @@ function collectAssetMetrics() {
       };
     });
   const total = files.reduce((sum, file) => sum + file.bytes, 0);
-  const largest = [...files].sort((a, b) => b.bytes - a.bytes).slice(0, 8);
   const oversized = files.filter((file) => file.bytes >= largeAssetLimit);
   const warnings = files.filter((file) => file.bytes >= warningAssetLimit && file.bytes < largeAssetLimit);
 
-  return { files, total, largest, oversized, warnings };
+  return { files, total, oversized, warnings };
 }
 
 function assetWeightCheck(assetMetrics) {
@@ -143,7 +142,7 @@ function assetWeightCheck(assetMetrics) {
       id: 'asset-weight',
       label: '大资源体积',
       status: 'fail',
-      detail: `${assetMetrics.oversized.length} 个资源超过 4MB：${assetMetrics.oversized.slice(0, 4).map((file) => file.path).join(', ')}`,
+      detail: `${assetMetrics.oversized.length} 个资源超过 4MB，请在本地巡检输出中定位具体文件`,
     };
   }
   if (assetMetrics.warnings.length) {
@@ -200,7 +199,6 @@ function buildMetrics(data, assetMetrics) {
     sitemapBytes: fileSize('sitemap.xml'),
     pcVideoCount: bgFiles.filter((file) => /^bg\d+\.webm$/.test(file)).length,
     pcPosterCount: bgFiles.filter((file) => /^bg\d+\.webp$/.test(file)).length,
-    largestAssets: assetMetrics.largest,
   };
 }
 
@@ -228,8 +226,8 @@ function buildRecommendations(reportStatus, assetMetrics) {
   if (assetMetrics.warnings.length || assetMetrics.oversized.length) {
     recommendations.push('持续关注大体积媒体，新增图片或视频优先压缩为 WebP/WebM，并避免首屏同步加载。');
   }
-  recommendations.push('每次大改导航、搜索、背景池或内容生成脚本后，运行 npm run check:site-health。');
-  recommendations.push('发布前保留一次 node scripts/build_dist.mjs 构建验证，防止静态打包遗漏脚本。');
+  recommendations.push('每次大改导航、搜索、背景池或内容生成流程后，重新跑一遍站点健康巡检。');
+  recommendations.push('发布前保留一次静态构建验证，防止打包遗漏脚本或资源。');
   return recommendations;
 }
 

@@ -1,5 +1,5 @@
 window.SITE_HEALTH_REPORT = {
-  "generatedAt": "2026-06-06T23:04:20.940Z",
+  "generatedAt": "2026-06-06T23:14:56.187Z",
   "status": "warning",
   "summary": {
     "pass": 8,
@@ -11,28 +11,28 @@ window.SITE_HEALTH_REPORT = {
       "id": "data-split",
       "label": "数据拆分规则",
       "status": "pass",
-      "durationMs": 101,
+      "durationMs": 93,
       "detail": "data_split_ok legacy=814741 core=41776"
     },
     {
       "id": "video-background",
       "label": "视频背景规则",
       "status": "pass",
-      "durationMs": 53,
+      "durationMs": 50,
       "detail": "video_background_rules_ok"
     },
     {
       "id": "lazy-card-media",
       "label": "卡片媒体懒加载",
       "status": "pass",
-      "durationMs": 45,
+      "durationMs": 54,
       "detail": "lazy_card_media_ok"
     },
     {
       "id": "site-search",
       "label": "站内搜索覆盖",
       "status": "pass",
-      "durationMs": 43,
+      "durationMs": 46,
       "detail": "site_search_ok"
     },
     {
@@ -79,41 +79,7 @@ window.SITE_HEALTH_REPORT = {
     "rssBytes": 21808,
     "sitemapBytes": 4213,
     "pcVideoCount": 120,
-    "pcPosterCount": 120,
-    "largestAssets": [
-      {
-        "path": "assets/audio/bg.mp3",
-        "bytes": 2528175
-      },
-      {
-        "path": "assets/uploads/paste-20260530060511-kaqjhz.png",
-        "bytes": 2381391
-      },
-      {
-        "path": "assets/motion/projects/project-moment-henan.webp",
-        "bytes": 875818
-      },
-      {
-        "path": "assets/bg-pool/pc-video/bg31.webm",
-        "bytes": 648275
-      },
-      {
-        "path": "assets/bg-pool/pc-video/bg66.webm",
-        "bytes": 571851
-      },
-      {
-        "path": "assets/bg-pool/pc-video/bg32.webm",
-        "bytes": 545494
-      },
-      {
-        "path": "assets/motion/projects/project-law-contract.webp",
-        "bytes": 515978
-      },
-      {
-        "path": "assets/bg-pool/pc-video/bg26.webm",
-        "bytes": 514748
-      }
-    ]
+    "pcPosterCount": 120
   },
   "issues": [
     {
@@ -124,7 +90,7 @@ window.SITE_HEALTH_REPORT = {
   ],
   "recommendations": [
     "持续关注大体积媒体，新增图片或视频优先压缩为 WebP/WebM，并避免首屏同步加载。",
-    "每次大改导航、搜索、背景池或内容生成脚本后，运行 npm run check:site-health。",
-    "发布前保留一次 node scripts/build_dist.mjs 构建验证，防止静态打包遗漏脚本。"
+    "每次大改导航、搜索、背景池或内容生成流程后，重新跑一遍站点健康巡检。",
+    "发布前保留一次静态构建验证，防止打包遗漏脚本或资源。"
   ]
 };

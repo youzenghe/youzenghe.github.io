@@ -54,6 +54,18 @@ if (!report.metrics || typeof report.metrics.coreDataBytes !== 'number' || typeo
   errors.push('site health metrics should include coreDataBytes and totalAssetBytes');
 }
 
+if ('largestAssets' in (report.metrics || {})) {
+  errors.push('site health report should not expose largest asset file paths publicly');
+}
+
+if (files.healthPage.includes('health-largest-assets') || files.healthPage.includes('最大资源')) {
+  errors.push('site health page should not render a public largest-assets panel');
+}
+
+if (files.healthJs.includes('largestAssets') || files.healthJs.includes('health-largest-assets')) {
+  errors.push('site health page script should not render largest asset file paths');
+}
+
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
