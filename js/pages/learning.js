@@ -40,6 +40,72 @@ window.SiteApp.registerPage('learning', () => {
     return temp.textContent?.replace(/\s+/g, ' ').trim() || '';
   }
 
+  function makeHeadingSlug(text) {
+    return String(text || '')
+      .trim()
+      .toLowerCase()
+      .replace(/&[a-z0-9#]+;/gi, '')
+      .replace(/[\u3000]/g, ' ')
+      .replace(/([\u4e00-\u9fff])\s+(\d)/g, '$1$2')
+      .replace(/[，。、：:；;！？?（）()【】[\]《》“”"']/g, '')
+      .replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function hashCandidates(hash = location.hash) {
+    const raw = String(hash || '').replace(/^#/, '');
+    if (!raw) return [];
+
+    const candidates = [raw];
+    try {
+      const decoded = decodeURIComponent(raw);
+      if (decoded && decoded !== raw) candidates.push(decoded);
+    } catch (error) {
+      // Keep the raw hash. A malformed hash should not break the detail page.
+    }
+
+    return [...new Set(candidates)];
+  }
+
+  function escapeSelectorIdent(value) {
+    if (window.CSS?.escape) return window.CSS.escape(value);
+    return String(value).replace(/["\\]/g, '\\$&');
+  }
+
+  function findDetailHashTarget(root, hash = location.hash) {
+    const candidates = hashCandidates(hash);
+    for (const candidate of candidates) {
+      const target = root.querySelector(`[data-heading-slug="${escapeSelectorIdent(candidate)}"]`);
+      if (target) return target;
+    }
+
+    for (const candidate of candidates) {
+      const target = document.getElementById(candidate);
+      if (target) return target;
+    }
+
+    return null;
+  }
+
+  function scrollToCurrentHash(root) {
+    if (!location.hash) return;
+
+    const expectedHash = location.hash;
+    const scrollDelays = [0, 80, 240, 600];
+    scrollDelays.forEach((delay) => {
+      const timer = window.setTimeout(() => {
+        if (location.hash !== expectedHash) return;
+        window.requestAnimationFrame(() => {
+          const target = findDetailHashTarget(root, expectedHash);
+          if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        });
+      }, delay);
+      cleanupFns.push(() => window.clearTimeout(timer));
+    });
+  }
+
   function categoryLabel(category) {
     return category === '全部' ? '全部' : categoryLabels[category] || category;
   }
@@ -58,8 +124,12 @@ window.SiteApp.registerPage('learning', () => {
     if (window.SITE_DATA?.learningDetails) return Promise.resolve();
     const existing = document.getElementById('learning-detail-data-script');
     if (existing) {
+      if (existing.dataset.loaded === 'true') return Promise.resolve();
       return new Promise((resolve, reject) => {
-        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('load', () => {
+          existing.dataset.loaded = 'true';
+          resolve();
+        }, { once: true });
         existing.addEventListener('error', reject, { once: true });
       });
     }
@@ -68,7 +138,10 @@ window.SiteApp.registerPage('learning', () => {
       const script = document.createElement('script');
       script.id = 'learning-detail-data-script';
       script.src = resolveVersionedDataUrl('js/data-learning.js');
-      script.onload = resolve;
+      script.onload = () => {
+        script.dataset.loaded = 'true';
+        resolve();
+      };
       script.onerror = reject;
       document.body.appendChild(script);
     });
@@ -338,10 +411,16 @@ window.SiteApp.registerPage('learning', () => {
       return;
     }
 
+    const usedSlugs = new Map();
     toc.innerHTML = `<ul class="learning-toc-list">${headings.map((heading, index) => {
-      heading.id = `learning-heading-${index}`;
+      const baseSlug = makeHeadingSlug(heading.textContent) || `learning-heading-${index}`;
+      const usedCount = usedSlugs.get(baseSlug) || 0;
+      usedSlugs.set(baseSlug, usedCount + 1);
+      const headingId = usedCount ? `${baseSlug}-${usedCount + 1}` : baseSlug;
+      heading.id = headingId;
+      heading.dataset.headingSlug = baseSlug;
       const level = heading.tagName.toLowerCase();
-      return `<li><a class="toc-${level}" href="#${heading.id}">${escapeHtml(heading.textContent || '')}</a></li>`;
+      return `<li><a class="toc-${level}" href="#${encodeURIComponent(baseSlug)}">${escapeHtml(heading.textContent || '')}</a></li>`;
     }).join('')}</ul>`;
 
     toc.scrollTop = 0;
@@ -368,7 +447,7 @@ window.SiteApp.registerPage('learning', () => {
     const onTocClick = (event) => {
       const link = event.target.closest('a[href^="#"]');
       if (!link) return;
-      const heading = document.getElementById(link.getAttribute('href').slice(1));
+      const heading = findDetailHashTarget(root, link.getAttribute('href'));
       if (!heading) return;
       event.preventDefault();
       heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -490,6 +569,7 @@ window.SiteApp.registerPage('learning', () => {
     renderDetailToc(detail);
     wireCodeCopy(detail);
     initReveal();
+    scrollToCurrentHash(detail);
   }
 
   const onPaginationClick = (event) => {

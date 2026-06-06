@@ -1551,7 +1551,12 @@ function runCurrentPageModule() {
   teardownCurrentPageModule();
   const init = PAGE_MODULES.get(getPageKey());
   if (typeof init === 'function') {
-    currentPageCleanup = init() || null;
+    try {
+      currentPageCleanup = init() || null;
+    } catch (error) {
+      currentPageCleanup = null;
+      console.error('[PageModule] Failed to render current page:', getPageKey(), error);
+    }
   }
 }
 
@@ -1756,13 +1761,43 @@ function prefetchPageScripts(doc) {
     });
 }
 
+function hashCandidates(hash) {
+  const raw = String(hash || '').replace(/^#/, '');
+  if (!raw) return [];
+
+  const candidates = [raw];
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded && decoded !== raw) candidates.push(decoded);
+  } catch (error) {
+    // Keep the raw hash. Malformed hashes should never break page navigation.
+  }
+
+  return [...new Set(candidates)];
+}
+
+function findHashTarget(hash) {
+  const candidates = hashCandidates(hash);
+  for (const candidate of candidates) {
+    const byId = document.getElementById(candidate);
+    if (byId) return byId;
+  }
+
+  if (!window.CSS?.escape) return null;
+  for (const candidate of candidates) {
+    const selector = `#${window.CSS.escape(candidate)}`;
+    const bySelector = document.querySelector(selector);
+    if (bySelector) return bySelector;
+  }
+
+  return null;
+}
+
 function scrollToNavigationTarget(hash) {
-  if (hash) {
-    const target = document.getElementById(hash.slice(1)) || document.querySelector(hash);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
+  const target = findHashTarget(hash);
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
   }
 
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -1785,6 +1820,7 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
   document.getElementById('mobile-menu')?.classList.remove('open');
 
   await ensurePageScripts(doc);
+  runCurrentPageModule();
   initSakanaWidget();
   syncLive2DVisibility();
   scrollToNavigationTarget(hash);
@@ -1796,8 +1832,7 @@ async function applyFetchedPage(doc, targetUrl, options = {}) {
 
   pendingPageRunRaf = window.requestAnimationFrame(() => {
     pendingPageRunRaf = 0;
-    runCurrentPageModule();
-    window.requestAnimationFrame(initReveal);
+    initReveal();
   });
 }
 
