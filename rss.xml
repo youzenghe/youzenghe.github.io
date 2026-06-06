@@ -6,7 +6,15 @@
     <atom:link href="https://yzh1019.top/rss.xml" rel="self" type="application/rss+xml" />
     <description>记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 04 Jun 2026 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 06 Jun 2026 00:00:00 +0800</lastBuildDate>
+    <item>
+      <title>学习计划：MySQL 拷打 - 0606</title>
+      <link>https://yzh1019.top/pages/learning.html?id=21</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=21</guid>
+      <pubDate>Sat, 06 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>MySQL 拷打 - 0606 今日主题：第 2 周 MySQL 主线复盘。主线：EXPLAIN -&gt; B+Tree -&gt; 回表/覆盖索引 -&gt; 联合索引 -&gt; 防超卖 -&gt; 锁 -&gt; MVCC 与三大读问题。 标签：主线、MySQL周-特殊、MySQL、面试。</description>
+    </item>
     <item>
       <title>学习计划：MySQL 拷打 - 0604</title>
       <link>https://yzh1019.top/pages/learning.html?id=20</link>

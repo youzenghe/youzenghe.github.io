@@ -1,6 +1,35 @@
 {
   "plans": [
     {
+      "id": 21,
+      "title": "MySQL 拷打 - 0606",
+      "cat": "主线",
+      "catColor": "#5b9dff",
+      "subcategory": "MySQL周-特殊",
+      "date": "2026-06-06",
+      "updatedAt": "2026-06-06",
+      "status": "主线训练",
+      "readTime": 12,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-21.webp",
+      "coverAnimated": false,
+      "excerpt": "MySQL 拷打 - 0606 今日主题：第 2 周 MySQL 主线复盘。主线：EXPLAIN -> B+Tree -> 回表/覆盖索引 -> 联合索引 -> 防超卖 -> 锁 -> MVCC 与三大读问题。",
+      "tags": [
+        "主线",
+        "MySQL周-特殊",
+        "MySQL",
+        "面试",
+        "SQL"
+      ],
+      "highlights": [
+        "1. 今日学习定位",
+        "2. 第一轮：EXPLAIN 与慢 SQL",
+        "第二周 5 分钟口述稿"
+      ],
+      "source": "主线/MySQL周-特殊/MySQL拷打-0606.md",
+      "contentFile": "/content/learning-plans-md/learning-21.md"
+    },
+    {
       "id": 1,
       "title": "Java 后端学习计划（每日待办清单版｜2026-05-07）",
       "cat": "总览",
