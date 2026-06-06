@@ -269,7 +269,12 @@ function dateKeyFromFileName(file) {
   return '';
 }
 
-function newestMarkdown(sourceDir) {
+function dateKeyFromDate(value) {
+  const match = String(value || '').match(/(20\d{2})-(\d{2})-(\d{2})/);
+  return match ? `${match[1]}${match[2]}${match[3]}` : '';
+}
+
+function newestMarkdown(sourceDir, usedSources = new Set(), usedDateKeys = new Set()) {
   if (!fs.existsSync(sourceDir)) throw new Error(`Source directory does not exist: ${sourceDir}`);
   const entries = fs.readdirSync(sourceDir)
     .filter((name) => path.extname(name).toLowerCase() === '.md')
@@ -277,12 +282,13 @@ function newestMarkdown(sourceDir) {
       const file = path.join(sourceDir, name);
       return { file, dateKey: dateKeyFromFileName(file), mtimeMs: fs.statSync(file).mtimeMs };
     })
+    .filter(({ file, dateKey }) => !usedSources.has(sourceLabel(file)) && !(dateKey && usedDateKeys.has(dateKey)))
     .sort((a, b) => {
       if (b.dateKey !== a.dateKey) return b.dateKey.localeCompare(a.dateKey);
       if (b.mtimeMs !== a.mtimeMs) return b.mtimeMs - a.mtimeMs;
       return path.basename(b.file).localeCompare(path.basename(a.file), 'zh-Hans-CN');
     });
-  if (!entries.length) throw new Error(`No Markdown files found in ${sourceDir}`);
+  if (!entries.length) throw new Error(`No unpublished Markdown files found in ${sourceDir}`);
   return entries[0].file;
 }
 
@@ -301,13 +307,25 @@ function insertPlanEntry(jsonPath, entry) {
 }
 
 function makePlan(args) {
-  const sourcePath = path.resolve(args.file || newestMarkdown(args.sourceDir));
+  const plansPath = path.join(ROOT, 'content', 'learning-plans.json');
+  const data = readJson(plansPath);
+  const usedSources = new Set(data.plans.map((plan) => plan.source).filter(Boolean));
+  const usedDateKeys = new Set(data.plans
+    .filter((plan) => plan.cat === args.category && plan.subcategory === args.subcategory)
+    .map((plan) => dateKeyFromDate(plan.date))
+    .filter(Boolean));
+  const sourcePath = path.resolve(args.file || newestMarkdown(args.sourceDir, usedSources, usedDateKeys));
   if (!fs.existsSync(sourcePath)) throw new Error(`Markdown file does not exist: ${sourcePath}`);
+  if (usedSources.has(sourceLabel(sourcePath))) {
+    throw new Error(`Markdown source is already published: ${sourceLabel(sourcePath)}`);
+  }
   const markdown = fs.readFileSync(sourcePath, 'utf8');
   const title = inferTitle(markdown, sourcePath);
   const date = inferDate(sourcePath, title, args.date);
-  const plansPath = path.join(ROOT, 'content', 'learning-plans.json');
-  const data = readJson(plansPath);
+  const sourceDateKey = dateKeyFromDate(date);
+  if (sourceDateKey && usedDateKeys.has(sourceDateKey)) {
+    throw new Error(`Learning note date is already published for ${args.category} / ${args.subcategory}: ${date}`);
+  }
   const ids = data.plans.map((plan) => Number(plan.id)).filter(Number.isFinite);
   const id = Math.max(0, ...ids) + 1;
   const idText = padId(id);
