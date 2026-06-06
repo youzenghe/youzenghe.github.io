@@ -12,10 +12,11 @@
     "build:sitemap": "python scripts/generate_sitemap.py",
     "build:fonts": "python scripts/build_fonts.py",
     "validate:content": "python scripts/validate_content.py",
-    "prepare:site": "npm run optimize:uploads && npm run build:thumbs && npm run validate:content && npm run build:content && npm run check:data-split && npm run build:rss && npm run build:sitemap && npm run build:fonts",
+    "prepare:site": "npm run optimize:uploads && npm run build:thumbs && npm run validate:content && npm run build:content && npm run check:data-split && npm run check:video-background && npm run build:rss && npm run build:sitemap && npm run build:fonts",
     "prebuild:dist": "npm run prepare:site",
     "build:dist": "node scripts/build_dist.mjs",
-    "check:data-split": "node scripts/checks/check_data_split.mjs"
+    "check:data-split": "node scripts/checks/check_data_split.mjs",
+    "check:video-background": "node scripts/checks/check_video_background.mjs"
   },
   "devDependencies": {
     "clean-css": "^5.3.3",
