@@ -1,5 +1,27 @@
 const POSTS = [
   {
+    "id": 8,
+    "title": "最后一次了，以后不再打比赛",
+    "cat": "荣誉证明",
+    "catColor": "#fbbf24",
+    "date": "2026-06-01",
+    "updatedAt": "2026-06-01",
+    "status": "published",
+    "featured": false,
+    "pinned": false,
+    "readTime": 3,
+    "emoji": "🏁",
+    "cover": "../assets/motion/posts/post-last-contest.webp",
+    "coverAnimated": true,
+    "series": "荣誉证明",
+    "excerpt": "这一次主要负责中国大学生计算机设计大赛的统筹规划，带着几个队伍一路走到结果面前，也算给自己的竞赛阶段收个尾。",
+    "tags": [
+      "计算机设计大赛",
+      "竞赛复盘",
+      "队长"
+    ]
+  },
+  {
     "id": 7,
     "title": "我深思熟虑，决定做一款由乔瓮执笔的 GalGame",
     "cat": "趣味生活",
@@ -1263,25 +1285,14 @@ const CHANGELOG = [
 ];
 
 const SITE_DATA = Object.freeze({
-
   posts: POSTS,
-
   projects: PROJECTS,
-
   learningPlans: LEARNING_PLANS,
-
   games: GAMES,
-
   acg: ACG,
-
   moments: MOMENTS,
-
   friendLinks: FRIEND_LINKS,
-
   changelog: CHANGELOG,
-
 });
-
-
 
 window.SITE_DATA = SITE_DATA;

@@ -1,5 +1,5 @@
 window.SITE_HEALTH_REPORT = {
-  "generatedAt": "2026-06-06T22:41:54.327Z",
+  "generatedAt": "2026-06-06T23:04:20.940Z",
   "status": "warning",
   "summary": {
     "pass": 8,
@@ -11,28 +11,28 @@ window.SITE_HEALTH_REPORT = {
       "id": "data-split",
       "label": "数据拆分规则",
       "status": "pass",
-      "durationMs": 68,
-      "detail": "data_split_ok legacy=810840 core=41099"
+      "durationMs": 101,
+      "detail": "data_split_ok legacy=814741 core=41776"
     },
     {
       "id": "video-background",
       "label": "视频背景规则",
       "status": "pass",
-      "durationMs": 41,
+      "durationMs": 53,
       "detail": "video_background_rules_ok"
     },
     {
       "id": "lazy-card-media",
       "label": "卡片媒体懒加载",
       "status": "pass",
-      "durationMs": 34,
+      "durationMs": 45,
       "detail": "lazy_card_media_ok"
     },
     {
       "id": "site-search",
       "label": "站内搜索覆盖",
       "status": "pass",
-      "durationMs": 32,
+      "durationMs": 43,
       "detail": "site_search_ok"
     },
     {
@@ -51,7 +51,7 @@ window.SITE_HEALTH_REPORT = {
       "id": "data-assets",
       "label": "内容资源引用",
       "status": "pass",
-      "detail": "36 个核心内容资源引用可访问"
+      "detail": "37 个核心内容资源引用可访问"
     },
     {
       "id": "asset-weight",
@@ -67,17 +67,17 @@ window.SITE_HEALTH_REPORT = {
     }
   ],
   "metrics": {
-    "posts": 7,
+    "posts": 8,
     "projects": 8,
     "learningPlans": 21,
     "pages": 19,
-    "coreDataBytes": 41099,
-    "legacyDataBytes": 810840,
-    "postDataBytes": 8470,
+    "coreDataBytes": 41776,
+    "legacyDataBytes": 814741,
+    "postDataBytes": 11696,
     "learningDataBytes": 760358,
-    "totalAssetBytes": 48786929,
-    "rssBytes": 21311,
-    "sitemapBytes": 4140,
+    "totalAssetBytes": 48932077,
+    "rssBytes": 21808,
+    "sitemapBytes": 4213,
     "pcVideoCount": 120,
     "pcPosterCount": 120,
     "largestAssets": [
