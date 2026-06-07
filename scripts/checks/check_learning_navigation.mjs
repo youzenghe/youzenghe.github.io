@@ -64,6 +64,14 @@ if (!learningSource.includes('script.dataset.loaded = \'true\'')) {
   errors.push('js/pages/learning.js should mark lazy learning scripts after they load.');
 }
 
+if (!learningSource.includes('scriptPromise(scriptId, scriptSrc, { force: true })')) {
+  errors.push('js/pages/learning.js should force-reload a detail script when the script tag loaded but detail content is missing.');
+}
+
+if (!learningSource.includes('Learning detail content missing for id=')) {
+  errors.push('js/pages/learning.js should fail explicitly when a learning detail script cannot provide content.');
+}
+
 if (!learningSource.includes('function scrollToCurrentHash(')) {
   errors.push('js/pages/learning.js should scroll to URL hashes after async detail content renders.');
 }

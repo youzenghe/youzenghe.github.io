@@ -120,9 +120,10 @@ window.SiteApp.registerPage('learning', () => {
     return { ...plan, ...details };
   }
 
-  function scriptPromise(id, src) {
+  function scriptPromise(id, src, options = {}) {
+    const force = options.force === true;
     const existing = document.getElementById(id);
-    if (existing) {
+    if (existing && !force) {
       if (existing.dataset.loaded === 'true') return Promise.resolve();
       return new Promise((resolve, reject) => {
         existing.addEventListener('load', () => {
@@ -132,9 +133,8 @@ window.SiteApp.registerPage('learning', () => {
         existing.addEventListener('error', reject, { once: true });
       });
     }
-
-    if (typeof loadScript === 'function') {
-      return loadScript(new URL(src, location.href).href);
+    if (existing && force) {
+      existing.remove();
     }
 
     return new Promise((resolve, reject) => {
@@ -168,7 +168,18 @@ window.SiteApp.registerPage('learning', () => {
     return loadLearningDetailManifest().then(() => {
       const detailScript = detailScriptForPlan(plan);
       if (!detailScript) return;
-      return scriptPromise(`learning-detail-script-${plan.id}`, resolveVersionedDataUrl(detailScript));
+      const scriptId = `learning-detail-script-${plan.id}`;
+      const scriptSrc = resolveVersionedDataUrl(detailScript);
+      return scriptPromise(scriptId, scriptSrc)
+        .then(() => {
+          if (window.SITE_DATA?.learningDetails?.[String(plan.id)]?.content) return;
+          return scriptPromise(scriptId, scriptSrc, { force: true });
+        })
+        .then(() => {
+          if (!window.SITE_DATA?.learningDetails?.[String(plan.id)]?.content) {
+            throw new Error(`Learning detail content missing for id=${plan.id}`);
+          }
+        });
     });
   }
 
