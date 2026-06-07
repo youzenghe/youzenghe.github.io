@@ -116,6 +116,19 @@ function runGit(args, options = {}) {
   }).trim();
 }
 
+function runProjectScript(scriptName) {
+  execFileSync('npm', ['run', scriptName], {
+    cwd: ROOT,
+    stdio: 'inherit',
+  });
+}
+
+function gitStatusPaths() {
+  const status = runGit(['status', '--porcelain']);
+  if (!status) return new Set();
+  return new Set(status.split('\n').filter(Boolean).map((line) => line.slice(3)));
+}
+
 function ensureCleanWorktree() {
   const status = runGit(['status', '--porcelain']);
   if (status) {
@@ -366,6 +379,7 @@ function printPlan(plan, args) {
   console.log(`Delete cover source: ${args.keepCoverSource ? 'no' : 'yes'}`);
   console.log(`Commit: ${args.commit ? 'yes' : 'no'}`);
   console.log(`Push: ${args.push ? 'yes' : 'no'}`);
+  console.log(`Prepare site: ${args.commit ? 'yes' : 'no'}`);
 }
 
 function main() {
@@ -379,6 +393,7 @@ function main() {
   printPlan(plan, args);
 
   if (args.dryRun) return;
+  const baselineDirtyPaths = args.allowDirty ? gitStatusPaths() : new Set();
   if (!args.allowDirty) ensureCleanWorktree();
   if (fs.existsSync(plan.mdDest)) throw new Error(`Destination Markdown already exists: ${plan.mdDest}`);
   if (fs.existsSync(plan.coverDest)) throw new Error(`Destination cover already exists: ${plan.coverDest}`);
@@ -392,7 +407,12 @@ function main() {
     .map((file) => normalizeSlashes(path.relative(ROOT, file)));
 
   if (args.commit) {
-    runGit(['add', '--', ...relativePaths], { stdio: 'inherit' });
+    runProjectScript('prepare:site');
+    const changedPaths = [...gitStatusPaths()].filter((file) => !baselineDirtyPaths.has(file));
+    if (!changedPaths.length) {
+      throw new Error('No generated changes found to commit after preparing the site.');
+    }
+    runGit(['add', '--', ...changedPaths], { stdio: 'inherit' });
     runGit(['commit', '-m', `Add ${plan.title} learning note`], { stdio: 'inherit' });
     if (args.push) {
       runGit(['push', 'origin', 'main'], { stdio: 'inherit' });
