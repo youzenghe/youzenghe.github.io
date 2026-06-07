@@ -2,7 +2,7 @@
    次元日记 · Global JavaScript
    ============================================================ */
 
-const DYNAMIC_SCRIPT_RE = /\/js\/(?:pages\/[^/]+|data-(?:posts|projects|learning|site-health))\.js(?:\?.*)?$/i;
+const DYNAMIC_SCRIPT_RE = /\/js\/(?:pages\/[^/]+|learning-details\/learning-\d+|data-(?:posts|projects|learning|site-health))\.js(?:\?.*)?$/i;
 const PAGE_STYLE_ATTR = 'data-page-style';
 const PAGE_HEAD_JSON_LD_ATTR = 'data-page-json-ld';
 const SAKANA_WIDGET_STYLE_ID = 'sakana-widget-style';

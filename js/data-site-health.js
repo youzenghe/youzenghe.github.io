@@ -1,5 +1,5 @@
 window.SITE_HEALTH_REPORT = {
-  "generatedAt": "2026-06-06T23:14:56.187Z",
+  "generatedAt": "2026-06-07T00:18:58.748Z",
   "status": "warning",
   "summary": {
     "pass": 8,
@@ -11,28 +11,28 @@ window.SITE_HEALTH_REPORT = {
       "id": "data-split",
       "label": "数据拆分规则",
       "status": "pass",
-      "durationMs": 93,
-      "detail": "data_split_ok legacy=814741 core=41776"
+      "durationMs": 71,
+      "detail": "data_split_ok legacy=814741 core=41776 learning=2993"
     },
     {
       "id": "video-background",
       "label": "视频背景规则",
       "status": "pass",
-      "durationMs": 50,
+      "durationMs": 44,
       "detail": "video_background_rules_ok"
     },
     {
       "id": "lazy-card-media",
       "label": "卡片媒体懒加载",
       "status": "pass",
-      "durationMs": 54,
+      "durationMs": 40,
       "detail": "lazy_card_media_ok"
     },
     {
       "id": "site-search",
       "label": "站内搜索覆盖",
       "status": "pass",
-      "durationMs": 46,
+      "durationMs": 36,
       "detail": "site_search_ok"
     },
     {
@@ -74,7 +74,7 @@ window.SITE_HEALTH_REPORT = {
     "coreDataBytes": 41776,
     "legacyDataBytes": 814741,
     "postDataBytes": 11696,
-    "learningDataBytes": 760358,
+    "learningDataBytes": 2993,
     "totalAssetBytes": 48932077,
     "rssBytes": 21808,
     "sitemapBytes": 4213,

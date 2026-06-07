@@ -52,8 +52,16 @@ if (/heading\.id\s*=\s*`learning-heading-\$\{index\}`/.test(learningSource)) {
   errors.push('js/pages/learning.js should not overwrite all detail headings with transient numeric ids.');
 }
 
+if (!learningSource.includes('function loadLearningDetail(')) {
+  errors.push('js/pages/learning.js should load a single learning detail bundle for the focused plan.');
+}
+
+if (!learningSource.includes('learning-details/learning-${plan.id}.js')) {
+  errors.push('js/pages/learning.js should fall back to per-id learning detail bundle paths.');
+}
+
 if (!learningSource.includes('script.dataset.loaded = \'true\'')) {
-  errors.push('js/pages/learning.js should mark the lazy learning detail bundle after it loads.');
+  errors.push('js/pages/learning.js should mark lazy learning scripts after they load.');
 }
 
 if (!learningSource.includes('function scrollToCurrentHash(')) {
@@ -68,16 +76,19 @@ const context = {
 vm.createContext(context);
 runDataFile('js/data-learning.js', context);
 
-const details = context.window.SITE_DATA.learningDetails || {};
+const manifest = context.window.SITE_DATA.learningDetailManifest || {};
 const expectedLearningHashes = {
   9: ['五附录高频追问串讲'],
   10: ['十一高频追问串讲'],
 };
 
 for (const [id, expectedHashes] of Object.entries(expectedLearningHashes)) {
+  const detailScript = manifest[id]?.detailScript || `js/learning-details/learning-${id}.js`;
+  runDataFile(detailScript, context);
+  const details = context.window.SITE_DATA.learningDetails || {};
   const content = details[id]?.content || '';
   if (!content) {
-    errors.push(`learning detail ${id} should include rendered markdown content.`);
+    errors.push(`learning detail ${id} should include rendered markdown content in ${detailScript}.`);
     continue;
   }
 

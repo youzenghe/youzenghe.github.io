@@ -120,9 +120,8 @@ window.SiteApp.registerPage('learning', () => {
     return { ...plan, ...details };
   }
 
-  function loadLearningDetails() {
-    if (window.SITE_DATA?.learningDetails) return Promise.resolve();
-    const existing = document.getElementById('learning-detail-data-script');
+  function scriptPromise(id, src) {
+    const existing = document.getElementById(id);
     if (existing) {
       if (existing.dataset.loaded === 'true') return Promise.resolve();
       return new Promise((resolve, reject) => {
@@ -134,16 +133,42 @@ window.SiteApp.registerPage('learning', () => {
       });
     }
 
+    if (typeof loadScript === 'function') {
+      return loadScript(new URL(src, location.href).href);
+    }
+
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.id = 'learning-detail-data-script';
-      script.src = resolveVersionedDataUrl('js/data-learning.js');
+      script.id = id;
+      script.src = src;
       script.onload = () => {
         script.dataset.loaded = 'true';
         resolve();
       };
       script.onerror = reject;
       document.body.appendChild(script);
+    });
+  }
+
+  function loadLearningDetailManifest() {
+    if (window.SITE_DATA?.learningDetailManifest) return Promise.resolve();
+    return scriptPromise('learning-detail-manifest-script', resolveVersionedDataUrl('js/data-learning.js'));
+  }
+
+  function detailScriptForPlan(plan) {
+    if (!plan) return '';
+    const manifest = window.SITE_DATA?.learningDetailManifest?.[String(plan.id)] || {};
+    return manifest.detailScript || `js/learning-details/learning-${plan.id}.js`;
+  }
+
+  function loadLearningDetail(plan) {
+    if (!plan) return Promise.resolve();
+    if (window.SITE_DATA?.learningDetails?.[String(plan.id)]?.content) return Promise.resolve();
+
+    return loadLearningDetailManifest().then(() => {
+      const detailScript = detailScriptForPlan(plan);
+      if (!detailScript) return;
+      return scriptPromise(`learning-detail-script-${plan.id}`, resolveVersionedDataUrl(detailScript));
     });
   }
 
@@ -582,7 +607,7 @@ window.SiteApp.registerPage('learning', () => {
 
   if (focusId) {
     renderDetailLoading();
-    loadLearningDetails()
+    loadLearningDetail(focusedPlanSummary)
       .then(() => {
         renderDetail(detailForPlan(focusedPlanSummary));
       })

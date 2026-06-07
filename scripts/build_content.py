@@ -16,6 +16,7 @@ DATA_CORE_JS = ROOT / "js" / "data-core.js"
 DATA_POSTS_JS = ROOT / "js" / "data-posts.js"
 DATA_PROJECTS_JS = ROOT / "js" / "data-projects.js"
 DATA_LEARNING_JS = ROOT / "js" / "data-learning.js"
+LEARNING_DETAILS_DIR = ROOT / "js" / "learning-details"
 IMAGE_MARKDOWN_RE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>\S+?)(?:\s+"(?P<title>[^"]+)")?\)')
 LINK_MARKDOWN_RE = re.compile(r'(?<!!)\[(?P<label>[^\]]+)\]\((?P<href>[^)\s]+)\)')
 MOTION_POST_COVERS = {
@@ -523,10 +524,10 @@ def write_data_js(
         {key: value for key, value in plan.items() if key not in {"content", "contentFile"}}
         for plan in learning_plans
     ]
-    learning_details = {
+    learning_detail_manifest = {
         str(plan["id"]): {
-            "content": plan.get("content", ""),
             "contentFile": plan.get("contentFile", ""),
+            "detailScript": f"js/learning-details/learning-{plan['id']}.js",
         }
         for plan in learning_plans
     }
@@ -571,10 +572,29 @@ def write_data_js(
         + ";\n\nwindow.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), projectDetails: PROJECT_DETAILS });\n",
         encoding="utf-8",
     )
+    LEARNING_DETAILS_DIR.mkdir(parents=True, exist_ok=True)
+    for old_detail in LEARNING_DETAILS_DIR.glob("learning-*.js"):
+        old_detail.unlink()
+    for plan in learning_plans:
+        detail_payload = {
+            "id": plan["id"],
+            "content": plan.get("content", ""),
+            "contentFile": plan.get("contentFile", ""),
+        }
+        detail_js = (
+            "(function(){\n"
+            "  const detail = "
+            + json.dumps(detail_payload, ensure_ascii=False, indent=2)
+            + ";\n"
+            "  const learningDetails = { ...(window.SITE_DATA?.learningDetails || {}), [String(detail.id)]: detail };\n"
+            "  window.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), learningDetails });\n"
+            "})();\n"
+        )
+        (LEARNING_DETAILS_DIR / f"learning-{plan['id']}.js").write_text(detail_js, encoding="utf-8")
     DATA_LEARNING_JS.write_text(
-        "const LEARNING_DETAILS = "
-        + json.dumps(learning_details, ensure_ascii=False, indent=2)
-        + ";\n\nwindow.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), learningDetails: LEARNING_DETAILS });\n",
+        "const LEARNING_DETAIL_MANIFEST = "
+        + json.dumps(learning_detail_manifest, ensure_ascii=False, indent=2)
+        + ";\n\nwindow.SITE_DATA = Object.freeze({ ...(window.SITE_DATA || {}), learningDetailManifest: LEARNING_DETAIL_MANIFEST });\n",
         encoding="utf-8",
     )
 
