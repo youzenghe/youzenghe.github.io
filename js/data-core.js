@@ -334,6 +334,34 @@ const PROJECTS = [
 
 const LEARNING_PLANS = [
   {
+    "id": 22,
+    "title": "MySQL 拷打 - 薄弱点整理",
+    "cat": "主线",
+    "catColor": "#5b9dff",
+    "subcategory": "MySQL周-特殊",
+    "date": "2026-06-07",
+    "updatedAt": "2026-06-07",
+    "status": "主线训练",
+    "readTime": 12,
+    "emoji": "📚",
+    "cover": "../assets/motion/learning/blue-archive-learning-22.webp",
+    "coverAnimated": false,
+    "excerpt": "MySQL 拷打 - 薄弱点整理 范围：第 3 周 MySQL 主线薄弱点。 主线：隔离级别 -> 三大读问题 -> MVCC -> undo/redo -> 快照读/当前读 -> 锁 -> 防超卖 -> 乐观锁/悲观锁 -> 面试综合链路。",
+    "tags": [
+      "主线",
+      "MySQL周-特殊",
+      "MySQL",
+      "面试",
+      "SQL"
+    ],
+    "highlights": [
+      "MySQL 拷打 - 薄弱点整理",
+      "0. 薄弱点总览",
+      "1. 隔离级别薄弱点"
+    ],
+    "source": "主线/MySQL周-特殊/MySQL拷打-薄弱.md"
+  },
+  {
     "id": 21,
     "title": "MySQL 拷打 - 0606",
     "cat": "主线",
