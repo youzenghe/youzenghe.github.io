@@ -6,7 +6,15 @@
     <atom:link href="https://yzh1019.top/rss.xml" rel="self" type="application/rss+xml" />
     <description>记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sun, 07 Jun 2026 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 09 Jun 2026 00:00:00 +0800</lastBuildDate>
+    <item>
+      <title>学习计划：MySQL 拷打 - 0609</title>
+      <link>https://yzh1019.top/pages/learning.html?id=23</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=23</guid>
+      <pubDate>Tue, 09 Jun 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 主线</category>
+      <description>MySQL 拷打 - 0609 日期：2026-06-09 范围：第 3 周 MySQL 主线复习 标签：主线、MySQL周-特殊、MySQL、面试。</description>
+    </item>
     <item>
       <title>学习计划：MySQL 拷打 - 薄弱点整理</title>
       <link>https://yzh1019.top/pages/learning.html?id=22</link>

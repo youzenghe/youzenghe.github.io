@@ -334,6 +334,34 @@ const PROJECTS = [
 
 const LEARNING_PLANS = [
   {
+    "id": 23,
+    "title": "MySQL 拷打 - 0609",
+    "cat": "主线",
+    "catColor": "#5b9dff",
+    "subcategory": "MySQL周-特殊",
+    "date": "2026-06-09",
+    "updatedAt": "2026-06-09",
+    "status": "主线训练",
+    "readTime": 5,
+    "emoji": "📚",
+    "cover": "../assets/motion/learning/blue-archive-learning-23.webp",
+    "coverAnimated": false,
+    "excerpt": "MySQL 拷打 - 0609 日期：2026-06-09 范围：第 3 周 MySQL 主线复习",
+    "tags": [
+      "主线",
+      "MySQL周-特殊",
+      "MySQL",
+      "面试",
+      "SQL"
+    ],
+    "highlights": [
+      "MySQL 拷打 - 0609",
+      "1. 今日主线",
+      "2. 今日暴露的薄弱点"
+    ],
+    "source": "主线/MySQL周-特殊/MySQL拷打-0609.md"
+  },
+  {
     "id": 22,
     "title": "MySQL 拷打 - 薄弱点整理",
     "cat": "主线",
