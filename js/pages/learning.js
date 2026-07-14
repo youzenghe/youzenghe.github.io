@@ -4,10 +4,11 @@ window.SiteApp.registerPage('learning', () => {
   const plans = Array.isArray(LEARNING_PLANS) ? LEARNING_PLANS : [];
   const categoryLabels = {
     总览: '总览',
-    主线: '📘 主线',
-    八股速通这一块: '⚡ 八股速通',
-    番外: '🌸 番外',
-    绝望拷打之啥也不会: '🔥 专项拷打',
+    主线: '主线',
+    八股速通这一块: '八股速通',
+    番外: '番外',
+    绝望拷打之啥也不会: '专项拷打',
+    面经: '面经',
   };
   const categories = ['全部', ...new Set(plans.map((plan) => plan.cat).filter(Boolean))];
   const params = new URLSearchParams(location.search);
@@ -206,7 +207,7 @@ window.SiteApp.registerPage('learning', () => {
       '@type': 'CollectionPage',
       url: `${absoluteBase}/pages/learning.html`,
       name: '学习计划 · 次元日记',
-      description: '整理 Java 后端学习计划、主线训练、面试八股和专项复盘。',
+      description: '整理 Java 后端学习计划、主线训练、面试八股、企业面经和专项复盘。',
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: plans.map((plan, index) => ({

@@ -1,4 +1,8 @@
 const LEARNING_DETAIL_MANIFEST = {
+  "24": {
+    "contentFile": "/content/learning-plans-md/learning-24.md",
+    "detailScript": "js/learning-details/learning-24.js"
+  },
   "23": {
     "contentFile": "/content/learning-plans-md/learning-23.md",
     "detailScript": "js/learning-details/learning-23.js"

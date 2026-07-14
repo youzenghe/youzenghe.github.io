@@ -6,7 +6,15 @@
     <atom:link href="https://yzh1019.top/rss.xml" rel="self" type="application/rss+xml" />
     <description>记录 Java 后端、AI 应用、项目复盘与 ACG 兴趣的个人技术博客。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 09 Jun 2026 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 14 Jul 2026 00:00:00 +0800</lastBuildDate>
+    <item>
+      <title>学习计划：牧原股份 / 牧原集团 Java 岗位面经汇总</title>
+      <link>https://yzh1019.top/pages/learning.html?id=24</link>
+      <guid>https://yzh1019.top/pages/learning.html?id=24</guid>
+      <pubDate>Tue, 14 Jul 2026 00:00:00 +0800</pubDate>
+      <category>学习计划 / 面经</category>
+      <description>牧原股份 / 牧原集团 Java 岗位面经汇总 应对建议：AI 面基本不刷人，放松即可。问答题提前写好 1 分钟版自我介绍和「为什么选牧原」的答案（见下文 HR 面部分），对着镜头流畅说完；朗读环节吐字清晰、语速平稳；小游戏认真做即可。 应对建议：视频务必完整看完并记 3 个具体细节（如创业故事、智能化养殖场景、员工成长案例），观后感中引用细节才显得真看过。回答模板见下文「HR 面参考答案」。 标签：面经、Java、牧原股份、后端面试。</description>
+    </item>
     <item>
       <title>学习计划：MySQL 拷打 - 0609</title>
       <link>https://yzh1019.top/pages/learning.html?id=23</link>

@@ -184,12 +184,12 @@ collections:
             fields:
               - { label: "ID", name: "id", widget: "number" }
               - { label: "标题", name: "title", widget: "string" }
-              - { label: "分类", name: "cat", widget: "select", options: ["总览", "主线", "八股速通这一块", "番外", "绝望拷打之啥也不会"], default: "主线" }
+              - { label: "分类", name: "cat", widget: "select", options: ["总览", "主线", "八股速通这一块", "番外", "绝望拷打之啥也不会", "面经"], default: "主线" }
               - { label: "分类颜色", name: "catColor", widget: "string", default: "#5b9dff" }
               - { label: "子分类", name: "subcategory", widget: "string", required: false }
               - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
               - { label: "更新日期", name: "updatedAt", widget: "datetime", format: "YYYY-MM-DD", required: false }
-              - { label: "状态", name: "status", widget: "select", options: ["42 天主线", "主线训练", "面试速通", "番外补充", "专项拷打", "学习计划"], default: "主线训练" }
+              - { label: "状态", name: "status", widget: "select", options: ["42 天主线", "主线训练", "面试速通", "面经复盘", "番外补充", "专项拷打", "学习计划"], default: "主线训练" }
               - { label: "阅读时间", name: "readTime", widget: "number", default: 5 }
               - { label: "表情", name: "emoji", widget: "string", default: "📚" }
               - { label: "封面路径", name: "cover", widget: "string", hint: "学习计划页右侧封面。可填 ../assets/motion/learning/blue-archive-learning-01.webp，也可以填 /assets/uploads/文件名或外部图片 URL。" }

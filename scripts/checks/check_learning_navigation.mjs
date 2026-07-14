@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -35,6 +35,34 @@ function collectHeadings(html) {
 
 const mainSource = read('js/main.js');
 const learningSource = read('js/pages/learning.js');
+const adminConfig = read('admin/config.yml');
+const learningPlansData = JSON.parse(read('content/learning-plans.json'));
+
+const categoryLabelsStart = learningSource.indexOf('const categoryLabels = {');
+const categoryLabelsEnd = learningSource.indexOf('};', categoryLabelsStart);
+const categoryLabelsSource = categoryLabelsStart >= 0 && categoryLabelsEnd > categoryLabelsStart
+  ? learningSource.slice(categoryLabelsStart, categoryLabelsEnd)
+  : '';
+
+if (!categoryLabelsSource) {
+  errors.push('js/pages/learning.js should define categoryLabels.');
+} else if (/\p{Extended_Pictographic}/u.test(categoryLabelsSource)) {
+  errors.push('learning category labels should use plain text without decorative emoji.');
+}
+
+if (!adminConfig.includes('options: ["总览", "主线", "八股速通这一块", "番外", "绝望拷打之啥也不会", "面经"]')) {
+  errors.push('admin/config.yml should expose 面经 as a learning category.');
+}
+
+const interviewPlan = learningPlansData.plans.find((plan) => plan.cat === '面经' && /牧原股份/.test(plan.title));
+if (!interviewPlan) {
+  errors.push('content/learning-plans.json should include the 牧原股份 Java 面经 under 面经.');
+} else {
+  const contentFile = String(interviewPlan.contentFile || '').replace(/^\//, '');
+  if (!contentFile.endsWith('.md') || !existsSync(path.join(root, contentFile))) {
+    errors.push('the 牧原股份 Java 面经 should reference an existing Markdown contentFile.');
+  }
+}
 
 if (!mainSource.includes('function findHashTarget(')) {
   errors.push('js/main.js should use a safe hash-target resolver before scrolling.');

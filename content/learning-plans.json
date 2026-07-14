@@ -1,6 +1,34 @@
 {
   "plans": [
     {
+      "id": 24,
+      "title": "牧原股份 / 牧原集团 Java 岗位面经汇总",
+      "cat": "面经",
+      "catColor": "#38bdf8",
+      "subcategory": "Java岗位",
+      "date": "2026-07-14",
+      "updatedAt": "2026-07-14",
+      "status": "面经复盘",
+      "readTime": 20,
+      "emoji": "📚",
+      "cover": "../assets/motion/learning/blue-archive-learning-24.webp",
+      "coverAnimated": false,
+      "excerpt": "牧原股份 / 牧原集团 Java 岗位面经汇总 应对建议：AI 面基本不刷人，放松即可。问答题提前写好 1 分钟版自我介绍和「为什么选牧原」的答案（见下文 HR 面部分），对着镜头流畅说完；朗读环节吐字清晰、语速平稳；小游戏认真做即可。 应对建议：视频务必完整看完并记 3 个具体细节（如创业故事、智能化养殖场景、员工成长案例），观后感中引用细节才显得真看过。回答模板见下文「HR 面参考答案」。",
+      "tags": [
+        "面经",
+        "Java",
+        "牧原股份",
+        "后端面试"
+      ],
+      "highlights": [
+        "牧原股份 / 牧原集团 Java 岗位面经汇总",
+        "AI 面试三个环节",
+        "关于企业文化视频（重点！）"
+      ],
+      "source": "牧原股份Java岗位面经汇总.md",
+      "contentFile": "/content/learning-plans-md/learning-24.md"
+    },
+    {
       "id": 23,
       "title": "MySQL 拷打 - 0609",
       "cat": "主线",
