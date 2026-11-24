@@ -34,6 +34,7 @@ export const GET: APIRoute = ({ params, props }) => {
 		`<!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'self'">
 <meta name="robots" content="noindex, follow"><title>正在进入次元日记</title>
 </head><body>
 <p>此页面的地址已更新，正在跳转。</p>
