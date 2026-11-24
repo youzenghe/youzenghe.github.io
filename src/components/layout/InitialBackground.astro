@@ -1,0 +1,5 @@
+---
+import pools from "../../data/background-pool.json";
+import initialScript from "../../scripts/initial-background.js?raw";
+---
+<script is:inline data-initial-background data-pools={JSON.stringify(pools)} set:html={initialScript} />

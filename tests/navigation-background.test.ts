@@ -160,7 +160,7 @@ test("background component renders a responsive selected image rather than entir
 		"utf8",
 	);
 	assert.match(source, /<picture/);
-	assert.equal((source.match(/<img\s/g) || []).length, 1);
+	assert.equal((source.replace(/<noscript>[\s\S]*?<\/noscript>/g, "").match(/<img\s/g) || []).length, 1);
 	assert.doesNotMatch(source, /\.map\(|<video|<template/);
 	const banner = fs.readFileSync(
 		new URL("../src/components/layout/Banner.astro", import.meta.url),

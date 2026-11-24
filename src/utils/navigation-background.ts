@@ -45,6 +45,15 @@ export class BackgroundRotation {
 		return this.selected;
 	}
 
+	adopt(url: string, device: BackgroundDevice): boolean {
+		if (!normalizeBackgroundPool(this.pools[device]).includes(url)) return false;
+		this.invalidate();
+		this.selected = { url, device };
+		this.history[device] = url;
+		this.apply(url, device);
+		return true;
+	}
+
 	invalidate() {
 		this.revision++;
 		this.abort?.abort();

@@ -4,9 +4,29 @@ interface Props { id?: string; position?: "top" | "center" | "bottom"; eager?: b
 const {id,position="center",eager=true}: Props = Astro.props;
 ---
 <picture class="navigation-background absolute inset-0 block w-full h-full" data-navigation-background aria-hidden="true">
-	<source media="(max-width: 768px)" srcset={pools.mobile[0]} type="image/webp" />
-	<img id={id} src={pools.desktop[0]} alt="" class="w-full h-full object-cover" style={`object-position:${position}`} decoding="async" loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : "low"} />
+	<source media="(max-width: 768px)" type="image/webp" />
+	<img id={id} alt="" class="w-full h-full object-cover" style={`object-position:${position}`} decoding="async" loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : "low"} />
+	<script is:inline>
+		(() => {
+			const picture = document.currentScript.parentElement;
+			const selection = window.__navigationBackground;
+			if (!selection) return;
+			picture.querySelector("source").srcset = selection.url;
+			picture.querySelector("img").src = selection.url;
+			picture.dataset.backgroundUrl = selection.url;
+			picture.dataset.backgroundDevice = selection.device;
+		})();
+	</script>
+	<noscript>
+		<picture class="absolute inset-0 block w-full h-full">
+			<source media="(max-width: 768px)" srcset={pools.mobile[0]} type="image/webp" />
+			<img src={pools.desktop[0]} alt="" class="w-full h-full object-cover" style={`object-position:${position}`} />
+		</picture>
+	</noscript>
 </picture>
+<style>
+	img:not([src]) { visibility: hidden; }
+</style>
 <script>
 	import {initializeNavigationBackground} from "../../scripts/navigation-background";
 	initializeNavigationBackground();

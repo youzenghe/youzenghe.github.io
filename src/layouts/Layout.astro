@@ -5,6 +5,7 @@ import Pio from "@components/features/pio/Pio.astro";
 import ConfigCarrier from "@components/misc/ConfigCarrier.astro";
 import MusicPlayer from "@components/widgets/music-player/MusicPlayer.svelte";
 import { pioConfig, profileConfig, siteConfig } from "@/config";
+import InitialBackground from "../components/layout/InitialBackground.astro";
 
 const BANNER_HEIGHT = 35;
 const BANNER_HEIGHT_EXTEND = 30;
@@ -150,6 +151,7 @@ const bannerOffset =
 			@layer properties, theme, base, components, utilities;
 		</style>
 		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+		<InitialBackground />
 		<Font cssVariable="--font-body" preload />
 		<Font cssVariable="--font-cjk" />
 		<Font cssVariable="--font-jetbrains-mono" />

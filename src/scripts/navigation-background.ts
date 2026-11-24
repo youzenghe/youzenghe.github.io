@@ -34,6 +34,7 @@ export function initializeNavigationBackground() {
 		try { history[device] = sessionStorage.getItem(storageKey(device)) ?? undefined; } catch { /* Storage is optional. */ }
 	}
 	const rotation = new BackgroundRotation(pools,loadBackground,(url,device) => {
+		(window as unknown as { __navigationBackground: { url: string; device: BackgroundDevice } }).__navigationBackground = { url, device };
 		for (const element of document.querySelectorAll<HTMLPictureElement>("[data-navigation-background]")) {
 			const source = element.querySelector("source");
 			const image = element.querySelector("img");
@@ -46,10 +47,13 @@ export function initializeNavigationBackground() {
 		try { sessionStorage.setItem(storageKey(device),url); } catch { /* Storage is optional. */ }
 		window.dispatchEvent(new CustomEvent("navigation-background:change",{detail:{url,device}}));
 	},history);
+	const seed = (window as unknown as { __navigationBackground?: { url: string; device: BackgroundDevice } }).__navigationBackground;
+	if (seed) rotation.adopt(seed.url, seed.device);
 	const media = window.matchMedia("(max-width: 768px)");
 	const device = () => backgroundDevice(media.matches ? 768 : 769);
 	const change = () => { void rotation.rotate(device()); };
 	let active = false;
+	let initialLoad: AbortController | undefined;
 	let boundSwup: typeof window.swup | undefined;
 	const bindSwup = () => {
 		if (!active || !window.swup || boundSwup === window.swup) return;
@@ -71,10 +75,18 @@ export function initializeNavigationBackground() {
 		document.addEventListener("swup:enable",bindSwup);
 		media.addEventListener("change",change);
 		bindSwup();
-		change();
+		if (!rotation.current || rotation.current.device !== device()) change();
+		else {
+			const selection = rotation.current;
+			initialLoad = new AbortController();
+			void loadBackground(selection.url, initialLoad.signal).catch(() => {
+				if (active && rotation.current === selection) change();
+			});
+		}
 	};
 	const stop = () => {
 		active = false;
+		initialLoad?.abort();
 		rotation.invalidate();
 		document.removeEventListener("click",samePageNavigation,true);
 		document.removeEventListener("swup:enable",bindSwup);
