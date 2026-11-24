@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "posts": [
+    {
+      "slug": "shen-ben-wu-xiang",
+      "title": "神本无相——豆包说，它识别不出我的脸",
+      "published": "2024-12-30",
+      "cover": "lookme.webp",
+      "assets": [
+        {
+          "file": "lookme.webp",
+          "sha256": "46bf355172e1bb908787d03a41e0a8ff193a750e3ae387d9c1357ea5f308d5d0",
+          "bytes": 101102
+        },
+        {
+          "file": "doubao-face-result.webp",
+          "sha256": "1fd3adf61a039a00d673d365f86f611370c881ed7d2e496c04aa38b1895b4460",
+          "bytes": 73336
+        }
+      ]
+    },
+    {
+      "slug": "qiaoweng-galgame",
+      "title": "我决定做一款关于乔瓮的 GalGame",
+      "published": "2025-03-02",
+      "cover": "bgcbw.webp",
+      "assets": [
+        {
+          "file": "bgcbw.webp",
+          "sha256": "ca4f9f77e6bd9c9c5386a6c111c7cfe51c0b9430daeb9091ca5ae4791e4659e3",
+          "bytes": 99932
+        },
+        {
+          "file": "galgame-note.png",
+          "sha256": "d05e7b6e8a411d592550065a9fb90158d6efe358feb2f95a9521a0fcd9a8f2a9",
+          "bytes": 2381391
+        }
+      ]
+    },
+    {
+      "slug": "software-copyrights",
+      "title": "软件著作权×2",
+      "published": "2025-06-21",
+      "cover": "miku.webp",
+      "assets": [
+        {
+          "file": "miku.webp",
+          "sha256": "9d8317ffbba44884555a30b4f07ccc1f9aa7b1d18d733c9cd6cb461eeaafae43",
+          "bytes": 102092
+        },
+        {
+          "file": "wenzhi-copyright.jpg",
+          "sha256": "a7daa832097dc9baa45aede5bcd937d1149e509d66d48dab2de6fa1cb9427433",
+          "bytes": 318240
+        },
+        {
+          "file": "poetry-copyright.jpg",
+          "sha256": "516a639e0cf940894f07eabbc47544435c5b92282baa130e2464b63bbb110692",
+          "bytes": 300670
+        }
+      ]
+    },
+    {
+      "slug": "robot-ai-contest",
+      "title": "中国机器人及人工智能大赛",
+      "published": "2025-08-22",
+      "cover": "shiroko.webp",
+      "assets": [
+        {
+          "file": "shiroko.webp",
+          "sha256": "9755e3d056466d4263542577afae7d8f87615be4d60947e4878cd1bf8b2f943e",
+          "bytes": 101688
+        },
+        {
+          "file": "national-first-certificate.webp",
+          "sha256": "7afd1be04a4e123eded815fa5ed8e4de9560e61d7156202604ce5218166810c8",
+          "bytes": 55756
+        }
+      ]
+    },
+    {
+      "slug": "software-adoption",
+      "title": "软件引入证明",
+      "published": "2025-11-10",
+      "cover": "1257649.webp",
+      "assets": [
+        {
+          "file": "1257649.webp",
+          "sha256": "8b5f47ea42a66dcdc2d64831a9cf75278c2770c811a7c05d67a3a4cf534420d7",
+          "bytes": 52828
+        },
+        {
+          "file": "software-adoption-proof.webp",
+          "sha256": "5f4a5e68e2d7a07f1bd489f7589f40316d64b33664f7bc03b8b62d9f77a2a6b5",
+          "bytes": 84880
+        }
+      ]
+    },
+    {
+      "slug": "last-contest",
+      "title": "累死了，以后不打比赛了",
+      "published": "2026-05-27",
+      "cover": "1358198.webp",
+      "assets": [
+        {
+          "file": "1358198.webp",
+          "sha256": "c6fb9c9481e1ce1124c8bdf30381e106f202ab771d0935050fb29f73393e07f3",
+          "bytes": 55586
+        },
+        {
+          "file": "last-contest-certificates.webp",
+          "sha256": "b62464925e57935f419a14f3a4b487d3f1c214c26ba4ae504df519ef0366965e",
+          "bytes": 49152
+        }
+      ]
+    },
+    {
+      "slug": "muyuan-java-interview",
+      "title": "牧原Java面经",
+      "published": "2026-08-03",
+      "cover": "1358196.webp",
+      "assets": [
+        {
+          "file": "1358196.webp",
+          "sha256": "2eef23956ff2c62ba72fc95793fde59f6daf41ef72f416286e85e053eb661578",
+          "bytes": 49962
+        }
+      ]
+    }
+  ]
+}

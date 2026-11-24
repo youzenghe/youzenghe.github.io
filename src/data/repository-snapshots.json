@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"repositories": {
+		"lyravoid/mizuki": {
+			"fullName": "LyraVoid/Mizuki",
+			"observedAt": "2026-11-22T09:52:33Z",
+			"description": "Next-Gen Material Design 3 Blog Theme (Astro Powered)",
+			"language": "Astro",
+			"stars": 1886,
+			"forks": 536,
+			"license": "Apache-2.0",
+			"source": {
+				"url": "https://api.github.com/repos/LyraVoid/Mizuki",
+				"sha256": "7c7565751752c925d1fdf7146cacf717af093fd1dd5eb1d53deb24e52257112f",
+				"kind": "saved-public-repository-metadata"
+			}
+		},
+		"aicorein/astro-blog": {
+			"fullName": "aicorein/astro-blog",
+			"observedAt": "2026-11-22T09:56:57Z",
+			"description": "基于 Astro Mizuki 修改的个人博客",
+			"language": "Astro",
+			"stars": 2,
+			"forks": 0,
+			"license": "Apache-2.0",
+			"source": {
+				"url": "https://api.github.com/repos/aicorein/astro-blog",
+				"sha256": "a114695796e9e09bfa7e1faa67c025c886e59a47554b633a3348e0df7c34ffe0",
+				"kind": "saved-public-repository-metadata"
+			}
+		}
+	}
+}

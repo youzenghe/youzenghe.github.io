@@ -1,0 +1,46 @@
+---
+import type { Game } from "../../../types/game";
+import { resolveGameDestination } from "../../../utils/game-links";
+
+interface Props {game: Game;}
+const {game} = Astro.props;
+const href = resolveGameDestination(game.url);
+const Tag = href ? "a" : "article";
+---
+<Tag
+	id={`game-card-${game.id}`}
+	data-page-toc={game.title}
+	href={href || undefined}
+	target={href ? "_blank" : undefined}
+	rel={href ? "noopener noreferrer" : undefined}
+	class="game-card text-90"
+	class:list={{"game-card-linked": !!href}}
+	data-game-id={game.id}
+>
+	<div class="game-cover">
+		<img src={game.cover} alt={game.title} width={game.width} height={game.height} loading="lazy" decoding="async" />
+	</div>
+	<div class="game-title">
+		<h2>{game.title}</h2>
+	</div>
+</Tag>
+
+<style>
+	.game-card {
+		display:block;
+		min-width:0;
+		overflow:hidden;
+		border:1px solid var(--line-color);
+		border-radius:var(--radius-large);
+		background:var(--card-bg);
+		text-decoration:none;
+		transition:transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease;
+	}
+	.game-cover { aspect-ratio:4/3; overflow:hidden; background:var(--btn-regular-bg); }
+	.game-cover img { display:block; width:100%; height:100%; object-fit:cover; }
+	.game-title { padding:1rem; }
+	h2 { margin:0; font-size:1rem; line-height:1.5; font-weight:700; overflow-wrap:anywhere; }
+	.game-card-linked:hover { transform:translateY(-3px); border-color:var(--primary); box-shadow:0 8px 24px rgb(0 0 0 / 0.08); }
+	.game-card-linked:focus-visible { outline:2px solid var(--primary); outline-offset:4px; }
+	@media (prefers-reduced-motion:reduce) { .game-card { transition:none; } }
+</style>

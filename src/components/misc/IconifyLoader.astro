@@ -1,0 +1,13 @@
+---
+// Backward-compatible local initializer; no external component script is loaded.
+export interface Props {
+	preloadIcons?: string[];
+	timeout?: number;
+	retryCount?: number;
+}
+---
+
+<script>
+	import { loadIconify } from "../../utils/icon-loader";
+	void loadIconify();
+</script>

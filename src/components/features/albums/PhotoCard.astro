@@ -1,0 +1,31 @@
+---
+import type { PhotoCardProps } from "./types";
+
+interface Props extends PhotoCardProps {
+	width?: number;
+	height?: number;
+}
+
+const { src, alt = "", albumId, width, height } = Astro.props as Props;
+---
+
+<div class="gallery-photo-card break-inside-avoid mb-3">
+	<a
+		href={src}
+		data-fancybox={`gallery-${albumId}`}
+		data-src={src}
+		data-type="image"
+		data-caption={alt}
+		class="block rounded-xl overflow-hidden group cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
+	>
+		<img
+			src={src}
+			alt={alt}
+			width={width}
+			height={height}
+			loading="lazy"
+			decoding="async"
+			class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+		/>
+	</a>
+</div>

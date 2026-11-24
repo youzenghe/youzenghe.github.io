@@ -1,0 +1,202 @@
+---
+import { Icon } from "astro-icon/components";
+
+import { navBarConfig, siteConfig } from "../../../config";
+import { LinkPresets } from "../../../constants/link-presets";
+import { LinkPreset, type NavBarLink } from "../../../types/config";
+import { url } from "../../../utils/url-utils";
+import { BLOG_HOME_PATH } from "../../../constants/constants";
+import ThemeSwitch from "../../control/ThemeSwitch.svelte";
+import SettingsPanel from "../../features/settings/SettingsPanel.svelte";
+import MobileTOC from "../../features/toc/MobileTOC.svelte";
+import DropdownMenu from "./DropdownMenu.astro";
+import NavMenuPanel from "./NavMenuPanel.astro";
+import Search from "./Search.svelte";
+
+const className = Astro.props.class;
+
+// 获取导航栏透明模式配置
+const navbarTransparentMode =
+	siteConfig.banner?.navbar?.transparentMode || "semi";
+
+const isHomePage = Astro.url.pathname.replace(/\/$/, "") === BLOG_HOME_PATH.replace(/\/$/, "");
+
+// featurePage URL -> config key mapping
+const featurePageUrlMap: Record<string, string> = {
+	"/anime/": "anime",
+	"/diary/": "diary",
+	"/friends/": "friends",
+	"/projects/": "projects",
+	"/skills/": "skills",
+	"/timeline/": "timeline",
+	"/albums/": "albums",
+};
+
+function isFeaturePageDisabled(url: string): boolean {
+	const key = featurePageUrlMap[url];
+	if (
+		key &&
+		!siteConfig.featurePages[key as keyof typeof siteConfig.featurePages]
+	) {
+		return true;
+	}
+	return false;
+}
+
+function filterLinksByFeaturePages(
+	items: (NavBarLink | LinkPreset)[],
+): NavBarLink[] {
+	return items
+		.map((item: NavBarLink | LinkPreset): NavBarLink | null => {
+			if (typeof item === "number") {
+				const resolved = LinkPresets[item];
+				if (isFeaturePageDisabled(resolved.url)) {
+					return null;
+				}
+				return resolved;
+			}
+			if (isFeaturePageDisabled(item.url)) {
+				return null;
+			}
+			if (item.children) {
+				const filteredChildren = filterLinksByFeaturePages(item.children);
+				if (filteredChildren.length === 0) {
+					return null;
+				}
+				return { ...item, children: filteredChildren };
+			}
+			return item;
+		})
+		.filter((item): item is NavBarLink => item !== null);
+}
+
+const links: NavBarLink[] = filterLinksByFeaturePages(navBarConfig.links);
+
+const rawLogo = siteConfig.navbarTitle?.logo;
+const logoSrc = rawLogo?.match(/^(http|https|\/\/)/)
+	? rawLogo
+	: rawLogo
+		? url(rawLogo)
+		: "";
+
+const rawIcon = siteConfig.navbarTitle?.icon;
+const iconSrc = rawIcon?.match(/^(http|https|\/\/)/)
+	? rawIcon
+	: rawIcon
+		? url(rawIcon)
+		: "";
+
+const isLogoExternal = rawLogo?.match(/^(http|https|\/\/)/);
+const isIconExternal = rawIcon?.match(/^(http|https|\/\/)/);
+const hasLogoPngFallback = rawLogo?.endsWith(".png") && !isLogoExternal;
+const hasIconPngFallback = rawIcon?.endsWith(".png") && !isIconExternal;
+const logoWebpSrc = hasLogoPngFallback
+	? logoSrc.replace(/\.png$/i, ".webp")
+	: logoSrc;
+const iconWebpSrc = hasIconPngFallback
+	? iconSrc.replace(/\.png$/i, ".webp")
+	: iconSrc;
+---
+<div id="navbar" class="z-50 onload-animation group" data-transparent-mode={navbarTransparentMode} data-is-home={isHomePage}>
+    <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation -->
+    <div class:list={[className, "navbar-shell !overflow-visible max-w-[var(--page-width)] h-[4.5rem] mx-auto flex items-center justify-between px-4"]}>
+        <a href={url(BLOG_HOME_PATH)} aria-label={siteConfig.navbarTitle?.text || siteConfig.title} data-text-only={!!siteConfig.navbarTitle && siteConfig.navbarTitle.mode !== "logo" && !iconSrc} class="navbar-brand btn-plain scale-animation rounded-lg h-[2.5rem] md:h-[3.25rem] md:[.enable-banner_&]:h-[2.5rem] md:[.enable-banner_&]:group-[.scrolled]:h-[3.25rem] px-5 font-bold active:scale-95 min-w-0 transition-all duration-300">
+            <div class="flex flex-row items-center text-md">
+				{/* 使用navbarTitle配置或默认配置 */}
+                {siteConfig.navbarTitle ? (
+                    siteConfig.navbarTitle.mode === "logo" ? (
+                        hasLogoPngFallback ? (
+                            <picture>
+                                <source srcset={logoWebpSrc} type="image/webp" />
+                                <img src={logoSrc} alt={siteConfig.navbarTitle.text} class="h-[2.5rem] md:h-[3.25rem] md:[.enable-banner_&]:h-[2.5rem] md:[.enable-banner_&]:group-[.scrolled]:h-[3.25rem] max-w-full object-contain transition-all duration-300" loading="lazy" />
+                            </picture>
+                        ) : (
+                            <img src={logoSrc} alt={siteConfig.navbarTitle.text} class="h-[2.5rem] md:h-[3.25rem] md:[.enable-banner_&]:h-[2.5rem] md:[.enable-banner_&]:group-[.scrolled]:h-[3.25rem] max-w-full object-contain transition-all duration-300" loading="lazy" />
+                        )
+                    ) : (
+                        <>
+                            {iconSrc && (hasIconPngFallback ? (
+                                <picture>
+                                    <source srcset={iconWebpSrc} type="image/webp" />
+                                    <img src={iconSrc} alt="" class="h-[1.75rem] w-[1.75rem] mr-2 object-contain" loading="lazy" />
+                                </picture>
+                            ) : (
+                                <img src={iconSrc} alt="" class="h-[1.75rem] w-[1.75rem] mr-2 object-contain" loading="lazy" />
+                            ))}
+                            <span class="dark:text-white text-black">{siteConfig.navbarTitle.text}</span>
+                        </>
+                    )
+                ) : (
+                    <>
+                        <Icon name="material-symbols:home-pin-outline" class="text-[1.75rem] mr-2" />
+                        <span class="dark:text-white text-black">{siteConfig.title}</span>
+                    </>
+                )}
+            </div>
+        </a>
+        <nav id="navbar-links-container" aria-label="Main navigation" class="hidden lg:flex items-center space-x-1 transition-opacity duration-300">
+            {links.map((l, index) => {
+                return <DropdownMenu link={l} menuId={`desktop-nav-${index}`} />;
+            })}
+        </nav>
+        <div class="navbar-actions flex items-center gap-1 shrink-0">
+            <div id="search-container" class="w-11 h-11 shrink-0">
+                <Search client:only="svelte"></Search>
+            </div>
+            {/* 只在 sidebar 模式下显示移动端 TOC 按钮 */}
+			{siteConfig.toc.enable && siteConfig.toc.mobileTop && <MobileTOC client:only="svelte"></MobileTOC>}
+            <button type="button" aria-label="Display Settings" aria-expanded="false" aria-controls="display-setting" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch">
+                <Icon name="material-symbols:palette-outline" class="text-[1.25rem]"></Icon>
+            </button>
+            <div class="navbar-theme-slot w-11 h-11 shrink-0">
+                <ThemeSwitch client:only="svelte"></ThemeSwitch>
+            </div>
+            <button type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu-panel" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 lg:!hidden" id="nav-menu-switch">
+                <Icon name="material-symbols:unfold-more" class="text-[1.25rem]"></Icon>
+            </button>
+        </div>
+        <NavMenuPanel links={links}></NavMenuPanel>
+        <SettingsPanel client:only="svelte"></SettingsPanel>
+    </div>
+</div>
+
+<script>
+import { initNavbar } from "./navigation-runtime";
+import { createPagefindLoader } from "./search-controller.mjs";
+
+let header: ReturnType<typeof initNavbar> | undefined;
+const initialize = () => {
+    header?.dispose();
+    const navbar = document.getElementById("navbar");
+    header = navbar ? initNavbar(navbar) : undefined;
+};
+initialize();
+window.initSemifullScrollDetection = () => header?.updateScroll();
+
+// The header persists across Swup main-content replacement. Rebind safely if
+// another layout replaces it, and discard open disclosures on navigation.
+let hookedSwup: typeof window.swup;
+const closePanels = () => header?.close();
+const setupSwup = () => {
+    if (hookedSwup || !window.swup?.hooks) return;
+    hookedSwup = window.swup;
+    hookedSwup.hooks.on("content:replace", closePanels);
+    hookedSwup.hooks.on("page:view", initialize);
+};
+setupSwup();
+document.addEventListener("swup:enable", setupSwup);
+window.addEventListener("pagehide", () => header?.dispose());
+window.addEventListener("pageshow", initialize);
+
+const loadPagefind = createPagefindLoader(import.meta.env.BASE_URL, (path) => import(/* @vite-ignore */ path));
+window.loadPagefind = async () => {
+    if (window.pagefind) return;
+    try {
+        window.pagefind = await loadPagefind();
+        document.dispatchEvent(new CustomEvent("pagefindready"));
+    } catch (error) {
+        document.dispatchEvent(new CustomEvent("pagefindloaderror"));
+        throw error;
+    }
+};
+</script>

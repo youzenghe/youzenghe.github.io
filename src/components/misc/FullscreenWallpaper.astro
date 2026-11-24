@@ -1,0 +1,46 @@
+---
+import type { FullscreenWallpaperConfig } from "../../types/config";
+import NavigationBackground from "../layout/NavigationBackground.astro";
+interface Props {config: FullscreenWallpaperConfig; className?: string;}
+const {config,className} = Astro.props;
+const opacity = config.opacity ?? 0.8;
+const blurAmount = config.blur ?? 0;
+---
+<div
+	class:list={["fixed inset-0 w-full h-full overflow-hidden pointer-events-none wallpaper-container",className]}
+	style={`z-index:${config.zIndex ?? -1}; opacity:var(--wallpaper-opacity,${opacity}); filter:blur(var(--wallpaper-blur,${blurAmount}px));`}
+	data-fullscreen-wallpaper
+	data-wallpaper-enabled={config.enable ?? true}
+>
+	<script is:inline define:vars={{ overlaySwitchable: config.overlay?.switchable ?? true }}>
+	(function() {
+		const root = document.documentElement;
+		const wallpaperEnabledVal = document.currentScript.parentElement.dataset.wallpaperEnabled === "true";
+		const mode = wallpaperEnabledVal ? (localStorage.getItem('wallpaperMode') || 'banner') : 'banner';
+
+		if (mode === 'overlay') {
+			const isSw = typeof overlaySwitchable === 'object' ? overlaySwitchable : { opacity: !!overlaySwitchable, blur: !!overlaySwitchable, cardOpacity: !!overlaySwitchable };
+			const overlayOpacity = isSw.opacity ? localStorage.getItem('overlayOpacity') : null;
+			const overlayBlur = isSw.blur ? localStorage.getItem('overlayBlur') : null;
+			const overlayCardOpacity = isSw.cardOpacity ? localStorage.getItem('overlayCardOpacity') : null;
+
+			if (overlayOpacity) {
+				document.currentScript.parentElement.style.setProperty('--wallpaper-opacity', overlayOpacity);
+			}
+			if (overlayBlur) {
+				document.currentScript.parentElement.style.setProperty('--wallpaper-blur', overlayBlur + 'px');
+			}
+			if (overlayCardOpacity) {
+				root.style.setProperty('--card-transparent-opacity', overlayCardOpacity);
+			}
+		}
+
+		if (mode !== 'overlay') {
+			root.style.removeProperty('--card-transparent-opacity');
+			document.currentScript.parentElement.style.display = 'none';
+		}
+	})();
+	</script>
+
+	<NavigationBackground position={config.position} eager={false} />
+</div>

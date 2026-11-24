@@ -1,0 +1,13 @@
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; font-family:"Microsoft YaHei","PingFang SC",sans-serif; color:#2e2930; }
+a { color:inherit; text-decoration:none; }
+button,input { font:inherit; }
+.site-wrapper { width:min(1120px,calc(100% - 2rem)); margin-inline:auto; padding-bottom:3rem; }
+.reveal { opacity:1; }
+.resource-nav { position:sticky; top:0; z-index:130; display:flex; flex-wrap:wrap; gap:1.25rem; padding:1rem 1.5rem; background:rgb(255 255 255 / .92); border-bottom:1px solid rgb(58 48 58 / .1); }
+.resource-nav a { font-weight:600; }
+.resource-nav a:hover { color:#e85d88; }
+.resource-footer { padding:1.5rem; text-align:center; color:rgb(46 41 48 / .6); }
+:focus-visible { outline:2px solid #e85d88; outline-offset:3px; }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }

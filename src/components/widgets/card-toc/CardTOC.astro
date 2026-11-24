@@ -1,0 +1,127 @@
+---
+/**
+ * CardTOC - 卡片式目录组件
+ * 使用 WidgetLayout (竖线+标题封装)
+ * 复用 TOCManager 逻辑
+ */
+
+import "@/styles/toc.css";
+
+import type { MarkdownHeading } from "astro";
+import { siteConfig } from "@/config";
+
+import I18nKey from "../../../i18n/i18nKey";
+import { i18n } from "../../../i18n/translation";
+import WidgetLayout from "../common/WidgetLayout.astro";
+
+interface Props {
+	class?: string;
+	style?: string;
+	headings?: MarkdownHeading[];
+}
+
+const { class: className, style } = Astro.props;
+const useJapaneseBadge = siteConfig.toc.useJapaneseBadge;
+---
+
+<WidgetLayout
+	name={i18n(I18nKey.tableOfContents)}
+	id="card-toc"
+	class={"group " + (className || "")}
+	style={style}
+>
+	<div data-card-toc-root data-japanese-badge={String(useJapaneseBadge)}>
+		<div class="toc-scroll-container">
+			<div class="toc-content" data-card-toc-content></div>
+		</div>
+	</div>
+</WidgetLayout>
+
+<style>
+	.toc-scroll-container {
+		height: min(20rem, calc(100dvh - 10rem));
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		scrollbar-width: thin;
+		scrollbar-color: var(--line-color) transparent;
+	}
+</style>
+
+<script>
+	import { capturePageTOC, isSamePageTOC } from "@/utils/page-toc";
+	import { TOCManager } from "@/utils/tocManager";
+	import { registerTOCPageLifecycle } from "../../features/toc/hooks/useTocLifecycle";
+
+	const managers = new Map<HTMLElement, TOCManager>();
+	let mutationObserver: MutationObserver | undefined;
+	let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+	let disposeLifecycle: (() => void) | undefined;
+	let directorySnapshot: ReturnType<typeof capturePageTOC> = [];
+
+	function cleanupManagers() {
+		mutationObserver?.disconnect();
+		mutationObserver = undefined;
+		clearTimeout(refreshTimer);
+		refreshTimer = undefined;
+		for (const [root, manager] of managers) {
+			manager.cleanup();
+			root.querySelector("[data-card-toc-content]")?.replaceChildren();
+		}
+		managers.clear();
+		directorySnapshot = [];
+	}
+
+	function refreshDirectories() {
+		cleanupManagers();
+		for (const root of document.querySelectorAll<HTMLElement>("[data-card-toc-root]")) {
+			const content = root.querySelector<HTMLElement>("[data-card-toc-content]");
+			if (!content) continue;
+			const manager = new TOCManager({
+				contentElement: content,
+				maxLevel: 3,
+				useJapaneseBadge: root.dataset.japaneseBadge === "true",
+				scrollOffset: 88,
+			});
+			managers.set(root, manager);
+			manager.init();
+		}
+		const main = document.querySelector("#content-wrapper");
+		if (main) {
+			directorySnapshot = capturePageTOC(main as HTMLElement);
+			mutationObserver = new MutationObserver(() => {
+				if (!isSamePageTOC(directorySnapshot, capturePageTOC(main as HTMLElement))) {
+					scheduleRefresh();
+				}
+			});
+			mutationObserver.observe(main, {
+				childList: true,
+				characterData: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ["hidden", "aria-hidden", "inert", "class", "style", "id", "data-page-toc"],
+			});
+		}
+	}
+
+	function scheduleRefresh() {
+		if (!disposeLifecycle) return;
+		clearTimeout(refreshTimer);
+		refreshTimer = setTimeout(refreshDirectories, 100);
+	}
+
+	function start() {
+		if (disposeLifecycle) return;
+		disposeLifecycle = registerTOCPageLifecycle(refreshDirectories, cleanupManagers);
+		document.addEventListener("password:decrypted", scheduleRefresh);
+	}
+
+	function stop() {
+		disposeLifecycle?.();
+		disposeLifecycle = undefined;
+		document.removeEventListener("password:decrypted", scheduleRefresh);
+	}
+
+	window.addEventListener("pagehide", stop);
+	window.addEventListener("pageshow", start);
+	start();
+</script>

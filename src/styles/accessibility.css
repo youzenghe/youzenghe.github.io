@@ -1,0 +1,82 @@
+/* Shared readability and keyboard behavior, independent of page transitions. */
+:root {
+  --focus-ring: var(--primary, #2878c8);
+  --primary-foreground: white;
+}
+
+:root.dark {
+  --primary-foreground: #17202e;
+}
+
+/* A readable link accent is not automatically a white-text button background. */
+:is([class~="bg-(--primary)"], [class~="bg-[var(--primary)]"])[class~="text-white"] {
+  color: var(--primary-foreground);
+}
+
+html {
+  scroll-padding-top: 6rem;
+}
+
+:is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--card-bg, white);
+  color: var(--primary);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+#swup-container,
+#content-wrapper,
+.custom-md {
+  min-width: 0;
+}
+
+.custom-md {
+  overflow-wrap: anywhere;
+  line-height: 1.85;
+}
+
+.custom-md :is(img, video, iframe) {
+  max-width: 100%;
+}
+
+.custom-md :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 6rem;
+}
+
+.custom-md :is(h1, h2, h3, h4, h5, h6):focus-within .anchor {
+  opacity: 1;
+}
+
+.custom-md :is(pre, .expressive-code, .table-wrapper) {
+  max-width: 100%;
+  overflow-wrap: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

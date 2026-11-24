@@ -1,0 +1,42 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import { PageHeader } from "@components/features/page-header";
+import Markdown from "@components/misc/Markdown.astro";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getArchivedProjects } from "@utils/archived-projects";
+import { getCategoryUrl } from "@utils/url-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+
+export async function getStaticPaths() {
+	return (await getArchivedProjects()).map((project) => ({
+		params: { slug: project.id },
+		props: { project },
+	}));
+}
+interface Props {
+	project: CollectionEntry<"archivedProjects">;
+}
+const { project } = Astro.props;
+const { Content } = await render(project);
+const published = formatDateToYYYYMMDD(project.data.published);
+---
+<MainGridLayout
+	title={project.data.title}
+	description={project.data.description}
+	publishedDate={project.data.published}
+	category={project.data.category}
+>
+	<script>
+		import("../../../scripts/right-sidebar-layout.js");
+	</script>
+	<div class="card-base px-6 sm:px-9 py-6 w-full" data-archived-project={project.id}>
+		<PageHeader title={project.data.title} />
+		<div class="flex flex-wrap gap-4 text-sm text-(--content-meta) mb-6">
+			<time datetime={published}>{published}</time>
+			<a href={getCategoryUrl(project.data.category)} class="link">{project.data.category}</a>
+		</div>
+		<Markdown class="mt-2">
+			<Content />
+		</Markdown>
+	</div>
+</MainGridLayout>

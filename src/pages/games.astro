@@ -1,0 +1,32 @@
+---
+import { PageHeader } from "@components/features/page-header";
+import GameCard from "@components/features/games/GameCard.astro";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { games } from "../data/games";
+---
+<MainGridLayout title="游戏">
+	<script>
+		import("../scripts/right-sidebar-layout.js");
+	</script>
+	<div class="card-base px-6 sm:px-9 py-6 w-full">
+		<PageHeader title="游戏" />
+		<div id="games-grid" class="games-grid">
+			{games.map(game => <GameCard game={game} />)}
+		</div>
+		<section id="game-download-notes" class="game-download-notes" aria-labelledby="game-download-heading">
+			<h2 id="game-download-heading" class="text-lg font-bold text-90">下载与解压</h2>
+			<p>这些游戏都可以下载，点击卡片会跳转到对应的网盘。</p>
+			<p>网盘中文件名后缀括号里的内容就是解压密码。没有括号时，可能无需解压密码，也可能是站长忘记了密码。链接中的 <code>pwd</code> 是网盘提取码，与解压密码不同。</p>
+			<p>可以使用“解压缩全能王”或“解压专家”进行解压；如果文件确实加密，仍需要正确密码。</p>
+			<p>部分文件后缀需要使用伪装工具转换，大家可以根据后缀自行搜索对应教程。</p>
+		</section>
+	</div>
+</MainGridLayout>
+
+<style>
+	.games-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); gap:1rem; align-items:start; }
+	.game-download-notes { margin-top:1.75rem; padding-top:1.25rem; border-top:1px solid var(--line-color); color:var(--content-meta); font-size:0.875rem; line-height:1.9; overflow-wrap:anywhere; }
+	.game-download-notes h2 { margin-bottom:0.65rem; }
+	.game-download-notes p + p { margin-top:0.6rem; }
+	.game-download-notes code { padding:0.1rem 0.3rem; border-radius:0.25rem; background:var(--inline-code-bg); color:var(--inline-code-color); }
+</style>

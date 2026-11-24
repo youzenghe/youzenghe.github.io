@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://yzh1019.top/sitemap.xml

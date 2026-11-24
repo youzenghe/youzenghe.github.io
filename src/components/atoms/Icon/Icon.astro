@@ -1,0 +1,32 @@
+---
+import { generateIcon } from "@iconify/svelte/dist/offline-functions";
+import { hasLocalIcon, resolveLocalIcon } from "../../../utils/local-icons";
+import type { IconProps } from "./types";
+
+const {
+	icon,
+	class: className = "",
+	style = "",
+	size = "md",
+	color,
+	fallback = "●",
+} = Astro.props as IconProps;
+const sizeClasses = {
+	xs: "text-xs", sm: "text-sm", md: "text-base", lg: "text-lg", xl: "text-xl", "2xl": "text-2xl",
+};
+const combinedClass = `${sizeClasses[size] || sizeClasses.md} ${className}`.trim();
+const combinedStyle = `${color ? `color: ${color};` : ""}${style}`;
+const rendered = generateIcon({ icon: resolveLocalIcon(icon), width: "1em", height: "1em" });
+const viewBox = rendered?.svg ? String(rendered.attributes.viewBox) : "0 0 24 24";
+const body = rendered?.svg ? rendered.body : "";
+---
+
+<span class={`inline-flex items-center justify-center ${combinedClass}`} style={combinedStyle} data-icon={icon}>
+	{hasLocalIcon(icon) ? (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox={viewBox} width="1em" height="1em" aria-hidden="true" focusable="false" class="icon-content">
+			<Fragment set:html={body} />
+		</svg>
+	) : (
+		<span aria-hidden="true" class="icon-fallback">{fallback}</span>
+	)}
+</span>

@@ -1,0 +1,35 @@
+---
+import { friendContacts, friendContactActions } from "../../../data/friend-contact";
+---
+
+<div class="friend-exchange-contacts">
+	<ul class="contact-list" aria-label="友链联系邮箱">
+		{friendContacts.map(contact => (
+			<li>
+				<a href={contact.href} target="_blank" rel="noopener noreferrer">
+					<span class="contact-label">{contact.label}：</span>
+					<span>{contact.email}</span>
+				</a>
+			</li>
+		))}
+	</ul>
+	<div class="contact-actions" role="group" aria-label="选择联系渠道">
+		{friendContactActions.map((action, index) => (
+			<a class:list={["btn-regular rounded-xl px-4 py-2 font-medium", { "primary-contact": index === 0 }]} href={action.href} target="_blank" rel="noopener noreferrer">
+				{action.label}
+			</a>
+		))}
+	</div>
+</div>
+
+<style>
+	.friend-exchange-contacts { margin-top: 1rem; }
+	.contact-list { display: grid; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+	.contact-list a { display: inline-block; color: var(--content-meta); line-height: 1.7; overflow-wrap: anywhere; }
+	.contact-list a:hover { color: var(--primary); }
+	.contact-label { font-weight: 600; }
+	.contact-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+	.contact-actions a { min-height: 2.75rem; text-decoration: none; }
+	.primary-contact { background: var(--primary); color: var(--primary-foreground, white); }
+	.primary-contact:hover { background: var(--primary); filter: brightness(0.95); }
+</style>

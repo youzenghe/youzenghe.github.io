@@ -1,0 +1,466 @@
+---
+import FloatingButton from "@components/common/FloatingButton.astro";
+import type { MarkdownHeading } from "astro";
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "../../../config";
+import I18nKey from "../../../i18n/i18nKey";
+import { i18n } from "../../../i18n/translation";
+
+interface Props {
+	headings?: MarkdownHeading[];
+}
+
+const { headings: _ = [] } = Astro.props;
+const tocDepth = siteConfig.toc.depth;
+const useJapaneseBadge = siteConfig.toc.useJapaneseBadge;
+---
+
+<div
+	class="floating-toc-wrapper"
+	data-depth={tocDepth}
+	data-japanese-badge={useJapaneseBadge}
+>
+	<FloatingButton
+		id="floating-toc-btn"
+		icon="material-symbols:format-list-bulleted-rounded"
+		ariaLabel={i18n(I18nKey.tableOfContents)}
+		class="hide"
+	/>
+	<div id="floating-toc-panel" class="floating-toc-panel" role="region" aria-labelledby="floating-toc-title" aria-hidden="true" inert>
+		<div class="floating-toc-header">
+			<h3 id="floating-toc-title" class="text-lg font-bold text-(--primary)">
+				{i18n(I18nKey.tableOfContents)}
+			</h3>
+			<button
+				id="floating-toc-close"
+				type="button"
+				aria-label="Close TOC"
+				class="btn-plain rounded-lg h-8 w-8 active:scale-90"
+			>
+				<Icon name="material-symbols:close" class="text-lg" />
+			</button>
+		</div>
+		<div class="floating-toc-panel-content" id="floating-toc-content"></div>
+	</div>
+</div>
+
+<style>
+	.floating-toc-wrapper {
+		position: relative;
+		z-index: 51;
+		pointer-events: auto;
+	}
+
+	.floating-toc-panel {
+		position: absolute;
+		bottom: calc(100% + 0.75rem);
+		right: 0;
+		width: 18rem;
+		max-height: 60vh;
+		background: var(--card-bg);
+		border: 1px solid var(--line-color);
+		border-radius: 1rem;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+		overflow: hidden;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(10px) scale(0.95);
+		transition: all 0.2s ease;
+		pointer-events: none;
+		z-index: 52;
+	}
+
+	.floating-toc-panel.show {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0) scale(1);
+		pointer-events: auto;
+	}
+
+	.floating-toc-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid var(--line-color);
+		background: var(--card-bg);
+	}
+
+	.floating-toc-panel-content {
+		padding: 0.75rem;
+		max-height: calc(60vh - 3rem);
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.floating-toc-panel-content::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	.floating-toc-panel-content::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.floating-toc-panel-content::-webkit-scrollbar-thumb {
+		background: var(--line-color);
+		border-radius: 2px;
+	}
+
+	@media (width < 768px) {
+		.floating-toc-panel {
+			width: 85vw;
+			max-width: 20rem;
+			right: 0;
+		}
+	}
+
+	:global(.floating-toc-item) {
+		display: flex;
+		align-items: center;
+		padding: 0.5rem;
+		color: var(--content-meta);
+		text-decoration: none;
+		font-size: 0.9rem;
+		line-height: 1.5;
+		border-radius: 0.5rem;
+		transition: all 0.2s;
+	}
+
+	:global(.floating-toc-item:hover) {
+		background-color: var(--btn-regular-bg);
+		color: var(--primary);
+	}
+
+	:global(.floating-toc-item.active) {
+		background-color: var(--btn-card-bg-active);
+		color: var(--primary);
+		font-weight: 500;
+	}
+
+	:global(.floating-toc-badge) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.25rem;
+		height: 1.25rem;
+		background: var(--btn-regular-bg);
+		color: var(--primary);
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: bold;
+		margin-right: 0.5rem;
+		flex-shrink: 0;
+	}
+
+	:global(.floating-toc-dot) {
+		width: 0.5rem;
+		height: 0.5rem;
+		background: var(--line-divider);
+		border-radius: 50%;
+		margin-right: 0.75rem;
+		margin-left: 0.375rem;
+		flex-shrink: 0;
+	}
+
+	:global(.floating-toc-dot-small) {
+		width: 0.35rem;
+		height: 0.35rem;
+		background: var(--line-divider);
+		border-radius: 50%;
+		margin-right: 0.75rem;
+		margin-left: 0.45rem;
+		flex-shrink: 0;
+	}
+
+	:global(.floating-toc-item.active .floating-toc-dot),
+	:global(.floating-toc-item.active .floating-toc-dot-small) {
+		background: var(--primary);
+	}
+
+	:global(.floating-toc-text) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	:global(.floating-toc-item:focus-visible),
+	#floating-toc-close:focus-visible {
+		outline: 2px solid var(--primary);
+		outline-offset: -2px;
+	}
+</style>
+
+<script>
+	import { findActiveHeadingIndex } from "./hooks/useTocHighlight";
+	import { throttle, scrollActiveIntoView } from "./hooks/useTocScroll";
+	import { registerTOCPageLifecycle } from "./hooks/useTocLifecycle";
+	import { escapeTOCText, getContentHeadingElements, headingData } from "./utils/heading-dom";
+	import {
+		generateTOCItems,
+		getTOCConfig,
+		scrollToHeading,
+	} from "./utils/toc-utils";
+
+	interface FloatingTOCState {
+		btn: HTMLElement | null;
+		closeBtn: HTMLElement | null;
+		panel: HTMLElement | null;
+		content: HTMLElement | null;
+		wrapper: HTMLElement | null;
+		isOpen: boolean;
+		observer: MutationObserver | null;
+		headings: HTMLElement[];
+	}
+
+	class FloatingTOC {
+		state: FloatingTOCState;
+		navbarOffset = 80;
+		handleScroll = throttle(() => this.updateActiveHeading(), 50);
+		handleButtonClick = (event: Event) => { event.stopPropagation(); this.toggle(); };
+		handleCloseClick = () => this.close(true);
+		handleOutsideClick = (event: MouseEvent) => {
+			if (this.state.isOpen && !this.state.wrapper?.contains(event.target as Node)) this.close();
+		};
+		handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape" && this.state.isOpen) {
+				event.preventDefault();
+				this.close(true);
+			}
+		};
+		handleContentClick = (event: Event) => {
+			const link = (event.target as Element).closest("a");
+			if (!(link instanceof HTMLAnchorElement)) return;
+			event.preventDefault();
+			try {
+				const id = decodeURIComponent(link.getAttribute("href")?.slice(1) || "");
+				if (id) { scrollToHeading(id, this.navbarOffset); this.close(); }
+			} catch { /* Ignore malformed external fragments. */ }
+		};
+
+		constructor() {
+			this.state = {
+				btn: document.getElementById("floating-toc-btn"),
+				closeBtn: document.getElementById("floating-toc-close"),
+				panel: document.getElementById("floating-toc-panel"),
+				content: document.getElementById("floating-toc-content"),
+				wrapper: document.querySelector(".floating-toc-wrapper"),
+				isOpen: false,
+				observer: null,
+				headings: [],
+			};
+			this.init();
+		}
+
+		init() {
+			window.addEventListener("scroll", this.handleScroll, { passive: true });
+			window.addEventListener("resize", this.handleScroll, { passive: true });
+			document.addEventListener("click", this.handleOutsideClick);
+			document.addEventListener("keydown", this.handleKeyDown);
+
+			this.bindEvents();
+			this.generateTOC();
+			this.observeContent();
+			this.close();
+		}
+
+		observeContent() {
+			const contentWrapper = document.getElementById("post-container");
+			if (contentWrapper) {
+				this.state.observer = new MutationObserver(() => {
+					this.generateTOC();
+				});
+				this.state.observer.observe(contentWrapper, {
+					childList: true,
+					subtree: true,
+				});
+			}
+		}
+
+		updateActiveHeading() {
+			const { content, headings } = this.state;
+			if (!content || headings.length === 0) return;
+
+			const activeIndex = findActiveHeadingIndex(
+				headings,
+				window.scrollY,
+				150,
+			);
+			const links = Array.from(
+				content.querySelectorAll(".floating-toc-item"),
+			) as HTMLAnchorElement[];
+
+			links.forEach((link, index) => {
+				if (index === activeIndex) {
+					link.classList.add("active");
+					if (this.state.isOpen) {
+						const panelRect = content.getBoundingClientRect();
+						const linkRect = link.getBoundingClientRect();
+						if (
+							linkRect.top < panelRect.top ||
+							linkRect.bottom > panelRect.bottom
+						) {
+							scrollActiveIntoView(content, [link], content.clientHeight);
+						}
+					}
+				} else {
+					link.classList.remove("active");
+				}
+			});
+		}
+
+		generateTOC() {
+			const container = document.getElementById("post-container");
+
+			if (!container) {
+				this.clearTOC();
+				return;
+			}
+
+			const allHeadings = getContentHeadingElements("#post-container");
+
+			if (allHeadings.length === 0) {
+				this.clearTOC();
+				return;
+			}
+
+			const headings = Array.from(allHeadings) as HTMLElement[];
+			const config = getTOCConfig();
+			const tocItems = generateTOCItems(
+				headings.map(headingData),
+				config,
+			);
+			if (tocItems.length === 0) {
+				this.clearTOC();
+				return;
+			}
+
+			this.state.headings = tocItems.map(
+				(item) => document.getElementById(item.id)!,
+			);
+
+			const html = tocItems
+				.map((item) => {
+					const indent = 0.5 + item.depth;
+					const badge =
+						item.depth === 0
+							? `<span class="floating-toc-badge">${item.badge || ""}</span>`
+							: item.depth === 1
+								? '<span class="floating-toc-dot"></span>'
+								: '<span class="floating-toc-dot-small"></span>';
+
+					return `<a href="#${encodeURIComponent(item.id)}" class="floating-toc-item" style="padding-left: ${indent}rem" data-level="${item.depth}">${badge}<span class="floating-toc-text">${escapeTOCText(item.text)}</span></a>`;
+				})
+				.join("");
+
+			if (this.state.content) {
+				this.state.content.innerHTML = html;
+			}
+			this.setAvailability(true);
+			this.updateActiveHeading();
+		}
+
+		setAvailability(available: boolean) {
+			const { wrapper, btn } = this.state;
+			wrapper?.classList.toggle("active-toc", available);
+			wrapper?.classList.toggle("no-toc", !available);
+			btn?.classList.toggle("hide", !available);
+			if (btn) {
+				if (available) btn.removeAttribute("disabled");
+				else btn.setAttribute("disabled", "");
+				btn.inert = !available;
+				btn.setAttribute("aria-hidden", String(!available));
+			}
+		}
+
+		clearTOC() {
+			this.close();
+			this.state.headings = [];
+			if (this.state.content) this.state.content.innerHTML = "";
+			this.setAvailability(false);
+		}
+
+		bindEvents() {
+			this.state.btn?.addEventListener("click", this.handleButtonClick);
+			this.state.closeBtn?.addEventListener("click", this.handleCloseClick);
+			this.state.content?.addEventListener("click", this.handleContentClick);
+		}
+
+		unbindEvents() {
+			this.state.btn?.removeEventListener("click", this.handleButtonClick);
+			this.state.closeBtn?.removeEventListener("click", this.handleCloseClick);
+			this.state.content?.removeEventListener("click", this.handleContentClick);
+		}
+
+		toggle() {
+			this.state.isOpen ? this.close() : this.open();
+		}
+
+		open() {
+			if (!this.state.headings.length || this.state.btn?.classList.contains("hide")) return;
+			this.state.isOpen = true;
+			this.state.panel?.classList.add("show");
+			this.state.btn?.classList.add("active");
+			this.state.wrapper?.classList.add("active");
+			this.state.btn?.setAttribute("aria-expanded", "true");
+			if (this.state.panel) {
+				this.state.panel.inert = false;
+				this.state.panel.setAttribute("aria-hidden", "false");
+			}
+			this.state.content?.querySelector<HTMLElement>("a")?.focus();
+		}
+
+		close(restoreFocus = false) {
+			this.state.isOpen = false;
+			this.state.panel?.classList.remove("show");
+			this.state.btn?.classList.remove("active");
+			this.state.wrapper?.classList.remove("active");
+			this.state.btn?.setAttribute("aria-expanded", "false");
+			if (this.state.panel) {
+				this.state.panel.inert = true;
+				this.state.panel.setAttribute("aria-hidden", "true");
+			}
+			if (restoreFocus) this.state.btn?.focus();
+		}
+
+		cleanupPage() {
+			this.state.observer?.disconnect();
+			this.state.observer = null;
+			this.clearTOC();
+		}
+
+		reinit() {
+			if (this.state.observer) {
+				this.state.observer.disconnect();
+			}
+			this.close();
+			this.unbindEvents();
+			this.state.btn = document.getElementById("floating-toc-btn");
+			this.state.closeBtn = document.getElementById("floating-toc-close");
+			this.state.panel = document.getElementById("floating-toc-panel");
+			this.state.content = document.getElementById(
+				"floating-toc-content",
+			);
+			this.state.wrapper = document.querySelector(
+				".floating-toc-wrapper",
+			);
+			this.bindEvents();
+			this.generateTOC();
+			this.observeContent();
+		}
+	}
+
+	let floatingTOCInstance: FloatingTOC | null = null;
+	window.toggleFloatingTOC = () => floatingTOCInstance?.toggle();
+
+	function initFloatingTOC() {
+		if (floatingTOCInstance) {
+			floatingTOCInstance.reinit();
+		} else {
+			floatingTOCInstance = new FloatingTOC();
+		}
+	}
+
+	document.addEventListener("DOMContentLoaded", initFloatingTOC);
+	registerTOCPageLifecycle(initFloatingTOC, () => floatingTOCInstance?.cleanupPage());
+	if (document.readyState !== "loading") initFloatingTOC();
+</script>

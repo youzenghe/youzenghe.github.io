@@ -1,0 +1,110 @@
+---
+import { Icon } from "astro-icon/components";
+import "../control/floating-control-sizes.css";
+
+interface Props {
+	id: string;
+	icon: string;
+	ariaLabel?: string;
+	onclick?: string;
+	href?: string;
+	class?: string;
+}
+
+const { id, icon, ariaLabel, onclick, href, class: className = "" } = Astro.props;
+const Tag = href ? "a" : "button";
+const isHidden = className.split(/\s+/).includes("hide");
+---
+
+<Tag
+	id={id}
+	type={href ? undefined : "button"}
+	href={href}
+	aria-label={ariaLabel}
+	aria-hidden={isHidden ? "true" : "false"}
+	inert={isHidden}
+	class:list={[
+		"floating-btn",
+		className,
+		"btn-card flex items-center justify-center overflow-hidden transition",
+	]}
+	onclick={onclick}
+>
+	<Icon name={icon} class="mx-auto" aria-hidden="true" />
+</Tag>
+
+<style lang="stylus">
+.floating-btn
+	color: var(--primary)
+	font-size: 1.5rem
+	font-weight: bold
+	width: var(--fab-button-size, 3rem)
+	height: var(--fab-button-size, 3rem)
+	box-sizing: border-box
+	opacity: 1
+	cursor: pointer
+	pointer-events: auto
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+	border-radius: var(--fab-button-radius, 1rem)
+	border: 1px solid rgba(148, 163, 184, 0.45)
+	flex-shrink: 0
+	overflow: hidden
+	text-decoration: none
+
+	:global(svg)
+		font-size: var(--fab-icon-size, 1.6rem)
+		opacity: 1
+		transition: opacity 0.2s ease 0.1s
+
+	&.hide
+		visibility: hidden
+		transform: scale(0.5)
+		opacity: 0
+		pointer-events: none
+		height: 0 !important
+		width: 0 !important
+		margin: 0 !important
+		border-width: 0 !important
+		padding: 0 !important
+
+		:global(svg)
+			opacity: 0
+			transition: opacity 0.1s ease
+
+	&:active
+		transform: scale(0.9)
+
+	&:hover
+		color: var(--primary)
+		box-shadow: var(--shadow-button)
+
+	&.active
+		background: var(--btn-card-bg-active)
+
+	&:focus-visible
+		outline: 2px solid var(--primary)
+		outline-offset: 3px
+
+:global(.dark) .floating-btn
+	border: 1px solid rgba(255, 255, 255, 0.15)
+	color: var(--primary, #60a5fa)
+
+	&:hover
+		color: var(--primary)
+		box-shadow: var(--shadow-button-dark)
+
+.floating-btn
+	min-width: 0
+	min-height: 0
+	padding: 0.25rem
+
+	&.hide
+		padding: 0
+
+@media (prefers-reduced-motion: reduce)
+	.floating-btn
+		transition: none
+
+		:global(svg)
+			transition: none
+</style>

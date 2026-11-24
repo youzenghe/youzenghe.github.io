@@ -1,0 +1,21 @@
+:root {
+	--fab-button-size: 3rem;
+	--fab-button-radius: 1rem;
+	--fab-icon-size: 1.6rem;
+}
+
+@media (width <= 768px) {
+	:root {
+		--fab-button-size: 2.75rem;
+		--fab-button-radius: 0.75rem;
+		--fab-icon-size: 1.4rem;
+	}
+}
+
+@media (width <= 480px) {
+	:root {
+		--fab-button-size: 2.5rem;
+		--fab-button-radius: 0.5rem;
+		--fab-icon-size: 1.2rem;
+	}
+}

@@ -1,0 +1,13 @@
+---
+import pools from "../../data/background-pool.json";
+interface Props { id?: string; position?: "top" | "center" | "bottom"; eager?: boolean; }
+const {id,position="center",eager=true}: Props = Astro.props;
+---
+<picture class="navigation-background absolute inset-0 block w-full h-full" data-navigation-background aria-hidden="true">
+	<source media="(max-width: 768px)" srcset={pools.mobile[0]} type="image/webp" />
+	<img id={id} src={pools.desktop[0]} alt="" class="w-full h-full object-cover" style={`object-position:${position}`} decoding="async" loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : "low"} />
+</picture>
+<script>
+	import {initializeNavigationBackground} from "../../scripts/navigation-background";
+	initializeNavigationBackground();
+</script>
