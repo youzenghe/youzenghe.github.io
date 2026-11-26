@@ -52,7 +52,7 @@ test("site information keeps theme attribution and links only the theme and owne
 		/此外，本站几乎所有内容都在 \[GitHub\]\(https:\/\/github\.com\/youzenghe\/youzenghe\.github\.io\) 开源/,
 	);
 	assert.deepEqual(
-		[...about.matchAll(/::github\{repo="([^"]+)"\}/g)].map((match) => match[1]),
+		[...about.matchAll(/::github\{repo="([^"]+)"(?: compact="true")?\}/g)].map((match) => match[1]),
 		["LyraVoid/Mizuki", ownerRepo],
 	);
 	assert.equal(about.trim().split("\n").at(-1), "欢迎前来提出建议、指出错误。");

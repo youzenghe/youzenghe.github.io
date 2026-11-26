@@ -12,7 +12,7 @@
 
 本站基于 Mizuki 主题修改。它是一款非常优秀的主题。如果正好也需要一个高颜值的个人博客，可以去看看 [Mizuki](https://github.com/LyraVoid/Mizuki)：
 
-::github{repo="LyraVoid/Mizuki"}
+::github{repo="LyraVoid/Mizuki" compact="true"}
 
 此外，本站几乎所有内容都在 [GitHub](https://github.com/youzenghe/youzenghe.github.io) 开源：
 

@@ -45,6 +45,26 @@ test("repository matching is case-insensitive and preserves recorded zero counts
 	assert.match(text(card), /基于 Astro Mizuki/);
 });
 
+test("compact repository cards preserve the link and title bar without snapshot details", () => {
+	const card = GithubCardComponent({ repo: "LyraVoid/Mizuki", compact: "true" }, []);
+	assert.equal(card.tagName, "a");
+	assert.equal(card.properties.href, "https://github.com/LyraVoid/Mizuki");
+	assert.equal(text(byClass(card, "gc-user")), "LyraVoid");
+	assert.equal(text(byClass(card, "gc-repo")), "Mizuki");
+	assert.ok(byClass(card, "gc-avatar"));
+	assert.ok(byClass(card, "github-logo"));
+	assert.equal(card.children.length, 1);
+	for (const name of ["gc-description", "gc-infobar", "gc-stars", "gc-forks", "gc-license", "gc-language", "gc-snapshot"]) {
+		assert.equal(byClass(card, name), undefined, name);
+	}
+});
+
+test("the about page uses compact rendering only for the theme card", () => {
+	const source = fs.readFileSync(new URL("../src/content/spec/about.md", import.meta.url), "utf8");
+	assert.match(source, /::github\{repo="LyraVoid\/Mizuki" compact="true"\}/);
+	assert.match(source, /::github\{repo="youzenghe\/youzenghe\.github\.io"\}/);
+});
+
 test("unknown repositories do not fabricate zero statistics", () => {
 	const card = GithubCardComponent({ repo: "someone/project" }, []);
 	assert.equal(card.properties.href, "https://github.com/someone/project");

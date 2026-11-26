@@ -34,7 +34,8 @@ export function GithubCardComponent(properties, children) {
 			'Invalid repository. Use "owner/repo".',
 		);
 	}
-	const snapshot = Object.hasOwn(snapshots.repositories, repo.toLowerCase())
+	const compact = properties?.compact === "true";
+	const snapshot = !compact && Object.hasOwn(snapshots.repositories, repo.toLowerCase())
 		? snapshots.repositories[repo.toLowerCase()]
 		: null;
 	const displayRepo = snapshot?.fullName || repo;
