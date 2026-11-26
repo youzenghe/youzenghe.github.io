@@ -12,7 +12,7 @@
 node scripts/preview-static.mjs
 ```
 
-打开 <http://localhost:4322/>。Windows 也可双击 `Start-Preview.cmd`。预览不需要安装项目依赖，不运行内容同步、发布或第三方数据更新。服务器默认仅监听本机，按 Ctrl+C 停止。
+打开 <http://localhost:4322/> 查看「小识书桌」，博客位于 <http://localhost:4322/blog/>。Windows 也可双击 `Start-Preview.cmd`。预览不需要安装项目依赖，不运行内容同步、发布或第三方数据更新。服务器默认仅监听本机，按 Ctrl+C 停止。
 
 ## 开发与重新构建
 
