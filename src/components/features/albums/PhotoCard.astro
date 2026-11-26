@@ -12,6 +12,7 @@ const { src, alt = "", albumId, width, height } = Astro.props as Props;
 <div class="gallery-photo-card break-inside-avoid mb-3">
 	<a
 		href={src}
+		data-no-swup
 		data-fancybox={`gallery-${albumId}`}
 		data-src={src}
 		data-type="image"

@@ -43,6 +43,7 @@ test('blog shell navigation and home layout use the shared blog entry path',()=>
 });
 test('blog pagination links do not return to the standalone paper homepage',()=>{
   const source=read('src/components/control/Pagination.astro');
-  assert.match(source,/return BLOG_HOME_PATH/);
-  assert.match(source,/BLOG_HOME_PATH.*\$\{p\}/);
+  assert.match(source,/basePath = BLOG_HOME_PATH/);
+  assert.match(source,/return basePath/);
+  assert.match(source,/basePath.*\$\{p\}/);
 });

@@ -15,7 +15,7 @@ export function isIndexablePage(page) {
 	if (url.search || url.hash) return false;
 	return (
 		publicPages.has(url.pathname) ||
-		/^\/blog\/(?:[2-9]|[1-9]\d+)\/$/.test(url.pathname) ||
+		/^\/(?:blog|albums)\/(?:[2-9]|[1-9]\d+)\/$/.test(url.pathname) ||
 		/^\/posts\/[^/]+\/$/.test(url.pathname) ||
 		/^\/archive\/projects\/[^/]+\/$/.test(url.pathname)
 	);

@@ -108,7 +108,7 @@ test("replacement assets do not generate intermediate album routes", async () =>
 });
 
 test("albums index renders photos directly without cards or category selectors", async () => {
-	const source = await readFile(new URL("../src/pages/albums.astro", import.meta.url), "utf8");
+	const source = await readFile(new URL("../src/pages/albums/[...page].astro", import.meta.url), "utf8");
 	assert.match(source, /await scanGalleryPhotos\(\)/);
 	assert.match(source, /photos\.map\(\(photo\) =>/);
 	assert.match(source, /<PhotoCard\b/);
@@ -129,6 +129,7 @@ test("photo card markup retains accessible grouped lightbox links and lazy sized
 	assert.match(source, /data-fancybox=\{`gallery-\$\{albumId\}`\}/);
 	assert.match(source, /data-src=\{src\}/);
 	assert.match(source, /data-type="image"/);
+	assert.match(source, /data-no-swup/, "image previews must not trigger page navigation");
 	assert.match(source, /data-caption=\{alt\}/);
 	assert.match(source, /<img\s+src=\{src\}/);
 	assert.match(source, /alt=\{alt\}/);
@@ -149,7 +150,7 @@ test("photo cards remain usable for legacy callers without dimensions", async ()
 });
 
 test("gallery styling preserves full-width mobile photos and wider masonry layouts", async () => {
-	const source = await readFile(new URL("../src/pages/albums.astro", import.meta.url), "utf8");
+	const source = await readFile(new URL("../src/pages/albums/[...page].astro", import.meta.url), "utf8");
 	assert.match(source, /#albums-grid\s*\{\s*column-width: auto;\s*column-count: 1;/);
 	assert.match(source, /@media \(width >= 640px\)\s*\{\s*#albums-grid\s*\{\s*column-count: 2;/);
 	assert.match(source, /@media \(width >= 1024px\)\s*\{\s*#main-grid\[data-layout-mode="grid"\] #albums-grid\s*\{\s*column-count: 3;/);

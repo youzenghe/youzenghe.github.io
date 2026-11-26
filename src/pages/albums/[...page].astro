@@ -1,19 +1,35 @@
 ---
 import { PhotoCard } from "@components/features/albums";
+import Pagination from "@components/control/Pagination.astro";
 import { PageHeader } from "@components/features/page-header";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { Icon } from "astro-icon/components";
+import type { GetStaticPaths, Page } from "astro";
 
-import { siteConfig } from "../config";
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
-import { scanGalleryPhotos } from "../utils/album-scanner";
+import { siteConfig } from "../../config";
+import { ALBUM_PAGE_SIZE } from "../../constants/constants";
+import I18nKey from "../../i18n/i18nKey";
+import { i18n } from "../../i18n/translation";
+import type { Photo } from "../../types/album";
+import { scanGalleryPhotos } from "../../utils/album-scanner";
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const photos = siteConfig.featurePages.albums
+		? await scanGalleryPhotos()
+		: [];
+	return paginate(photos, { pageSize: ALBUM_PAGE_SIZE });
+}) satisfies GetStaticPaths;
+
+interface Props {
+	page: Page<Photo>;
+}
 
 if (!siteConfig.featurePages.albums) {
 	return Astro.redirect("/404.html");
 }
 
-const photos = await scanGalleryPhotos();
+const { page } = Astro.props;
+const photos = page.data;
 
 const title = i18n(I18nKey.albums);
 const subtitle = i18n(I18nKey.albumsSubtitle);
@@ -21,7 +37,7 @@ const subtitle = i18n(I18nKey.albumsSubtitle);
 
 <MainGridLayout title={title} description={subtitle}>
 	<script>
-		import("../scripts/right-sidebar-layout.js");
+		import("../../scripts/right-sidebar-layout.js");
 	</script>
 
 	<div
@@ -60,6 +76,11 @@ const subtitle = i18n(I18nKey.albumsSubtitle);
 			}
 		</div>
 	</div>
+	<Pagination
+		class="mx-auto mt-4 onload-animation"
+		page={page}
+		basePath="/albums/"
+	/>
 </MainGridLayout>
 
 <style is:global>

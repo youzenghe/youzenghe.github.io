@@ -1,4 +1,5 @@
-export const PAGE_SIZE = 8;
+export const PAGE_SIZE = 5;
+export const ALBUM_PAGE_SIZE = 10;
 export const BLOG_HOME_PATH = "/blog/";
 
 export const LIGHT_MODE = "light",
