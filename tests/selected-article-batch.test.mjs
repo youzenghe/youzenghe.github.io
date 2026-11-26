@@ -6,7 +6,7 @@ const root = new URL("../", import.meta.url);
 const selected = [
 	[
 		"shen-ben-wu-xiang",
-		"神本无相——豆包说，它识别不出我的脸",
+		"神本无相",
 		"2024-12-30",
 		"lookme.webp",
 	],
